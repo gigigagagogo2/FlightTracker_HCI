@@ -12,7 +12,7 @@
 <div class="register-container">
     <div class="register-card shadow-sm">
         <h2 class="text-center mb-4">Crea un account</h2>
-    
+
         <form action="{{ route('register') }}" method="POST">
             @csrf
             <div class="mb-3">
@@ -22,6 +22,7 @@
                     <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror
             </div>
+
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" name="email" id="email" class="form-control" required>

@@ -24,9 +24,15 @@
 
             <ul class="navbar-nav d-flex flex-row">
                 @auth
-                    <li class="nav-item me-3">
-                        <a class="nav-link" href="#">Area personale</a>
-                    </li>
+                    @if(auth()->user()->is_admin)
+                        <li class="nav-item me-3">
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Area personale</a>
+                        </li>
+                    @else
+                        <li class="nav-item me-3">
+                            <a class="nav-link" href="{{ route('home') }}">Area personale</a>
+                        </li>
+                    @endif
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

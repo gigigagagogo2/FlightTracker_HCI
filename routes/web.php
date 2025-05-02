@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return view('home');
@@ -36,3 +37,28 @@ Route::post('/logout', function (Request $request) {
 
     return redirect('/')->with('success', 'Sei uscito correttamente.');
 })->name('logout');
+
+Route::get('/admin', function () {
+    return view('admin/admin');
+})->middleware('auth')->name('admin.dashboard');
+
+Route::get('/admin/users', [AdminController::class, 'users'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.users');
+
+Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.users.delete');
+
+Route::get('/admin/users/{user}/edit', [AdminController::class, 'editUser'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.users.edit');
+
+Route::put('/admin/users/{user}', [AdminController::class, 'updateUser'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.users.update');
+
+
+
+
+

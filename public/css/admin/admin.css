@@ -1,0 +1,13 @@
+body {
+    background-color: #f7f9fc;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.admin-card {
+    transition: transform 0.2s ease;
+    border-radius: 1rem;
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+}

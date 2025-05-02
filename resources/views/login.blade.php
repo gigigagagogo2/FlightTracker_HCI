@@ -34,6 +34,12 @@
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Accedi</button>
+
+            <div class="text-center mt-3">
+                <span>Non hai ancora un account?</span>
+                <a href="{{ route('register.form') }}" class="text-decoration-none">Registrati</a>
+            </div>
+
         </form>
     </div>
 </div>

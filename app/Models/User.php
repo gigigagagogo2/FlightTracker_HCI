@@ -10,6 +10,7 @@ class User extends Authenticatable
         'nickname',
         'email',
         'password',
+        'is_admin',
     ];
 
 }

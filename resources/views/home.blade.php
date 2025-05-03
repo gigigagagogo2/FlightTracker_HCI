@@ -51,23 +51,21 @@
                 @endguest
             </ul>
 
-
         </div>
     </nav>
 
     <div class="search-section">
-
         <h1 class="search-title">Cerca un volo in tempo reale</h1>
 
+        <!-- Search form con animazione interna -->
         <form action="#" method="GET" class="search-form">
             <div class="input-group">
-                <span class="input-group-text search-icon">
-                    <i class="bi bi-search"></i>
-                </span>
-                <input type="text" class="form-control search-input" placeholder="Inserisci codice volo" name="query">
+            <span class="input-group-text search-icon">
+                <i class="bi bi-search"></i>
+            </span>
+                <input type="text" class="form-control search-input" id="search-input" placeholder="Inserisci volo" name="query">
             </div>
         </form>
-
     </div>
 
     <footer class="site-footer">
@@ -79,6 +77,22 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        const input = document.getElementById("search-input");
+        const words = ["volo", "aeroporto", "città"];
+        let index = 0;
+
+        function updatePlaceholder() {
+            index = (index + 1) % words.length;
+            input.setAttribute("placeholder", "Inserisci " + words[index]);
+        }
+
+        setInterval(updatePlaceholder, 3000);
+
+    </script>
+
+
 
 
 

@@ -109,3 +109,7 @@
     margin: 0.3rem 0;
 }
 
+.placeholder-transition {
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+}

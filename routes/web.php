@@ -58,6 +58,19 @@ Route::put('/admin/users/{user}', [AdminController::class, 'updateUser'])
     ->middleware(['auth', 'is_admin'])
     ->name('admin.users.update');
 
+Route::get('/admin/flights', [AdminController::class, 'flights'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.flights');
+
+Route::get('/admin/flights/create', [AdminController::class, 'createFlight'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.flights.create');
+
+Route::post('/admin/flights', [AdminController::class, 'storeFlight'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.flights.store');
+
+
 
 
 

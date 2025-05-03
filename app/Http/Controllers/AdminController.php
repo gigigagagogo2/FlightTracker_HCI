@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Flight;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -40,6 +40,31 @@ class AdminController extends Controller
         $user->update($validated);
 
         return redirect()->route('admin.users')->with('success', 'Utente aggiornato con successo.');
+    }
+
+    public function flights()
+    {
+        $flights = Flight::orderBy('departure_time')->get();
+        return view('admin/manage_flights', compact('flights'));
+    }
+
+    public function createFlight()
+    {
+        return view('admin/create_flight');
+    }
+
+    public function storeFlight(Request $request)
+    {
+        $validated = $request->validate([
+            'departure_airport' => 'required|string|max:255',
+            'arrival_airport' => 'required|string|max:255',
+            'departure_time' => 'required|date',
+            'arrival_time' => 'nullable|date|after_or_equal:departure_time',
+        ]);
+
+        Flight::create($validated);
+
+        return redirect()->route('admin.flights')->with('success', 'Volo aggiunto con successo.');
     }
 
 }

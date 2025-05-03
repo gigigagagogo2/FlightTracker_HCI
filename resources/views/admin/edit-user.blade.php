@@ -20,6 +20,7 @@
 
             <div class="mb-3">
                 <label for="nickname" class="form-label">Nickname</label>
+                <!-- TODO: Controllare differnza di old cosi -->
                 <input type="text" class="form-control" id="nickname" name="nickname" value="{{ old('nickname', $user->nickname) }}" required>
                 @error('nickname')
                     <div class="text-danger small mt-1">{{ $message }}</div>

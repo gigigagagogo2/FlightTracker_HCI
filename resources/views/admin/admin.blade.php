@@ -27,7 +27,7 @@
             <div class="card text-center shadow-sm admin-card p-4">
                 <i class="bi bi-airplane-engines display-4 text-success mb-3"></i>
                 <h5 class="card-title">Gestisci Voli</h5>
-                <a href="#" class="btn btn-outline-success mt-3">Vai</a>
+                <a href="{{ route('admin.flights')  }}" class="btn btn-outline-success mt-3">Vai</a>
             </div>
         </div>
 

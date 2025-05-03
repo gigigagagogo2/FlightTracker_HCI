@@ -70,8 +70,17 @@ Route::post('/admin/flights', [AdminController::class, 'storeFlight'])
     ->middleware(['auth', 'is_admin'])
     ->name('admin.flights.store');
 
+Route::get('/admin/flights/{flight}/edit', [AdminController::class, 'editFlight'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.flights.edit');
 
+Route::put('/admin/flights/{flight}', [AdminController::class, 'updateFlight'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.flights.update');
 
+Route::delete('/admin/flights/{flight}', [AdminController::class, 'deleteFlight'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.flight.delete');
 
 
 

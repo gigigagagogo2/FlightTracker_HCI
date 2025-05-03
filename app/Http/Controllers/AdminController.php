@@ -32,6 +32,7 @@ class AdminController extends Controller
 
     public function updateUser(Request $request, User $user)
     {
+
         $validated = $request->validate([
             'nickname' => 'required|string|max:255|unique:users,nickname,' . $user->id,
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
@@ -65,6 +66,32 @@ class AdminController extends Controller
         Flight::create($validated);
 
         return redirect()->route('admin.flights')->with('success', 'Volo aggiunto con successo.');
+    }
+
+    public function editFlight(Flight $flight){
+        return view('admin/edit-flight', compact('flight'));
+    }
+
+    public function updateFlight(Request $request, Flight $flight)
+    {
+        $validated = $request->validate([
+            'departure_airport' => 'required|string|max:255',
+            'arrival_airport' => 'required|string|max:255',
+            'departure_time' => 'required|date',
+            'arrival_time' => 'nullable|date|after_or_equal:departure_time',
+        ]);
+
+        $flight->update($validated);
+
+        return redirect()->route('admin.flights')->with('success', 'Volo aggiornato con successo.');
+    }
+
+    public function deleteFlight(Flight $flight)
+    {
+
+        $flight->delete();
+
+        return redirect()->route('admin.flights')->with('success', 'Volo eliminato con successo.');
     }
 
 }

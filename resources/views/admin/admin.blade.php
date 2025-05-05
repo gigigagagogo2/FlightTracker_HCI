@@ -11,7 +11,7 @@
 <body>
 
 <div class="position-absolute top-0 start-0 m-3">
-    <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+    <a href="{{ route('home') }}" class="btn btn-outline-primary">
         <i class="bi bi-house-door"></i> Home
     </a>
 </div>

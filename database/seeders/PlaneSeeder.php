@@ -11,20 +11,20 @@ class PlaneSeeder extends Seeder
     public function run()
     {
         $planeNames = [
-            'Boeing 737-800',
-            'Airbus A320',
-            'Boeing 777-300ER',
-            'Airbus A350-900',
-            'Boeing 787-9 Dreamliner',
-            'Airbus A330-300',
-            'Boeing 747-400',
-            'Airbus A380',
-            'Embraer E195-E2',
-            'Bombardier CRJ900',
+            'Boeing_737_800',
+            'Airbus_A320',
+            'Boeing_777_300ER',
+            'Airbus_A350_900',
+            'Boeing_787_9_Dreamliner',
+            'Airbus_A330_300',
+            'Boeing_747_400',
+            'Airbus_A380',
+            'Embraer_E195_E2',
+            'Bombardier_CRJ900',
         ];
 
         foreach ($planeNames as $name) {
-            $fileName = str_replace([' ', '-'], '_', $name) . '.png';
+            $fileName = $name . '.png';
 
             AirplaneModel::create([
                 'name' => $name,

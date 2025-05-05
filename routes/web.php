@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FlightController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
@@ -82,3 +83,4 @@ Route::delete('/admin/flights/{flight}', [AdminController::class, 'deleteFlight'
     ->middleware(['auth', 'is_admin'])
     ->name('admin.flights.delete');
 
+Route::get('/search-flights', [FlightController::class, 'search'])->name('flights.search');

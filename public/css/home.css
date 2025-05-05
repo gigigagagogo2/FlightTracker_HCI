@@ -1,93 +1,126 @@
+/* Reset di base per tutti gli elementi */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Navbar generale */
+/* Stile generale del corpo */
+body {
+    font-family: 'Segoe UI', sans-serif; /* Font moderno e leggibile */
+    background-color: #f8f9fa;           /* Grigio chiaro per un effetto soft */
+    color: #212529;                      /* Testo scuro per maggiore leggibilità */
+}
+
+/* ------------------------------
+   Navbar in alto (testata del sito)
+------------------------------- */
 .navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    font-family: 'Segoe UI', sans-serif;
-    height: 60px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Aggiunta ombra leggera */
+    background-color: #fff;                /* Sfondo bianco */
+    height: 60px;                          /* Altezza navbar */
+    padding: 0 1.5rem;                     /* Spaziatura orizzontale */
 }
 
-/* Link navbar */
+/* Link nella navbar */
 .navbar .nav-link {
-    color: #333;
-    font-weight: 500;
-    transition: color 0.3s ease, border-bottom 0.3s ease;
-    position: relative;
+    color: #333;                           /* Colore grigio scuro */
+    font-weight: 500;                      /* Testo semi-bold */
+    transition: color 0.3s ease;           /* Transizione morbida al passaggio */
 }
 
-/* Hover effetto elegante */
+/* Effetto hover sui link della navbar */
 .navbar .nav-link:hover {
-    color: #0d6efd;
+    color: #0d6efd;                        /* Blu Bootstrap al passaggio del mouse */
     text-decoration: none;
 }
 
-/* Spaziatura */
+/* Spaziatura tra gli elementi della navbar */
 .navbar-nav .nav-item {
     margin-right: 1rem;
 }
 
-/* Rimuovi ultimo margine */
+/* Nessun margine dopo l'ultimo item */
 .navbar-nav .nav-item:last-child {
     margin-right: 0;
 }
 
-/* Contenitore verticale centrato */
+/* ------------------------------
+   Sezione centrale (search)
+------------------------------- */
 .search-section {
-    height: 80vh;
+    height: 80vh;                          /* 80% dell'altezza viewport */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
+    padding: 1rem;
 }
 
-/* Titolo sopra la searchbar */
+/* Titolo della sezione */
 .search-title {
     font-size: 2rem;
     font-weight: 600;
     margin-bottom: 2rem;
     color: #333;
-    text-align: center;
 }
 
-/* Contenitore della search form */
+/* Contenitore del form di ricerca */
 .search-form {
-    width: 100%;
     max-width: 600px;
+    width: 100%;
+    display: flex;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 50px;                   /* Bordo arrotondato tipo pillola */
+    overflow: hidden;
 }
 
-/* Icona lente (Bootstrap Icons) */
+/* Icona lente (sinistra) */
 .search-icon {
-    background-color: white;
+    background-color: transparent;
     border-right: none;
-    border-radius: 999px 0 0 999px;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    color: #888;
-    font-size: 1.1rem;
-}
-
-/* Input di ricerca */
-.search-input {
-    border-left: none;
-    border-radius: 0 999px 999px 0;
     padding: 0.75rem 1rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+}
+
+/* Campo input ricerca */
+.search-input {
+    border: none;
+    padding: 0.75rem 1rem;
+    width: 100%;
     font-size: 1rem;
+    color: #212529;
 }
 
-.search-input:focus,
-.search-icon:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border-color: #ced4da !important; /* stesso colore del bordo normale */
+/* Rimuove l'outline blu al focus */
+.search-input:focus {
+    outline: none;
 }
 
-/* Footer */
+/* ------------------------------
+   Bottoni verdi con effetto hover blu
+------------------------------- */
+.btn-outline-success {
+    border-radius: 0.375rem;               /* Angoli leggermente arrotondati */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Al passaggio del mouse, diventano blu */
+.btn-outline-success:hover {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+    border-color: #0d6efd !important;
+}
+
+/* ------------------------------
+   Footer (piè di pagina)
+------------------------------- */
 .site-footer {
-    background-color: #f8f9fa;
+    background-color: #fff;
     padding: 2rem 1rem;
     border-top: 1px solid #dee2e6;
     text-align: center;
@@ -96,20 +129,18 @@
     margin-top: 4rem;
 }
 
+/* Link nel footer */
 .site-footer a {
     color: #0d6efd;
     text-decoration: none;
 }
 
+/* Hover sui link del footer */
 .site-footer a:hover {
     text-decoration: underline;
 }
 
+/* Paragrafi nel footer */
 .footer-content p {
     margin: 0.3rem 0;
-}
-
-.placeholder-transition {
-    opacity: 0.3;
-    transition: opacity 0.3s ease;
 }

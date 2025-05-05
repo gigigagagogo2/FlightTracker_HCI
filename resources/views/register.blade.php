@@ -9,6 +9,12 @@
 </head>
 <body class="register-page">
 
+<div class="position-absolute top-0 start-0 m-3">
+    <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-house-door"></i> Home
+    </a>
+</div>
+
 <div class="register-container">
     <div class="register-card shadow-sm">
         <h2 class="text-center mb-4">Crea un account</h2>

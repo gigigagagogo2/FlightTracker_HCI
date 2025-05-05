@@ -9,6 +9,12 @@
 </head>
 <body class="login-page">
 
+<div class="position-absolute top-0 start-0 m-3">
+    <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-house-door"></i> Home
+    </a>
+</div>
+
 <div class="login-container">
     <div class="login-card shadow-sm">
         <h2 class="text-center mb-4">Accedi</h2>

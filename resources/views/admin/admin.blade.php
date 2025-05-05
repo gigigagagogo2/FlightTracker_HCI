@@ -10,11 +10,16 @@
 </head>
 <body>
 
+<div class="position-absolute top-0 start-0 m-3">
+    <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-house-door"></i> Home
+    </a>
+</div>
+
 <div class="container py-5">
     <h1 class="text-center mb-5">Pannello di Controllo</h1>
 
     <div class="row justify-content-center gap-4">
-
         <div class="col-md-4">
             <div class="card text-center shadow-sm admin-card p-4">
                 <i class="bi bi-people-fill display-4 text-primary mb-3"></i>
@@ -27,10 +32,9 @@
             <div class="card text-center shadow-sm admin-card p-4">
                 <i class="bi bi-airplane-engines display-4 text-success mb-3"></i>
                 <h5 class="card-title">Gestisci Voli</h5>
-                <a href="{{ route('admin.flights')  }}" class="btn btn-outline-success mt-3">Vai</a>
+                <a href="{{ route('admin.flights') }}" class="btn btn-outline-success mt-3">Vai</a>
             </div>
         </div>
-
     </div>
 </div>
 

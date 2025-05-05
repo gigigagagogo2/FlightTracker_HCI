@@ -40,7 +40,7 @@ Route::post('/logout', function (Request $request) {
 
 Route::get('/admin', function () {
     return view('admin/admin');
-})->middleware('auth')->name('admin.dashboard');
+})->middleware(['auth', 'is_admin'])->name('admin.dashboard');
 
 Route::get('/admin/users', [AdminController::class, 'users'])
     ->middleware(['auth', 'is_admin'])
@@ -80,7 +80,5 @@ Route::put('/admin/flights/{flight}', [AdminController::class, 'updateFlight'])
 
 Route::delete('/admin/flights/{flight}', [AdminController::class, 'deleteFlight'])
     ->middleware(['auth', 'is_admin'])
-    ->name('admin.flight.delete');
-
-
+    ->name('admin.flights.delete');
 

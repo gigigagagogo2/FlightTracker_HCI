@@ -29,26 +29,28 @@
         <thead class="table-light text-center">
         <tr>
             <th>ID</th>
+            <th>Modello Aereo</th>
             <th>Aeroporto Partenza</th>
             <th>Aeroporto Arrivo</th>
             <th>Partenza</th>
             <th>Arrivo</th>
-            <th>Azioni</th>
+            <th></th>
         </tr>
         </thead>
         <tbody class="text-center align-middle">
         @foreach ($flights as $flight)
             <tr>
                 <td>{{ $flight->id }}</td>
-                <td>{{ $flight->departure_airport }}</td>
-                <td>{{ $flight->arrival_airport }}</td>
+                <td>{{ $flight->airplaneModel->name ?? '—' }}</td>
+                <td>{{ $flight->departureAirport->name ?? '—' }}</td>
+                <td>{{ $flight->arrivalAirport->name ?? '—' }}</td>
                 <td>{{ $flight->departure_time }}</td>
                 <td>{{ $flight->arrival_time ?? '–' }}</td>
                 <td>
                     <a href="{{ route('admin.flights.edit', $flight->id) }}" class="btn btn-sm btn-warning me-1">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <form action="{{ route('admin.flight.delete', $flight->id) }}" method="POST" class="d-inline">
+                    <form action="{{ route('admin.flights.delete', $flight->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questo volo?')">
@@ -57,6 +59,7 @@
                     </form>
                 </td>
             </tr>
+
         @endforeach
         </tbody>
     </table>

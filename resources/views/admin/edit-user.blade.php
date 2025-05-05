@@ -35,6 +35,15 @@
                 @enderror
             </div>
 
+            <div class="mb-3">
+                <label for="password" class="form-label">Nuova password (lascia vuoto per non cambiarla)</label>
+                <input type="password" class="form-control" id="password" name="password">
+                @error('password')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+
+
             <div class="text-end">
                 <a href="{{ route('admin.users') }}" class="btn btn-secondary">Annulla</a>
                 <button type="submit" class="btn btn-primary">Salva modifiche</button>

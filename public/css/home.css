@@ -184,3 +184,31 @@ html, body {
     flex: 1;
 }
 
+.flight-card {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.flight-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    background-color: #f9f9f9;
+}
+
+.flight-card:hover img,
+.flight-card:hover h5,
+.flight-card:hover p,
+.flight-card:hover small {
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+}
+

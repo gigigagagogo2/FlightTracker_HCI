@@ -120,10 +120,14 @@
                         return;
                     }
 
-                    data.forEach((flight, i) => {
+                    data.forEach(flight => {
                         const card = document.createElement("div");
                         card.className = "flight-card";
-                        card.style.animationDelay = `${i * 0.1}s`;
+                        card.style.cursor = "pointer"; // mano al passaggio
+
+                        card.addEventListener("click", () => {
+                            window.location.href = `/flights/${flight.id}`;
+                        });
 
                         const departureCity = flight.departure_airport.city;
                         const arrivalCity = flight.arrival_airport.city;
@@ -139,8 +143,10 @@
                                 <small>Modello: ${flight.airplane_model.name}</small>
                             </div>
                         `;
+
                         resultContainer.appendChild(card);
                     });
+
                 });
         } else {
             title.style.display = "block";

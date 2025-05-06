@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FlightController;
+use App\Http\Controllers\FlightSimulationController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
@@ -84,3 +85,7 @@ Route::delete('/admin/flights/{flight}', [AdminController::class, 'deleteFlight'
     ->name('admin.flights.delete');
 
 Route::get('/search-flights', [FlightController::class, 'search'])->name('flights.search');
+
+Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.show');
+
+Route::get('/api/simulazione-volo/{id}', [FlightSimulationController::class, 'getFlightData']);

@@ -26,4 +26,11 @@ class FlightController extends Controller
 
         return response()->json($flights);
     }
+
+    public function show($id)
+    {
+        $flight = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])->findOrFail($id);
+        return view('/flights/show_card', compact('flight'));
+    }
+
 }

@@ -127,7 +127,12 @@
             });
     }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap" async defer></script>
+<?php
+    $googleapi = env("GOOGLE_MAPS_API");
+    ?>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $googleapi ?>&callback=initMap" async defer></script>
 </body>
 </html>
 

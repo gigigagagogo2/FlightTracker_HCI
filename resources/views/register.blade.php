@@ -23,7 +23,7 @@
             @csrf
             <div class="mb-3">
                 <label for="nickname" class="form-label">Nickname</label>
-                <input type="text" name="nickname" id="nickname" value="{{ old('nickname') }}" class="form-control" required>
+                <input type="text" name="nickname" id="nickname" value="{{ old('nickname') }}" class="form-control" autocomplete="off" required>
                 @error('nickname')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror
@@ -31,7 +31,7 @@
 
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" name="email" id="email" class="form-control" required>
+                <input type="email" name="email" id="email" class="form-control" autocomplete="off" required>
                 @error('email')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror
@@ -39,12 +39,12 @@
 
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" name="password" id="password" class="form-control" required>
+                <input type="password" name="password" id="password" class="form-control" autocomplete="off" required>
             </div>
 
             <div class="mb-3">
                 <label for="password_confirmation" class="form-label">Conferma password</label>
-                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" autocomplete="off" required>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Registrati</button>

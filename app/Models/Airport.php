@@ -23,4 +23,6 @@ class Airport extends Model
         return $this->hasMany(Flight::class, 'arrival_airport_id');
     }
 
+
+
 }

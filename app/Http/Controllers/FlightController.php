@@ -33,4 +33,21 @@ class FlightController extends Controller
         return view('/flights/show_card', compact('flight'));
     }
 
+    public function aggiungiPreferito(Request $request)
+    {
+        $user = auth()->user();
+        $user->flights()->syncWithoutDetaching([$request->flight_id]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function rimuoviPreferito(Request $request)
+    {
+        $user = auth()->user();
+        $user->flights()->detach($request->flight_id);
+
+        return response()->json(['success' => true]);
+    }
+
+
 }

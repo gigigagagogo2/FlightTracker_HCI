@@ -3,6 +3,7 @@
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\FlightSimulationController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Auth;
@@ -89,3 +90,12 @@ Route::get('/search-flights', [FlightController::class, 'search'])->name('flight
 Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.show');
 
 Route::get('/api/simulazione-volo/{id}', [FlightSimulationController::class, 'getFlightData']);
+
+Route::post('/flights/preferiti/add', [FlightController::class, 'aggiungiPreferito'])->middleware('auth');
+
+Route::post('/flights/preferiti/remove', [FlightController::class, 'rimuoviPreferito'])->middleware('auth');
+
+Route::get('/profile', [UserController::class, 'showProfile'])->name('user.profile');
+
+Route::post('/profile/update-picture', [UserController::class, 'updatePicture'])->middleware('auth')->name('user.updatePicture');
+

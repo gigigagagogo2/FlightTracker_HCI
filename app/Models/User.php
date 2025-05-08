@@ -11,6 +11,13 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'profile_picture_path',
     ];
+
+    public function flights()
+    {
+        return $this->belongsToMany(Flight::class, 'user_flight');
+    }
+
 
 }

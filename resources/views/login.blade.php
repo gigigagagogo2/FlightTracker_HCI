@@ -23,12 +23,12 @@
             @csrf
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control" required autofocus>
+                <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control" autocomplete="off" required autofocus>
             </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" name="password" id="password" class="form-control" required>
+                <input type="password" name="password" id="password" class="form-control" autocomplete="off" required>
                 @error('email')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror

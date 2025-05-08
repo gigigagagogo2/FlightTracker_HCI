@@ -29,6 +29,8 @@ class Flight extends Model
         return $this->belongsTo(Airport::class, 'arrival_airport_id');
     }
 
-
+    public function users(){
+        return $this->belongsToMany(User::class, 'user_flight');
+    }
 
 }

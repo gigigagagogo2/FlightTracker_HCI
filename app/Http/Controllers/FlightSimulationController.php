@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\FlightSimulationService;
+use App\Services\Services\FlightSimulationService;
 
 class FlightSimulationController extends Controller
 {

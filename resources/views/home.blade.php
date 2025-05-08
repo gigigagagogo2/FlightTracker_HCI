@@ -28,7 +28,7 @@
                     </li>
                 @else
                     <li class="nav-item me-3">
-                        <a class="nav-link" href="{{ route('home') }}">Area personale</a>
+                        <a class="nav-link" href="{{ route('user.profile') }}">Area personale</a>
                     </li>
                 @endif
                 <li class="nav-item">
@@ -61,7 +61,7 @@
                 <span class="input-group-text search-icon">
                     <i class="bi bi-search"></i>
                 </span>
-                <input type="text" class="form-control search-input" id="search-input" placeholder="Inserisci volo" name="query">
+                <input type="text" class="form-control search-input" id="search-input" placeholder="Inserisci volo" name="query" autocomplete="off">
             </div>
         </form>
     </div>
@@ -123,7 +123,7 @@
                     data.forEach(flight => {
                         const card = document.createElement("div");
                         card.className = "flight-card";
-                        card.style.cursor = "pointer"; // mano al passaggio
+                        card.style.cursor = "pointer"; // mano quando vai sopra
 
                         card.addEventListener("click", () => {
                             window.location.href = `/flights/${flight.id}`;
@@ -143,7 +143,6 @@
                                 <small>Modello: ${flight.airplane_model.name}</small>
                             </div>
                         `;
-
                         resultContainer.appendChild(card);
                     });
 

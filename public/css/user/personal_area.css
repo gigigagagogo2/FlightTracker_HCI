@@ -1,0 +1,52 @@
+/* personal_area.css */
+
+/* Profilo utente */
+.profile-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: auto;
+}
+
+.profile-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.profile-card img:hover {
+    transform: scale(1.1);
+}
+
+.profile-card .profile-info h5 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.profile-card .profile-info p {
+    color: #666;
+    font-size: 1rem;
+}
+
+.edit-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 1.5rem;
+    color: rgba(0, 0, 0, 0.7);
+    display: none;
+    cursor: pointer;
+}
+
+.profile-card:hover .edit-icon {
+    display: block;
+}

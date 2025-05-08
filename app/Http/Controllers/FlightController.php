@@ -23,7 +23,6 @@ class FlightController extends Controller
             ->take(10)
             ->get();
 
-
         return response()->json($flights);
     }
 

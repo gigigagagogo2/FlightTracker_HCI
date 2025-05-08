@@ -52,7 +52,6 @@
     margin-top: 1rem;
 }
 
-
 /* Titolo sopra la searchbar */
 .search-title {
     font-size: 2rem;
@@ -125,18 +124,16 @@
 
 .search-fixed {
     position: relative;
-    margin: 1rem auto 0 auto; /* ↓ Avvicina alla navbar */
+    margin: 1rem auto 0 auto; /* Avvicina alla navbar */
     width: 100%;
     max-width: 600px;
     transition: all 0.4s ease;
 }
 
 #result-container {
-    margin-top: 1rem; /* ↓ Accorcia lo spazio tra barra e risultati */
+    margin-top: 1rem; /* Accorcia lo spazio tra barra e risultati */
     padding: 0 1rem;
 }
-
-
 
 /* Card volo */
 .flight-card {
@@ -204,11 +201,39 @@ html, body {
     background-color: #f9f9f9;
 }
 
-.flight-card:hover img,
-.flight-card:hover h5,
-.flight-card:hover p,
-.flight-card:hover small {
-    opacity: 0.85;
-    transition: opacity 0.3s ease;
+/* Pallino accanto al volo */
+.flight-card .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background: none; /* nessun colore di default */
 }
 
+/* Stati specifici */
+.status-dot.green  { background-color: #28a745; }
+.status-dot.yellow { background-color: #ffc107; }
+.status-dot.red    { background-color: #dc3545; }
+.status-dot.gray   { background-color: #6c757d; }
+
+/* Animazione di lampeggio: sfuma tra colore base e tonalità più chiara */
+@keyframes blink-green {
+    0%, 100% { background-color: #28a745; }
+    50%      { background-color: #85e89b; }
+}
+
+@keyframes blink-yellow {
+    0%, 100% { background-color: #ffc107; }
+    50%      { background-color: #ffe58a; }
+}
+
+@keyframes blink-red {
+    0%, 100% { background-color: #dc3545; }
+    50%      { background-color: #ec9aa3; }
+}
+
+/* Assegna a ciascuno stato la propria animazione */
+.status-dot.green  { animation: blink-green 4s infinite; }
+.status-dot.yellow { animation: blink-yellow 3.5s infinite; }
+.status-dot.red    { animation: blink-red 4.5s infinite; }
+.status-dot.gray   { /* no animation per stato sconosciuto */ }

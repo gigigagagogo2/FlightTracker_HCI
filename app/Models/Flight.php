@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Flight extends Model
 {
@@ -13,6 +14,15 @@ class Flight extends Model
         'departure_time',
         'arrival_time',
     ];
+
+    // ▶️ assicurati che departure_time/arrival_time siano Carbon
+    protected $casts = [
+        'departure_time' => 'datetime',
+        'arrival_time'   => 'datetime',
+    ];
+
+    // ▶️ appendi l’attributo virtuale status
+    protected $appends = ['status'];
 
     public function airplaneModel()
     {
@@ -29,8 +39,29 @@ class Flight extends Model
         return $this->belongsTo(Airport::class, 'arrival_airport_id');
     }
 
-    public function users(){
+    public function users()
+    {
         return $this->belongsToMany(User::class, 'user_flight');
     }
 
+    /**
+     * Calcola lo stato del volo:
+     *  - yellow: now < departure_time
+     *  - green: departure_time ≤ now ≤ arrival_time
+     *  - red: now > arrival_time
+     */
+    public function getStatusAttribute()
+    {
+        $now = Carbon::now();
+
+        if ($now->lt($this->departure_time)) {
+            return 'yellow';
+        }
+
+        if ($now->between($this->departure_time, $this->arrival_time)) {
+            return 'green';
+        }
+
+        return 'red';
+    }
 }

@@ -4,36 +4,6 @@
     box-sizing: border-box;
 }
 
-/* Navbar generale */
-.navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    font-family: 'Segoe UI', sans-serif;
-    height: 60px;
-}
-
-/* Link navbar */
-.navbar .nav-link {
-    color: #333;
-    font-weight: 500;
-    transition: color 0.3s ease, border-bottom 0.3s ease;
-    position: relative;
-}
-
-/* Hover effetto elegante */
-.navbar .nav-link:hover {
-    color: #0d6efd;
-    text-decoration: none;
-}
-
-/* Spaziatura */
-.navbar-nav .nav-item {
-    margin-right: 1rem;
-}
-
-/* Rimuovi ultimo margine */
-.navbar-nav .nav-item:last-child {
-    margin-right: 0;
-}
 
 .search-section {
     display: flex;

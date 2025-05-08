@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - FlightTracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/access.css') }}">
 </head>
-<body class="login-page">
+<body class="page">
 
 <div class="position-absolute top-0 start-0 m-3">
     <a href="{{ route('home') }}" class="btn btn-outline-primary">
@@ -15,8 +15,8 @@
     </a>
 </div>
 
-<div class="login-container">
-    <div class="login-card shadow-sm">
+<div class="container">
+    <div class="card shadow-sm">
         <h2 class="text-center mb-4">Accedi</h2>
 
         <form action="{{ route('login') }}" method="POST">

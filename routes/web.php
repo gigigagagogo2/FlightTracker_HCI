@@ -99,3 +99,6 @@ Route::get('/profile', [UserController::class, 'showProfile'])->name('user.profi
 
 Route::post('/profile/update-picture', [UserController::class, 'updatePicture'])->middleware('auth')->name('user.updatePicture');
 
+Route::post('/profile/update', [UserController::class, 'updateProfile'])->middleware('auth')->name('user.updateProfile');
+
+Route::get('/personalmap', [UserController::class, 'showMap'])->middleware('auth')->name('user.personal.map');

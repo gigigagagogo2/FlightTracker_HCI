@@ -30,8 +30,12 @@ class FlightSeeder extends Seeder
                 $arrival = $airports->random();
             } while ($arrival->id === $departure->id);
 
-            // Orari realistici
-            $departureTime = Carbon::now()->addDays(rand(-10, 30))->setTime(rand(0, 23), [0, 15, 30, 45][rand(0, 3)]);
+            if ($i < 5) {
+                $departureTime = Carbon::now()->setSeconds(0);
+            } else {
+                $departureTime = Carbon::now()->addDays(rand(-10, 30))
+                    ->setTime(rand(0, 23), [0, 15, 30, 45][rand(0, 3)], 0);
+            }
             $arrivalTime = (clone $departureTime)->addHours(rand(1, 5))->addMinutes(rand(0, 59));
 
             Flight::create([

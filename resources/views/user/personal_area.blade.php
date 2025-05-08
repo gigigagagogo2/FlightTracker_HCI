@@ -1,90 +1,74 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Area Personale</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- Aggiungi il file CSS separato -->
-    <link href="{{ asset('css/personal_area.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/user/personal_area.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{asset('css/navbar.css')}}">
 </head>
 <body>
-<div class="container mt-5">
-    <!-- Scheda Utente -->
-    <div class="profile-card position-relative">
-        <!-- Immagine del profilo -->
-        <div>
-            <img id="profilePic" src="{{ auth()->user()->profile_picture ?? '/images/default-avatar.jpg' }}" alt="Immagine Profilo">
-            <i class="fas fa-pencil-alt edit-icon" id="editIcon"></i>
-        </div>
 
-        <!-- Info utente -->
-        <div class="profile-info">
-            <h5>{{ auth()->user()->name }}</h5>
-            <p>{{ auth()->user()->email }}</p>
-        </div>
-    </div>
-
-    <!-- Modal per modificare l'immagine del profilo -->
-    <div class="modal" id="editProfilePicModal" tabindex="-1" aria-labelledby="editProfilePicModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProfilePicModalLabel">Cambia Immagine del Profilo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="profilePicForm" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="profilePicInput" class="form-label">Seleziona immagine</label>
-                            <input type="file" class="form-control" id="profilePicInput" name="profile_picture" accept="image/*">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salva</button>
-                    </form>
-                </div>
+<div class="profile-card">
+    <!-- FORM 1: solo immagine -->
+    <form id="pictureForm" action="{{ route('user.updatePicture') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <label for="profile_picture" class="profile-image-wrapper">
+            <div class="profile-image-circle">
+                <img src="{{ Auth::user()->profile_picture_path ? asset('storage/' . Auth::user()->profile_picture_path) : asset('images/default_user.jpg') }}" alt="Foto profilo">
+                <span class="edit-icon">
+                <img src="{{ asset('images/pencil_icon.png') }}" alt="Modifica">
+            </span>
             </div>
+        </label>
+        <input type="file" id="profile_picture" name="profile_picture" onchange="document.getElementById('pictureForm').submit();">
+    </form>
+
+    <!-- FORM 2: info profilo -->
+    <form id="profileForm" action="{{ route('user.updateProfile') }}" method="POST">
+        @csrf
+
+        <div class="profile-info">
+            <input type="text" name="nickname" value="{{ Auth::user()->nickname }}" class="form-input" readonly>
+            <input type="email" name="email" value="{{ Auth::user()->email }}" class="form-input" readonly>
+            <input type="password" name="password" value="********" class="form-input" readonly>
         </div>
-    </div>
+
+        <button type="button" class="edit-btn" onclick="enableEdit()">Modifica profilo</button>
+        <button type="button" class="cancel-btn" style="display: none;" onclick="cancelEdit()">Annulla</button>
+        <button type="submit" class="save-btn" style="display: none;">Salva modifiche</button>
+    </form>
+
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- TODO: includere footer -->
+
 <script>
-    // Quando l'utente clicca sull'icona della matita, mostra il modal per caricare una nuova foto
-    document.getElementById('editIcon').addEventListener('click', function() {
-        const modal = new bootstrap.Modal(document.getElementById('editProfilePicModal'));
-        modal.show();
-    });
+    function enableEdit() {
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => input.removeAttribute('readonly'));
+        document.querySelector('.edit-btn').style.display = 'none';
+        document.querySelector('.save-btn').style.display = 'inline-block';
+        document.querySelector('.cancel-btn').style.display = 'inline-block';
+    }
 
-    // Quando l'utente invia il form per caricare la nuova immagine
-    document.getElementById('profilePicForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Impedisce il comportamento predefinito del form
 
-        const formData = new FormData(this);
 
-        // Invia l'immagine al server tramite AJAX
-        fetch("{{ route('user.updatePicture') }}", {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': "{{ csrf_token() }}"
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Aggiorna l'immagine del profilo sulla pagina senza ricaricare
-                    document.getElementById('profilePic').src = data.imageUrl;
-                    alert("Immagine del profilo aggiornata!");
-                } else {
-                    alert("Errore durante l'aggiornamento dell'immagine.");
-                }
-            })
-            .catch(error => {
-                console.error("Errore:", error);
-                alert("Errore durante il caricamento dell'immagine.");
-            });
-    });
+    function cancelEdit() {
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.setAttribute('readonly', true);
+            input.value = input.defaultValue;
+        });
+        document.querySelector('.edit-btn').style.display = 'inline-block';
+        document.querySelector('.save-btn').style.display = 'none';
+        document.querySelector('.cancel-btn').style.display = 'none';
+    }
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

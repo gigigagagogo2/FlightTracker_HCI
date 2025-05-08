@@ -7,51 +7,17 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{asset('css/navbar.css')}}">
+
 </head>
 <body>
-<nav class="navbar navbar-light bg-light px-4">
-    <div class="container-fluid d-flex justify-content-between">
-        <ul class="navbar-nav d-flex flex-row">
-            <li class="nav-item me-3">
-                <a class="nav-link" href="{{ route('home') }}">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Altro</a>
-            </li>
-        </ul>
-        <ul class="navbar-nav d-flex flex-row">
-            @auth
-                @if(auth()->user()->is_admin)
-                    <li class="nav-item me-3">
-                        <a class="nav-link" href="{{ route('admin.dashboard') }}">Area personale</a>
-                    </li>
-                @else
-                    <li class="nav-item me-3">
-                        <a class="nav-link" href="{{ route('user.profile') }}">Area personale</a>
-                    </li>
-                @endif
-                <li class="nav-item">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="nav-link btn btn-link text-decoration-none">Esci</button>
-                    </form>
-                </li>
-            @endauth
-            @guest
-                <li class="nav-item me-3">
-                    <a class="nav-link" href="{{ route('login.form') }}">Accedi</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('register.form') }}">Registrati</a>
-                </li>
-            @endguest
-        </ul>
-    </div>
-</nav>
+@include('navbar')
 
+<!-- Contenitore principale -->
 <div class="main-content">
     <div class="search-section" id="search-section">
         <h1 class="search-title" id="search-title">Cerca un volo in tempo reale</h1>
+
         <form action="#" method="GET" class="search-form">
             <div class="input-group">
                 <span class="input-group-text search-icon">
@@ -66,6 +32,8 @@
         <!-- I voli verranno qui -->
     </div>
 </div>
+
+@include('footer')
 <script>
     const input = document.getElementById("search-input");
     const title = document.getElementById("search-title");

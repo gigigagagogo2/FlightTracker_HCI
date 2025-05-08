@@ -61,5 +61,4 @@ class FlightSimulationService{
         return round($speed, 2);
     }
 
-
 }

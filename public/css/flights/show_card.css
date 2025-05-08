@@ -28,27 +28,25 @@
 
 #starIcon {
     transition: transform 0.3s ease, color 0.3s ease;
-    font-size: 2rem; /* Imposta la dimensione della stella */
-    cursor: pointer; /* Aggiungi il cursore a mano */
+    font-size: 1.2rem;        /* Stella più piccola */
+    cursor: pointer;
 }
 
-/* Stile per la stella vuota */
-#starIcon.fa-star-o {
-    color: #d3d3d3;  /* Colore grigio chiaro per la stella vuota */
-    border: 2px solid gold;  /* Bordo dorato per la stella vuota */
-    background-color: transparent;  /* Sfondo trasparente */
+/* outline (non preferito): solo contorno di stella giallo */
+#starIcon.far.fa-star {
+    color: gold;
+    background-color: transparent;
+    border: none;
 }
 
-/* Stile per la stella piena */
-#starIcon.fa-star {
-    color: gold;  /* Colore dorato per la stella piena */
-    background-color: gold;  /* Sfondo dorato */
-    border: none;  /* Nessun bordo per la stella piena */
+
+/* solid (preferito): stella piena gialla, senza bordo */
+#starIcon.fas.fa-star {
+    color: gold;
+    background-color: transparent;
+    border: none;
 }
 
-/* Aggiungi effetto hover per rendere più fluida l'interazione */
 #starIcon:hover {
-    transform: scale(1.1); /* Aumenta la dimensione della stella quando viene passata sopra */
+    transform: scale(1.1);
 }
-
-

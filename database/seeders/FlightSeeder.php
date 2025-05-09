@@ -52,13 +52,22 @@ class FlightSeeder extends Seeder
             $arrival = $airports->random();
         } while ($arrival->id === $departure->id);
 
-        //Creo almeno un volo live
+        // Volo che decolla tra 15 secondi
+        Flight::create([
+            'airplane_model_id'    => $airplanes->random()->id,
+            'departure_airport_id' => $departure->id,
+            'arrival_airport_id'   => $arrival->id,
+            'departure_time'       => Carbon::now()->addSeconds(15),
+            'arrival_time'         => Carbon::now()->addHours(2),
+        ]);
+
+        // Volo che atterra tra 1 minuto
         Flight::create([
             'airplane_model_id'    => $airplanes->random()->id,
             'departure_airport_id' => $departure->id,
             'arrival_airport_id'   => $arrival->id,
             'departure_time'       => Carbon::now()->addHours(-1),
-            'arrival_time'         => Carbon::now()->addHours(),
+            'arrival_time'         => Carbon::now()->addMinutes(),
         ]);
     }
 }

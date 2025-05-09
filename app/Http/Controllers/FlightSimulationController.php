@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Services\FlightSimulationService;
+use App\Services\FlightSimulationService;
 
 class FlightSimulationController extends Controller
 {

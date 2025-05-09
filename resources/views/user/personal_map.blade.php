@@ -24,7 +24,7 @@
         <p class="card-text mb-1"><strong>Coordinate:</strong> <span id="flightCoords">-</span></p>
         <p class="card-text mb-2"><strong>Velocità:</strong> <span id="flightSpeed">-</span> km/h</p>
         <div class="progress">
-            <div id="flightProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+            <div id="flightProgress" class="progress-bar" role="progressbar" style="width: 0"></div>
         </div>
     </div>
 </div>
@@ -33,131 +33,119 @@
 <!-- TODO:sistemare -->
 @include('footer')
 
-<script>
+<script type="module">
     const flights = @json($flights);
-    console.log(flights);
     let map;
-    const markers = {}; // flight.id => marker
-    let currentFlightId = null;
+    /** @type {Object.<number, RotatableOverlay>} */
+    let overlays = {};
+    let updates = 0;
 
+    async function initMap() {
+        await google.maps.importLibrary('maps');
+        const { spherical } = await google.maps.importLibrary("geometry");
 
-    function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 4,
+            zoom: 5,
             center: { lat: 45, lng: 15 },
-            streetViewControl: false,
-            //mapTypeControl: false
         });
 
-        // Per ogni volo preferito: carica stato iniziale
-        flights.forEach(flight => {
-            fetch(`/api/simulazione-volo/${flight.id}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.stato === 'In volo') {
-                        const posizione = { lat: data.lat, lng: data.lon };
+        const module = await import('/js/RotatableOverlay.js');
+        const RotatableOverlay = module.default;
 
-                        const marker = new google.maps.Marker({
-                            position: posizione,
-                            map: map,
-                            title: flight.airplane_model.name,
-                            icon: {
-                                url: "/images/icon.svg",
-                                scaledSize: new google.maps.Size(35, 35),
-                                anchor: new google.maps.Point(20, 20)
-                            }
-                        });
+        for (const flight of flights) {
+            const startPoint = new google.maps.LatLng(
+                parseFloat(flight.departure_airport.latitude),
+                parseFloat(flight.departure_airport.longitude)
+            );
 
-                        marker.addListener("click", () => {
-                            currentFlightId = flight.id;
-                            document.getElementById('flightInfoCard').style.display = 'block';
+            const endPoint = new google.maps.LatLng(
+                parseFloat(flight.arrival_airport.latitude),
+                parseFloat(flight.arrival_airport.longitude)
+            );
 
-                            // Mostra dati nella card
-                            document.getElementById('flightModelName').innerText = flight.airplane_model.name;
-                            document.getElementById('flightCoords').innerText = `${data.lat.toFixed(2)}, ${data.lon.toFixed(2)}`;
-                            document.getElementById('flightSpeed').innerText = `${data.velocita ?? '-'}`;
+            const heading = spherical.computeHeading(startPoint, endPoint);
+            const iconHeading = -45 + heading;
 
-                            document.getElementById('flightProgress').style.width = `${Math.round(data.percentuale)}%`;
-                            document.getElementById('flightProgress').innerText = `${Math.round(data.percentuale)}%`;
-                            console.log(data.percentuale);
+            const iniziale = new google.maps.LatLng(0, 0);
 
-                        });
+            const overlay = new RotatableOverlay(
+                iniziale,
+                '/images/plane-map-icon.svg',
+                iconHeading
+            );
 
+            overlay.setMap(map);
+            overlays[flight.id] = overlay;
 
-                        markers[flight.id] = marker;
+            // Disegna rotta tratteggiata
+            new google.maps.Polyline({
+                path: [startPoint, endPoint],
+                geodesic: true,
+                strokeColor: "#000",
+                strokeOpacity: 0,
+                strokeWeight: 2,
+                zIndex: 1,
+                icons: [{
+                    icon: {
+                        path: 'M 0,-1 0,1',
+                        strokeOpacity: 1,
+                        scale: 4
+                    },
+                    offset: '0',
+                    repeat: '20px'
+                }],
+                map: map
+            });
+        }
 
-                        // Rotta tratteggiata partenza → arrivo
-                        const partenza = {
-                            lat: parseFloat(flight.departure_airport.latitude),
-                            lng: parseFloat(flight.departure_airport.longitude)
-                        };
-
-                        const arrivo = {
-                            lat: parseFloat(flight.arrival_airport.latitude),
-                            lng: parseFloat(flight.arrival_airport.longitude)
-                        };
-
-                        new google.maps.Polyline({
-                            path: [partenza, arrivo],
-                            geodesic: true,
-                            strokeColor: "#282828",
-                            strokeOpacity: 0,
-                            strokeWeight: 2,
-                            icons: [{
-                                icon: {
-                                    path: 'M 0,-1 0,1',
-                                    strokeOpacity: 1,
-                                    scale: 4
-                                },
-                                offset: '0',
-                                repeat: '20px'
-                            }],
-                            map: map
-                        });
-                    }
-                })
-                .catch(err => {
-                    console.error(`Errore iniziale per volo ${flight.id}:`, err);
-                });
-        });
-
-        setInterval(updateFlightPositions, 1000);
+        await aggiornaPosizioni();
+        setInterval(aggiornaPosizioni, 250);
     }
 
+    async function aggiornaPosizioni() {
+        updates++;
+        for (const flight of flights) {
+            try {
+                const res = await fetch(`/api/simulazione-volo/${flight.id}`);
+                const data = await res.json();
 
-
-    function updateFlightPositions() {
-        flights.forEach(flight => {
-            fetch(`/api/simulazione-volo/${flight.id}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.stato === 'In volo' && markers[flight.id]) {
-                        // Aggiorna la posizione del marker
-                        markers[flight.id].setPosition({ lat: data.lat, lng: data.lon });
-
-                        // Se questo è il volo attualmente visualizzato nella card, aggiorna anche i dati
-                        if (flight.id === currentFlightId) {
-                            document.getElementById('flightCoords').innerText = `${data.lat.toFixed(2)}, ${data.lon.toFixed(2)}`;
-                            document.getElementById('flightSpeed').innerText = `${data.velocita ?? '-'}`;
-
-                            document.getElementById('flightProgress').style.width = `${Math.round(data.percentuale)}%`;
-                            document.getElementById('flightProgress').innerText = `${Math.round(data.percentuale)}%`;
-                            console.log(data.percentuale);
-                        }
-                    }
-                })
-                .catch(err => {
-                    console.error("Errore nella simulazione volo", err);
-                });
-        });
+                if (overlays[flight.id] && data.stato === 'In volo') {
+                    const nuovaPosizione = new google.maps.LatLng(data.lat, data.lon);
+                    overlays[flight.id].setPosition(nuovaPosizione);
+                }
+            } catch (err) {
+                console.error(`Errore aggiornamento volo ${flight.id}:`, err);
+            }
+        }
     }
 
-
+    initMap();
 </script>
 
 
-@php $googleapi = env('GOOGLE_MAPS_API'); @endphp
-<script src="https://maps.googleapis.com/maps/api/js?key={{ $googleapi }}&callback=initMap" async defer></script>
+<script>
+    (g => {
+        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+            m = document, b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+            u = () => h || (h = new Promise(async (f, n) => {
+                await (a = m.createElement("script"));
+                e.set("libraries", [...r] + "");
+                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                e.set("callback", c + ".maps." + q);
+                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                d[q] = f;
+                a.onerror = () => h = n(Error(p + " could not load."));
+                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                m.head.append(a)
+            }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+    })({
+        key: "{{ env('GOOGLE_MAPS_API') }}",
+        v: "weekly",
+    });
+</script>
 
 </body>
 </html>

@@ -61,9 +61,23 @@
     let map, marker, rotta;
     window.initMap = function() {
         const iniziale = { lat: 0, lng: 0 };
-        map = new google.maps.Map(document.getElementById("map"), { zoom: 5, center: iniziale });
-        marker = new google.maps.Marker({ position: iniziale, map, title: "Aereo", icon: { url: "/images/icon.svg", scaledSize: new google.maps.Size(40,40), anchor: new google.maps.Point(25,25) }});
-        aggiornaVolo(); setInterval(aggiornaVolo, 10000);
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 5,
+            center: iniziale,
+            streetViewControl: false,
+            //mapTypeControl: false,
+            //fullscreenControl: false
+        });
+        marker = new google.maps.Marker({
+            position: iniziale,
+            map,
+            title: "Aereo",
+            icon: {
+                url: "/images/icon.svg",
+                scaledSize: new google.maps.Size(40,40),
+                anchor: new google.maps.Point(25,25)
+            }});
+        aggiornaVolo(); setInterval(aggiornaVolo, 1000);
     };
 
     function aggiornaVolo() {

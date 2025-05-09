@@ -37,11 +37,12 @@ class UserController extends Controller
         // Recupera l'utente loggato
         $user = Auth::user();
 
-        // Salva l'immagine nella cartella 'public/profiles' e ottieni il percorso relativo
-        $imagePath = $request->file('profile_picture')->store('profiles', 'public');
+        $filename = Auth::user()->nickname . '_picture' . '.' . $request->file('profile_picture')->getClientOriginalExtension();
+        $request->file('profile_picture')->storeAs('profiles', $filename, 'public');
+
 
         // Salva il percorso nel database
-        $user->profile_picture_path = $imagePath;
+        $user->profile_picture_path = 'storage/profiles/' . $filename;
         $user->save();
 
         // Restituisce la risposta con il nuovo percorso dell'immagine

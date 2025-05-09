@@ -29,12 +29,13 @@
     </div>
 </div>
 
+@include('user/notify_popup')
 <!-- TODO:sistemare -->
 @include('footer')
 
 <script>
     const flights = @json($flights);
-    console.log(flights)
+    console.log(flights);
     let map;
     const markers = {}; // flight.id => marker
     let currentFlightId = null;
@@ -43,7 +44,9 @@
     function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
             zoom: 4,
-            center: { lat: 42.0, lng: 12.0 }
+            center: { lat: 45, lng: 15 },
+            streetViewControl: false,
+            //mapTypeControl: false
         });
 
         // Per ogni volo preferito: carica stato iniziale
@@ -118,7 +121,7 @@
                 });
         });
 
-        setInterval(updateFlightPositions, 10000);
+        setInterval(updateFlightPositions, 1000);
     }
 
 

@@ -6,7 +6,7 @@
     <title>Area Personale</title>
     <link rel="stylesheet" href="{{ asset('css/user/personal_area.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('css/navbar.css')}}">
 </head>
 <body>
@@ -17,10 +17,11 @@
         @csrf
         <label for="profile_picture" class="profile-image-wrapper">
             <div class="profile-image-circle">
-                <img src="{{ Auth::user()->profile_picture_path ? asset('storage/' . Auth::user()->profile_picture_path) : asset('images/default_user.jpg') }}" alt="Foto profilo">
+                <img src="{{ Auth::user()->profile_picture_path ? asset(Auth::user()->profile_picture_path) : asset('images/default_user.jpg') }}" alt="Foto profilo">
                 <span class="edit-icon">
-                <img src="{{ asset('images/pencil_icon.png') }}" alt="Modifica">
-            </span>
+                    <i class="bi bi-pencil"></i>
+                </span>
+
             </div>
         </label>
         <input type="file" id="profile_picture" name="profile_picture" onchange="document.getElementById('pictureForm').submit();">
@@ -44,7 +45,7 @@
 </div>
 
 <!-- TODO: includere footer -->
-
+@include('user/notify_popup')
 <script>
     function enableEdit() {
         const inputs = document.querySelectorAll('.form-input');

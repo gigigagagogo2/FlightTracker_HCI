@@ -17,13 +17,15 @@ class FlightSimulationService{
         $endCoords = ['lat' => $flight->arrivalAirport->latitude, 'lon' => $flight->arrivalAirport->longitude];
         $currentPosition = $this->getCoordinates($startCoords, $endCoords, $progress);
         $speed = $this->getActualSpeed($progress);
+        $city = $flight->departureAirport->city;
 
         return [
             'lat' => $currentPosition['lat'],
             'lon' => $currentPosition['lon'],
             'velocita' => $speed,
             'stato' => $progress != 1 ? 'In volo' : 'Atterrato',
-            'percentuale' => $progress * 100
+            'percentuale' => $progress * 100,
+            'arrival_city' => $city,
         ];
     }
 

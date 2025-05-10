@@ -174,9 +174,9 @@
             overlay.setPosition(nuovaPosizione);
 
             // Aggiorno l'immagine in diretta ma i dati solo ogni 20 tick (5s)
-            if (data.percentuale < 5 || data.percentuale > 95 || updates % 20 === 0) {
+            if (data.progress * 100 < 5 || data.progress * 100 > 95 || updates % 20 === 0) {
                 document.getElementById("current-speed").innerText =
-                    `${parseInt(data.velocita)} km/h`;
+                    `${parseInt(data.speed)} km/h`;
             }
 
             if (updates % 20 === 0) {

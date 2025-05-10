@@ -91,9 +91,8 @@ Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.sh
 
 Route::get('/api/simulazione-volo/{id}', [FlightSimulationController::class, 'getFlightData']);
 
-Route::post('/flights/preferiti/add', [FlightController::class, 'aggiungiPreferito'])->middleware('auth');
-
-Route::post('/flights/preferiti/remove', [FlightController::class, 'rimuoviPreferito'])->middleware('auth');
+Route::post('/flights/preferiti/{id}', [FlightController::class, 'aggiungiPreferito'])->middleware('auth');
+Route::delete('/flights/preferiti/{id}', [FlightController::class, 'rimuoviPreferito'])->middleware('auth');
 
 Route::get('/profile', [UserController::class, 'showProfile'])->name('user.profile');
 

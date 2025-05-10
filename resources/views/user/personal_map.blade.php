@@ -18,7 +18,8 @@
     <div id="map"></div>
 </div>
 
-<div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow" style="width: 22rem; display: none; z-index: 999;">
+<div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow"
+     style="width: 22rem; display: none; z-index: 999;">
     <div class="card-body">
         <h5 class="card-title" id="flightModelName">Modello Aereo</h5>
         <p class="card-text mb-1"><strong>Coordinate:</strong> <span id="flightCoords">-</span></p>
@@ -38,15 +39,19 @@
     let map;
     /** @type {Object.<number, RotatableOverlay>} */
     let overlays = {};
+    let routes = {};
     let updates = 0;
+    let currentFlightId = null;
 
     async function initMap() {
         await google.maps.importLibrary('maps');
-        const { spherical } = await google.maps.importLibrary("geometry");
+        const {spherical} = await google.maps.importLibrary("geometry");
 
         map = new google.maps.Map(document.getElementById("map"), {
             zoom: 5,
-            center: { lat: 45, lng: 15 },
+            center: {lat: 45, lng: 15},
+            streetViewControl: false,
+
         });
 
         const module = await import('/js/RotatableOverlay.js');
@@ -74,11 +79,26 @@
                 iconHeading
             );
 
+            overlay.addListener('click', () => {
+                // Closure, const value are saved inside the inner function (e.g. flight, overlay)
+                currentFlightId = flight.id;
+                const data = overlay.flightData;
+
+                if (!data) return;
+
+                document.getElementById('flightInfoCard').style.display = 'block';
+                document.getElementById('flightModelName').innerText = flight.airplane_model.name;
+                document.getElementById('flightCoords').innerText = `${data.lat.toFixed(2)} , ${data.lng.toFixed(2)}`;
+                document.getElementById('flightSpeed').innerText = `${data.speed ?? '-'}`;
+                document.getElementById('flightProgress').style.width = `${Math.round(data.progress * 100)}%`;
+                document.getElementById('flightProgress').innerText = `${Math.round(data.progress * 100)}%`;
+            });
+
             overlay.setMap(map);
             overlays[flight.id] = overlay;
 
             // Disegna rotta tratteggiata
-            new google.maps.Polyline({
+            routes[flight.id] = new google.maps.Polyline({
                 path: [startPoint, endPoint],
                 geodesic: true,
                 strokeColor: "#000",
@@ -99,22 +119,43 @@
         }
 
         await aggiornaPosizioni();
-        setInterval(aggiornaPosizioni, 250);
+
+        setInterval(aggiornaPosizioni, 500);
     }
 
+    let isRequestInProgress = false;
+
     async function aggiornaPosizioni() {
+        if (isRequestInProgress) return;
+        isRequestInProgress = true;
+
         updates++;
         for (const flight of flights) {
             try {
                 const res = await fetch(`/api/simulazione-volo/${flight.id}`);
                 const data = await res.json();
 
-                if (overlays[flight.id] && data.stato === 'In volo') {
-                    const nuovaPosizione = new google.maps.LatLng(data.lat, data.lon);
-                    overlays[flight.id].setPosition(nuovaPosizione);
+                const nuovaPosizione = new google.maps.LatLng(data.lat, data.lng);
+                overlays[flight.id].setPosition(nuovaPosizione);
+                overlays[flight.id].flightData = data;
+
+                // Se questo è il volo attualmente visualizzato nella card, aggiorna anche i dati
+                if (flight.id === currentFlightId) {
+                    document.getElementById('flightCoords').innerText = `${nuovaPosizione.lat().toFixed(2)}, ${nuovaPosizione.lng().toFixed(2)}`;
+                    document.getElementById('flightSpeed').innerText = `${data.speed ?? '-'}`;
+                    document.getElementById('flightProgress').style.width = `${Math.round(data.progress * 100)}%`;
+                    document.getElementById('flightProgress').innerText = `${Math.round(data.progress * 100)}%`;
                 }
+
+                if (data.progress == 0 || data.progress == 1) {
+                    overlays[flight.id].setMap(null);
+                    routes[flight.id].setMap(null);
+                }
+
             } catch (err) {
                 console.error(`Errore aggiornamento volo ${flight.id}:`, err);
+            } finally {
+                isRequestInProgress = false;
             }
         }
     }

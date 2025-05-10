@@ -50,7 +50,7 @@ class Flight extends Model
      *  - green: departure_time ≤ now ≤ arrival_time
      *  - red: now > arrival_time
      */
-    public function getStatusAttribute()
+    public function getStatusAttribute(): string
     {
         $now = Carbon::now();
 
@@ -63,5 +63,14 @@ class Flight extends Model
         }
 
         return 'red';
+    }
+
+    /**
+     * Verifica se il volo è nei preferiti dell'utente autenticato.
+     */
+    public function isPreferito(): bool
+    {
+        // Verifica se l'utente autenticato è presente nella relazione molti-a-molti
+        return $this->users->contains(auth()->user());
     }
 }

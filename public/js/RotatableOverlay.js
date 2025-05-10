@@ -5,6 +5,7 @@ export default class RotatableOverlay extends google.maps.OverlayView {
         this.imageUrl = imageUrl;
         this.angle = angle;
         this.div = null;
+        this.flightData = null;
     }
 
     onAdd() {
@@ -15,7 +16,12 @@ export default class RotatableOverlay extends google.maps.OverlayView {
 
         /** @type {google.maps.MapPanes} */
         const panes = this.getPanes();
-        panes.overlayImage.appendChild(this.div);
+        panes.overlayMouseTarget.appendChild(this.div);
+
+        this.div.addEventListener('click', (event) => {
+            // Rilancia l'evento sull'overlay stesso
+            google.maps.event.trigger(this, 'click', event);
+        });
     }
 
     draw() {

@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Flight;
 use Carbon\Carbon;
-use Log;
 
 class FlightSimulationService
 {
@@ -15,32 +14,27 @@ class FlightSimulationService
 
         $startTime = Carbon::parse($flight->departure_time);
         $endTime = Carbon::parse($flight->arrival_time);
-        $totalTime = $startTime->diffInSeconds($endTime, true);
+        $totalTime = $startTime->diffInSeconds($endTime);
         $progress = $this->getProgress($startTime, $totalTime);
 
         $startCoords = ['lat' => $flight->departureAirport->latitude, 'lng' => $flight->departureAirport->longitude];
         $endCoords = ['lat' => $flight->arrivalAirport->latitude, 'lng' => $flight->arrivalAirport->longitude];
 
-        if ($progress != 0 && $progress != 1) {
+        if ($progress == 0) {
+            $currentPosition = ['lat' => $flight->departureAirport->latitude, 'lng' => $flight->departureAirport->longitude];
+            $speed = 0;
+        } else if ($progress == 1) {
+            $currentPosition = ['lat' => $flight->arrivalAirport->latitude, 'lng' => $flight->arrivalAirport->longitude];
+            $speed = 0;
+        } else {
             $currentPosition = $this->getCurrentPoint($startCoords, $endCoords, $progress);
             $distance = $this->haversineGreatCircleDistance($startCoords, $endCoords);
             $averageSpeed = $distance / $totalTime * 3.6; // km/h
             $elapsedTime = $startTime->diffInSeconds(Carbon::now(), true);
             $speed = $this->getActualSpeed($averageSpeed, $elapsedTime, $totalTime);
-        } else if ($progress == 0){
-            $currentPosition = ['lat' => $flight->departureAirport->latitude, 'lng' => $flight->departureAirport->longitude];
-            $speed = 0;
-        } else {
-            $currentPosition = ['lat' => $flight->arrivalAirport->latitude, 'lng' => $flight->arrivalAirport->longitude];
         }
 
-        return [
-            'lat' => $currentPosition['lat'],
-            'lng' => $currentPosition['lng'],
-            'velocita' => $speed,
-            'stato' => $progress != 1 ? 'In volo' : 'Atterrato',
-            'percentuale' => $progress * 100
-        ];
+        return ['lat' => (float) $currentPosition['lat'], 'lng' => (float) $currentPosition['lng'], 'speed' => $speed, 'progress' => $progress];
     }
 
     /**
@@ -51,8 +45,7 @@ class FlightSimulationService
      * @param int $earthRadius Mean earth radius in [m]
      * @return float|int Distance between points in [m] (same as earthRadius)
      */
-    function haversineGreatCircleDistance(
-        $startCoords, $endCoords, int $earthRadius = 6371000): float|int
+    function haversineGreatCircleDistance($startCoords, $endCoords, int $earthRadius = 6371000): float|int
     {
         // convert from degrees to radians
         $latFrom = deg2rad($startCoords['lat']);
@@ -63,13 +56,11 @@ class FlightSimulationService
         $latDelta = $latTo - $latFrom;
         $lonDelta = $lngTo - $lngFrom;
 
-        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-                cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) + cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
         return $angle * $earthRadius;
     }
 
-    function getCurrentPoint(
-        $startCoords, $endCoords, $progress, int $earthRadius = 6371000): array
+    function getCurrentPoint($startCoords, $endCoords, $progress, int $earthRadius = 6371000): array
     {
         // convert from degrees to radians
         $latFrom = deg2rad($startCoords['lat']);
@@ -102,10 +93,7 @@ class FlightSimulationService
         $lngMid = rad2deg($lngMid);
 
         // Ritorniamo la latitudine e longitudine intermedia
-        return [
-            'lat' => round($latMid, 6),
-            'lng' => round($lngMid, 6),
-        ];
+        return ['lat' => round($latMid, 6), 'lng' => round($lngMid, 6)];
     }
 
     public function getProgress(Carbon $start, float $totalTime): float

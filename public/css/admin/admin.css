@@ -11,3 +11,7 @@ body {
 .admin-card:hover {
     transform: translateY(-5px);
 }
+/*override del nostro footer*/
+.site-footer{
+    margin-top: 17rem !important;
+}

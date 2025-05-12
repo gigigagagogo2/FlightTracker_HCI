@@ -12,22 +12,23 @@
 <body>
 
 @include('navbar')
+<main class="main-content">
+    <div class="map-container">
+        <h2 class="text-center mb-4">I tuoi voli preferiti</h2>
+        <div id="map"></div>
+    </div>
 
-<div class="map-container">
-    <h2 class="text-center mb-4">I tuoi voli preferiti</h2>
-    <div id="map"></div>
-</div>
-
-<div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow" style="width: 22rem; display: none; z-index: 999;">
-    <div class="card-body">
-        <h5 class="card-title" id="flightModelName">Modello Aereo</h5>
-        <p class="card-text mb-1"><strong>Coordinate:</strong> <span id="flightCoords">-</span></p>
-        <p class="card-text mb-2"><strong>Velocità:</strong> <span id="flightSpeed">-</span> km/h</p>
-        <div class="progress">
-            <div id="flightProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+    <div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow" style="width: 22rem; display: none; z-index: 999;">
+        <div class="card-body">
+            <h5 class="card-title" id="flightModelName">Modello Aereo</h5>
+            <p class="card-text mb-1"><strong>Coordinate:</strong> <span id="flightCoords">-</span></p>
+            <p class="card-text mb-2"><strong>Velocità:</strong> <span id="flightSpeed">-</span> km/h</p>
+            <div class="progress">
+                <div id="flightProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
         </div>
     </div>
-</div>
+</main>
 
 @include('user/notify_popup')
 <!-- TODO:sistemare -->

@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 <nav class="navbar navbar-light bg-light px-4">
     <div class="container-fluid d-flex justify-content-between">
         <ul class="navbar-nav d-flex flex-row">

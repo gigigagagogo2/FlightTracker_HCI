@@ -1,0 +1,25 @@
+/* Footer */
+.site-footer {
+    flex: 0 0 80px;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 2rem 1rem;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #555;
+    margin-top: 10rem;
+}
+
+.site-footer a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    text-decoration: underline;
+}
+
+.footer-content p {
+    margin: 0.3rem 0;
+}

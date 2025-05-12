@@ -1,17 +1,14 @@
 /* Sfondo chiaro */
 .page {
     background-color: #f3f6fa;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 /* Contenitore centrale */
-.container {
+.acces-container {
     width: 100%;
     max-width: 400px;
     padding: 1rem;
+    margin: 0 auto;
 }
 
 .card {

@@ -52,7 +52,7 @@
     </div>
 
     <div class="progress my-4" style="height: 25px;">
-        <div id="progress-bar" class="progress-bar bg-warning text-dark fw-bold" role="progressbar" style="width:0%;">
+        <div id="progress-bar" class="progress-bar bg-warning text-dark fw-bold" role="progressbar" style="width:0;">
             0%
         </div>
     </div>
@@ -132,24 +132,33 @@
         const partenza = new google.maps.LatLng({{ $flight->departureAirport->latitude }}, {{ $flight->departureAirport->longitude }});
         const arrivo = new google.maps.LatLng({{ $flight->arrivalAirport->latitude }}, {{ $flight->arrivalAirport->longitude }});
 
-        new google.maps.Polyline({
+        const rotta = new google.maps.Polyline({
             path: [partenza, arrivo],
             geodesic: true,
-            strokeColor: "#000",
-            strokeOpacity: 0,
+            strokeOpacity: 0, // invisibile, usiamo solo gli icons
             strokeWeight: 2,
             zIndex: 1,
-            icons: [{
-                icon: {
-                    path: 'M 0,-1 0,1', // tratteggio
-                    strokeOpacity: 1,
-                    scale: 4
-                },
-                offset: '0',
-                repeat: '20px'
-            }],
+            icons: [
+                {
+                    icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000000', scale: 4 },
+                    offset: '0px',
+                    repeat: '20px'
+                }
+            ],
             map: map
         });
+
+        let offset = 0;
+
+        setInterval(() => {
+            offset = (offset + 0.5) % 20;
+
+            rotta.set('icons', [{
+                icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000000', scale: 4 },
+                offset: `${offset}px`,
+                repeat: '20px'
+            }]);
+        }, 50);
 
         // Avvia aggiornamenti
         const posizioneIniziale = await aggiornaVolo();

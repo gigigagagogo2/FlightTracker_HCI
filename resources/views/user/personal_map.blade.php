@@ -118,6 +118,20 @@
             });
         }
 
+        let offset = 0;
+
+        setInterval(() => {
+            offset = (offset + 0.5) % 20;
+
+            for (const flight of flights) {
+                routes[flight.id].set('icons', [{
+                    icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000000', scale: 4 },
+                    offset: `${offset}px`,
+                    repeat: '20px'
+                }]);
+            }
+        }, 50);
+
         await aggiornaPosizioni();
 
         setInterval(aggiornaPosizioni, 500);
@@ -147,7 +161,7 @@
                     document.getElementById('flightProgress').innerText = `${Math.round(data.progress * 100)}%`;
                 }
 
-                if (data.progress == 0 || data.progress == 1) {
+                if (data.progress === 0 || data.progress === 1) {
                     overlays[flight.id].setMap(null);
                     routes[flight.id].setMap(null);
                 }

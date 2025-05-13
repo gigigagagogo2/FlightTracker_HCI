@@ -19,9 +19,12 @@
 </div>
 
 <div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow"
-     style="width: 22rem; display: none; z-index: 999;">
-    <div class="card-body">
+     style="width: 24rem; display: none; z-index: 999;">
+    <div class="card-body position-relative">
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Chiudi" onclick="chiudiCard()"></button>
         <h5 class="card-title" id="flightModelName">Modello Aereo</h5>
+        <p class="card-text mb-1"><strong>Aeroporto di partenza:</strong> <span id="departureAirport">-</span></p>
+        <p class="card-text mb-1"><strong>Aeroporto di arrivo:</strong> <span id="arrivalAirport">-</span></p>
         <p class="card-text mb-1"><strong>Coordinate:</strong> <span id="flightCoords">-</span></p>
         <p class="card-text mb-2"><strong>Velocità:</strong> <span id="flightSpeed">-</span> km/h</p>
         <div class="progress">
@@ -58,6 +61,7 @@
         const RotatableOverlay = module.default;
 
         for (const flight of flights) {
+
             const startPoint = new google.maps.LatLng(
                 parseFloat(flight.departure_airport.latitude),
                 parseFloat(flight.departure_airport.longitude)
@@ -88,6 +92,8 @@
 
                 document.getElementById('flightInfoCard').style.display = 'block';
                 document.getElementById('flightModelName').innerText = flight.airplane_model.name;
+                document.getElementById('departureAirport').innerText = flight.departure_airport.name.split(" ").slice(2).join(" ");
+                document.getElementById('arrivalAirport').innerText = flight.arrival_airport.name.split(" ").slice(2).join(" ");
                 document.getElementById('flightCoords').innerText = `${data.lat.toFixed(2)} , ${data.lng.toFixed(2)}`;
                 document.getElementById('flightSpeed').innerText = `${data.speed ?? '-'}`;
                 document.getElementById('flightProgress').style.width = `${Math.round(data.progress * 100)}%`;
@@ -175,8 +181,14 @@
     }
 
     initMap();
+
 </script>
 
+<script>
+    function chiudiCard() {
+        document.getElementById('flightInfoCard').style.display = 'none';
+    }
+</script>
 
 <script>
     (g => {

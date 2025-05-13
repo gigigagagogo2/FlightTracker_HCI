@@ -32,7 +32,9 @@ class FlightSeeder extends Seeder
 
             if ($i < 5) {
                 $departureTime = Carbon::now()->setSeconds(0);
-            } else {
+            } elseif ($i < 8){
+              $departureTime = Carbon::now()->copy()->addHours(rand(1, 3));
+            }else {
                 $departureTime = Carbon::now()->addDays(rand(-10, 30))
                     ->setTime(rand(0, 23), [0, 15, 30, 45][rand(0, 3)], 0);
             }

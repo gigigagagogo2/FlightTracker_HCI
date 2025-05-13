@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class Flight extends Model
 {
@@ -54,7 +55,7 @@ class Flight extends Model
     {
         $now = Carbon::now();
 
-        if ($now->lt($this->departure_time)) {
+        if ($now->between($this->departure_time->copy()->addHours(-2) ,$this->departure_time)) {
             return 'yellow';
         }
 
@@ -63,6 +64,7 @@ class Flight extends Model
         }
 
         return 'red';
+
     }
 
     /**

@@ -69,23 +69,25 @@
             const arrivalTime    = new Date(flight.arrival_time).toLocaleString();
             const planeImage     = flight.airplane_model.image_path;
 
-            // ▶️ qui calcoliamo la classe del pallino
+
             const statusClass = ['green','yellow','red'].includes(flight.status)
                 ? flight.status
                 : 'gray';
-
-            card.innerHTML = `
-          <div class="d-flex align-items-center">
-            <span class="status-dot ${statusClass}"></span>
-            <div class="ms-2">
-              <img src="${planeImage}" alt="Aereo" class="flight-image" style="width:50px;height:auto;">
-              <h5>${departureCity} → ${arrivalCity}</h5>
-              <p>${departureTime} - ${arrivalTime}</p>
-              <small>Modello: ${flight.airplane_model.name}</small>
-            </div>
-          </div>
+            if (statusClass != 'red'){
+                card.innerHTML = `
+              <div class="d-flex align-items-center">
+                <span class="status-dot ${statusClass}"></span>
+                <div class="ms-2">
+                  <img src="${planeImage}" alt="Aereo" class="flight-image" style="width:50px;height:auto;">
+                  <h5>${departureCity} → ${arrivalCity}</h5>
+                  <p>${departureTime} - ${arrivalTime}</p>
+                  <small>Modello: ${flight.airplane_model.name}</small>
+                </div>
+              </div>
         `;
-            resultContainer.appendChild(card);
+                resultContainer.appendChild(card);
+            }
+
         });
     }
 

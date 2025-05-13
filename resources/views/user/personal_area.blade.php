@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="{{ asset('css/main-content.css') }}">
     <title>Area Personale</title>
     <link rel="stylesheet" href="{{ asset('css/user/personal_area.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{asset('css/navbar.css')}}">
+
+
 </head>
 <body>
+@include("navbar")
+<main class="main-content">
 
 <div class="profile-card">
     <!-- FORM 1: solo immagine -->
@@ -44,7 +48,10 @@
 
 </div>
 
+            </main>
+
 <!-- TODO: includere footer -->
+@include("footer")
 @include('user/notify_popup')
 <script>
     function enableEdit() {

@@ -12,11 +12,11 @@
 <body>
 
 @include('navbar')
-
-<div class="map-container">
-    <h2 class="text-center mb-4">I tuoi voli preferiti</h2>
-    <div id="map"></div>
-</div>
+<main class="main-content">
+    <div class="map-container">
+        <h2 class="text-center mb-4">I tuoi voli preferiti</h2>
+        <div id="map"></div>
+    </div>
 
 <div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow"
      style="width: 24rem; display: none; z-index: 999;">

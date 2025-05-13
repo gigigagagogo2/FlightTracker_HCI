@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fetch(`/api/simulazione-volo/${id}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.stato === 'Atterrato') {
+                    if (data.progress === 1) {
                         showLandingToast(id, data);
                         notifiedFlights.push(id);
                     }
@@ -48,7 +48,5 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => toast.remove(), 6000);
     }
 
-
-    // Avvia il controllo ogni 10 secondi
     setInterval(checkFlightsLanding, 1000);
 });

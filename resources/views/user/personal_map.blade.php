@@ -61,67 +61,77 @@
         const RotatableOverlay = module.default;
 
         for (const flight of flights) {
+            try {
+                const res = await fetch(`/api/simulazione-volo/${flight.id}`);
+                const data = await res.json();
 
-            const startPoint = new google.maps.LatLng(
-                parseFloat(flight.departure_airport.latitude),
-                parseFloat(flight.departure_airport.longitude)
-            );
+                if (data.progress === 0 || data.progress === 1){
+                    continue;
+                }
 
-            const endPoint = new google.maps.LatLng(
-                parseFloat(flight.arrival_airport.latitude),
-                parseFloat(flight.arrival_airport.longitude)
-            );
+                const startPoint = new google.maps.LatLng(
+                    parseFloat(flight.departure_airport.latitude),
+                    parseFloat(flight.departure_airport.longitude)
+                );
 
-            const heading = spherical.computeHeading(startPoint, endPoint);
-            const iconHeading = -45 + heading;
+                const endPoint = new google.maps.LatLng(
+                    parseFloat(flight.arrival_airport.latitude),
+                    parseFloat(flight.arrival_airport.longitude)
+                );
 
-            const iniziale = new google.maps.LatLng(0, 0);
+                const heading = spherical.computeHeading(startPoint, endPoint);
+                const iconHeading = -45 + heading;
 
-            const overlay = new RotatableOverlay(
-                iniziale,
-                '/images/plane-map-icon.svg',
-                iconHeading
-            );
+                const iniziale = new google.maps.LatLng(0, 0);
 
-            overlay.addListener('click', () => {
-                // Closure, const value are saved inside the inner function (e.g. flight, overlay)
-                currentFlightId = flight.id;
-                const data = overlay.flightData;
+                const overlay = new RotatableOverlay(
+                    iniziale,
+                    '/images/plane-map-icon.svg',
+                    iconHeading
+                );
 
-                if (!data) return;
+                overlay.addListener('click', () => {
+                    // Closure, const value are saved inside the inner function (e.g. flight, overlay)
+                    currentFlightId = flight.id;
+                    const data = overlay.flightData;
 
-                document.getElementById('flightInfoCard').style.display = 'block';
-                document.getElementById('flightModelName').innerText = flight.airplane_model.name;
-                document.getElementById('departureAirport').innerText = flight.departure_airport.name.split(" ").slice(2).join(" ");
-                document.getElementById('arrivalAirport').innerText = flight.arrival_airport.name.split(" ").slice(2).join(" ");
-                document.getElementById('flightCoords').innerText = `${data.lat.toFixed(2)} , ${data.lng.toFixed(2)}`;
-                document.getElementById('flightSpeed').innerText = `${data.speed ?? '-'}`;
-                document.getElementById('flightProgress').style.width = `${Math.round(data.progress * 100)}%`;
-                document.getElementById('flightProgress').innerText = `${Math.round(data.progress * 100)}%`;
-            });
+                    if (!data) return;
 
-            overlay.setMap(map);
-            overlays[flight.id] = overlay;
+                    document.getElementById('flightInfoCard').style.display = 'block';
+                    document.getElementById('flightModelName').innerText = flight.airplane_model.name;
+                    document.getElementById('departureAirport').innerText = flight.departure_airport.name.split(" ").slice(2).join(" ");
+                    document.getElementById('arrivalAirport').innerText = flight.arrival_airport.name.split(" ").slice(2).join(" ");
+                    document.getElementById('flightCoords').innerText = `${data.lat.toFixed(2)} , ${data.lng.toFixed(2)}`;
+                    document.getElementById('flightSpeed').innerText = `${data.speed ?? '-'}`;
+                    document.getElementById('flightProgress').style.width = `${Math.round(data.progress * 100)}%`;
+                    document.getElementById('flightProgress').innerText = `${Math.round(data.progress * 100)}%`;
+                });
 
-            // Disegna rotta tratteggiata
-            routes[flight.id] = new google.maps.Polyline({
-                path: [startPoint, endPoint],
-                geodesic: true,
-                strokeColor: "#000",
-                strokeOpacity: 0,
-                strokeWeight: 2,
-                zIndex: 1,
-                icons: [{
-                    icon: {
-                        path: 'M 0,-1 0,1',
-                        strokeOpacity: 1,
-                        scale: 4
-                    },
-                    offset: '0',
-                    repeat: '20px'
-                }],
-                map: map
-            });
+                overlay.setMap(map);
+                overlays[flight.id] = overlay;
+
+                // Disegna rotta tratteggiata
+                routes[flight.id] = new google.maps.Polyline({
+                    path: [startPoint, endPoint],
+                    geodesic: true,
+                    strokeColor: "#000",
+                    strokeOpacity: 0,
+                    strokeWeight: 2,
+                    zIndex: 1,
+                    icons: [{
+                        icon: {
+                            path: 'M 0,-1 0,1',
+                            strokeOpacity: 1,
+                            scale: 4
+                        },
+                        offset: '0',
+                        repeat: '20px'
+                    }],
+                    map: map
+                });
+            }catch(err) {
+                console.error(`Errore nel disegno iniziale di ${flight.id}`, err);
+            }
         }
 
         let offset = 0;
@@ -213,6 +223,6 @@
         v: "weekly",
     });
 </script>
-
+</main>
 </body>
 </html>

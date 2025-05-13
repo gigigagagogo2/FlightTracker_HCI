@@ -34,7 +34,13 @@ class FlightSimulationService
             $speed = $this->getActualSpeed($averageSpeed, $elapsedTime, $totalTime);
         }
 
-        return ['lat' => (float) $currentPosition['lat'], 'lng' => (float) $currentPosition['lng'], 'speed' => $speed, 'progress' => $progress];
+        return [
+            'lat' => (float) $currentPosition['lat'],
+            'lng' => (float) $currentPosition['lng'],
+            'speed' => $speed,
+            'progress' => $progress,
+            'arrival_city' => $flight->arrivalAirport->city
+        ];
     }
 
     /**
@@ -60,7 +66,7 @@ class FlightSimulationService
         return $angle * $earthRadius;
     }
 
-    function getCurrentPoint($startCoords, $endCoords, $progress, int $earthRadius = 6371000): array
+    function getCurrentPoint($startCoords, $endCoords, $progress): array
     {
         // convert from degrees to radians
         $latFrom = deg2rad($startCoords['lat']);

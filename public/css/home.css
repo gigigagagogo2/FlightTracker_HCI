@@ -63,30 +63,6 @@
     border-color: #ced4da !important; /* stesso colore del bordo normale */
 }
 
-/*!* Footer *!*/
-/*.site-footer {*/
-/*    background-color: #f8f9fa;*/
-/*    padding: 2rem 1rem;*/
-/*    border-top: 1px solid #dee2e6;*/
-/*    text-align: center;*/
-/*    font-size: 0.95rem;*/
-/*    color: #555;*/
-/*    margin-top: 4rem;*/
-/*}*/
-
-/*.site-footer a {*/
-/*    color: #0d6efd;*/
-/*    text-decoration: none;*/
-/*}*/
-
-/*.site-footer a:hover {*/
-/*    text-decoration: underline;*/
-/*}*/
-
-/*.footer-content p {*/
-/*    margin: 0.3rem 0;*/
-/*}*/
-
 .placeholder-transition {
     opacity: 0.3;
     transition: opacity 0.3s ease;
@@ -119,6 +95,8 @@
     transition: background-color 0.3s ease;
 }
 
+
+
 /* Immagine aereo */
 .flight-card img.flight-image {
     display: block;
@@ -149,20 +127,6 @@ html, body {
 
 .main-content {
     flex: 1;
-}
-
-.flight-card {
-    display: flex;
-    align-items: center;
-    background-color: #fff;
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-    cursor: pointer;
 }
 
 .flight-card:hover {
@@ -207,3 +171,7 @@ html, body {
 .status-dot.yellow { animation: blink-yellow 3.5s infinite; }
 .status-dot.red    { animation: blink-red 4.5s infinite; }
 .status-dot.gray   { /* no animation per stato sconosciuto */ }
+
+
+
+

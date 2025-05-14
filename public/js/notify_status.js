@@ -44,8 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const bootstrapToast = new bootstrap.Toast(toast);
         bootstrapToast.show();
 
-        // Rimuovi il toast dopo 5 secondi
-        setTimeout(() => toast.remove(), 6000);
+        setTimeout(() => toast.remove(), 5000);
     }
 
     setInterval(checkFlightsLanding, 1000);

@@ -51,9 +51,15 @@
         const {spherical} = await google.maps.importLibrary("geometry");
 
         map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 5,
-            center: {lat: 45, lng: 15},
+            zoom: 4,
+            center: {lat: 48, lng: 10},
             streetViewControl: false,
+            fullscreenControl: false,
+            mapTypeControl: false,
+            scaleControl: true,
+            zoomControl: true,
+            gestureHandling: "greedy", // migliora l'interazione su mobile
+            minZoom: 2,
 
         });
 
@@ -63,9 +69,10 @@
         for (const flight of flights) {
             try {
                 const res = await fetch(`/api/simulazione-volo/${flight.id}`);
+                if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
                 const data = await res.json();
 
-                if (data.progress === 0 || data.progress === 1){
+                if (data.progress === 1){
                     continue;
                 }
 
@@ -163,6 +170,7 @@
         for (const flight of flights) {
             try {
                 const res = await fetch(`/api/simulazione-volo/${flight.id}`);
+                if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
                 const data = await res.json();
 
                 const nuovaPosizione = new google.maps.LatLng(data.lat, data.lng);

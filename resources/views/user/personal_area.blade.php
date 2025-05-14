@@ -21,7 +21,8 @@
         @csrf
         <label for="profile_picture" class="profile-image-wrapper">
             <div class="profile-image-circle">
-                <img src="{{ Auth::user()->profile_picture_path ? asset(Auth::user()->profile_picture_path) : asset('images/default_user.jpg') }}" alt="Foto profilo">
+                <!-- ??: Se la variabile a sinistra non e' nulla restituisce il suo valore -->
+                <img src="{{ asset(Auth::user()->profile_picture_path ?? 'images/default_user.jpg') }}" alt="Foto profilo">
                 <span class="edit-icon">
                     <i class="bi bi-pencil"></i>
                 </span>
@@ -47,8 +48,7 @@
     </form>
 
 </div>
-
-            </main>
+</main>
 
 <!-- TODO: includere footer -->
 @include("footer")
@@ -61,8 +61,6 @@
         document.querySelector('.save-btn').style.display = 'inline-block';
         document.querySelector('.cancel-btn').style.display = 'inline-block';
     }
-
-
 
     function cancelEdit() {
         const inputs = document.querySelectorAll('.form-input');

@@ -42,8 +42,20 @@
     const searchSection = document.getElementById("search-section");
     const resultContainer = document.getElementById("result-container");
 
-    function updatePlaceholder() { /* ... unchanged ... */ }
-    function resetSearch() { /* ... unchanged ... */ }
+    let index = 0;
+    const words = ["volo", "aereoporto", "citta"];
+
+    function updatePlaceholder() {
+        index = (index + 1) % words.length;
+        input.setAttribute("placeholder", "Inserisci " + words[index]);
+    }
+    function resetSearch() {
+        title.style.display = "block";  // Mostra di nuovo il titolo
+        searchSection.classList.remove("search-fixed");  // Rimuove la classe fissa
+        resultContainer.innerHTML = "";
+        input.blur();
+
+    }
 
     function showResults(data) {
         title.style.display = "none";
@@ -120,6 +132,8 @@
             resetSearch();
         }
     });
+
+    setInterval(updatePlaceholder, 3000);
 </script>
 </body>
 </html>

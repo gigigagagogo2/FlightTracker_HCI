@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div id="map" style="height: 500px; width: 100%;"></div>
+    <div id="map" style="height: 500px; width: 100%; border-radius: 10px "></div>
 
     <div class="text-center">
         <a href="{{ route('home') }}" class="btn btn-outline-secondary mt-3">← Torna alla ricerca</a>

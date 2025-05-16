@@ -26,7 +26,6 @@
                 <span class="edit-icon">
                     <i class="bi bi-pencil"></i>
                 </span>
-
             </div>
         </label>
         <input type="file" id="profile_picture" name="profile_picture" onchange="document.getElementById('pictureForm').submit();">

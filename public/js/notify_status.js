@@ -3,18 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Se non c'è la variabile globale userFlights definita, esce
     if (typeof userFlights === "undefined" || !Array.isArray(userFlights)) return;
 
-    const notifiedFlights = [];
+    const notifiedFlights = new Set();
 
     function checkFlightsLanding() {
         userFlights.forEach(id => {
-            if (notifiedFlights.includes(id)) return;
-
             fetch(`/api/simulazione-volo/${id}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.progress === 1) {
+                    if (data.progress === 1 && !notifiedFlights.has(id)) {
                         showLandingToast(id, data);
-                        notifiedFlights.push(id);
+                        notifiedFlights.add(id);
                     }
                 })
                 .catch(err => console.error("Errore controllo atterraggio:", err));

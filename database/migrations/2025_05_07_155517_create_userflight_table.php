@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('user_flight', function(Blueprint $table){
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('flight_id')->constrained('flights')->onDelete('cascade');
-            $table->timestamps();
         });
     }
 
@@ -23,6 +22,8 @@ return new class extends Migration
      */
         public function down(): void
         {
-            Schema::dropIfExists('userflight');
+            Schema::table('user_flight', function (Blueprint $table) {
+                $table->dropColumn('notified');
+            });
         }
 };

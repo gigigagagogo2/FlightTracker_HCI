@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Flight;
 use App\Services\FlightSimulationService;
+use Illuminate\Support\Facades\Auth;
 
 class FlightSimulationController extends Controller
 {
@@ -13,4 +15,7 @@ class FlightSimulationController extends Controller
 
         return response()->json($data);
     }
+
+
+
 }

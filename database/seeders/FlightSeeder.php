@@ -38,6 +38,7 @@ class FlightSeeder extends Seeder
                 $departureTime = Carbon::now()->addDays(rand(-10, 30))
                     ->setTime(rand(0, 23), [0, 15, 30, 45][rand(0, 3)], 0);
             }
+
             #$arrivalTime = (clone $departureTime)->addMinutes(2);
             $arrivalTime = (clone $departureTime)->addHours(rand(1, 5))->addMinutes(rand(0, 59));
 

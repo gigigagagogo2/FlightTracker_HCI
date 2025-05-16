@@ -68,35 +68,40 @@
         }
 
         data.forEach(flight => {
-            const card = document.createElement("div");
-            card.className = "flight-card mb-3 p-3 border";
-            card.style.cursor = "pointer";
-            card.addEventListener("click", () => {
-                window.location.href = `/flights/${flight.id}`;
-            });
-
-            const departureCity = flight.departure_airport.city;
-            const arrivalCity   = flight.arrival_airport.city;
-            const departureTime  = new Date(flight.departure_time).toLocaleString();
-            const arrivalTime    = new Date(flight.arrival_time).toLocaleString();
-            const planeImage     = flight.airplane_model.image_path;
-
-
-            const statusClass = ['green','yellow','red'].includes(flight.status)
+            const statusClass = ['green','yellow', 'red'].includes(flight.status)
                 ? flight.status
                 : 'gray';
-            if (statusClass != 'red'){
+            if(statusClass != 'red'){
+                const card = document.createElement("div");
+                card.className = "flight-card mb-3 p-3 border";
+                card.style.cursor = "pointer";
+                card.addEventListener("click", () => {
+                    window.location.href = `/flights/${flight.id}`;
+                });
+
+                const departureCity = flight.departure_airport.city;
+                const arrivalCity   = flight.arrival_airport.city;
+                const departureTime  = new Date(flight.departure_time).toLocaleString();
+                const arrivalTime    = new Date(flight.arrival_time).toLocaleString();
+                const planeImage     = flight.airplane_model.image_path;
+
                 card.innerHTML = `
-              <div class="d-flex align-items-center">
-                <span class="status-dot ${statusClass}"></span>
-                <div class="ms-2">
-                  <img src="${planeImage}" alt="Aereo" class="flight-image" style="width:50px;height:auto;">
-                  <h5>${departureCity} → ${arrivalCity}</h5>
-                  <p>${departureTime} - ${arrivalTime}</p>
-                  <small>Modello: ${flight.airplane_model.name}</small>
-                </div>
-              </div>
-        `;
+  <div class="d-flex align-items-center w-100 position-relative">
+    <!-- Immagine -->
+    <img src="${planeImage}" alt="Aereo" class="flight-image me-3" style="width:80px; height:auto; flex-shrink:0;">
+
+    <!-- Info -->
+    <div class="flex-grow-1">
+      <h5 class="mb-1">${departureCity} → ${arrivalCity}</h5>
+      <p class="mb-1">${departureTime} - ${arrivalTime}</p>
+      <small>Modello: ${flight.airplane_model.name}</small>
+    </div>
+
+    <!-- Pallino posizionato assolutamente -->
+    <span class="status-dot ${statusClass} status-dot-absolute"></span>
+  </div>
+`;
+
                 resultContainer.appendChild(card);
             }
 

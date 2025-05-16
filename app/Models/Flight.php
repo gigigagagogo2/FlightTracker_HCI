@@ -16,13 +16,11 @@ class Flight extends Model
         'arrival_time',
     ];
 
-    // ▶️ assicurati che departure_time/arrival_time siano Carbon
     protected $casts = [
         'departure_time' => 'datetime',
         'arrival_time'   => 'datetime',
     ];
 
-    // ▶️ appendi l’attributo virtuale status
     protected $appends = ['status'];
 
     public function airplaneModel()

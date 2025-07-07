@@ -29,7 +29,7 @@ class RegisterController extends Controller
         // Logga in automatico
         auth()->login($user);
 
-        // Redirect con messaggio
-        return redirect('/')->with('success', 'Registrazione completata con successo');
+        // Redirect
+        return redirect('/');
     }
 }

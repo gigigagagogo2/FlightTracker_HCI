@@ -49,7 +49,6 @@
 </div>
 </main>
 
-<!-- TODO: includere footer -->
 @include("footer")
 @include('user/notify_popup')
 <script>

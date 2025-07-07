@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/user/personal_map.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 
 </head>
 <body>

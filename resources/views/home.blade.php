@@ -104,7 +104,6 @@
 
                 resultContainer.appendChild(card);
             }
-
         });
     }
 

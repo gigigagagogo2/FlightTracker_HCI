@@ -16,6 +16,7 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Controlla se non è autenticato/se non è admin
         if (!Auth::check() || !Auth::user()->is_admin) {
             abort(403, 'Accesso negato');
         }

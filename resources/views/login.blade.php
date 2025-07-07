@@ -17,6 +17,7 @@
         <div class="card shadow-sm">
             <h2 class="text-center mb-4">Accedi</h2>
 
+            <!-- Esegue la rotta login -->
             <form action="{{ route('login') }}" method="POST">
                 @csrf
                 <div class="mb-3">

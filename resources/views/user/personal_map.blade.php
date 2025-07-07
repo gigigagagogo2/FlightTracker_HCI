@@ -92,7 +92,7 @@
                     const overlay = new RotatableOverlay(
                         iniziale,
                         '/images/plane-map-icon.svg',
-                        iconHeading
+                        iconHeading,
                     );
 
                     overlay.addListener('click', () => {

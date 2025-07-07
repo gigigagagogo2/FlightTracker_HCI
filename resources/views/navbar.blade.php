@@ -5,9 +5,6 @@
             <li class="nav-item me-3">
                 <a class="nav-link" href="{{ route('home') }}">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Altro</a>
-            </li>
         </ul>
 
         <ul class="navbar-nav d-flex flex-row">

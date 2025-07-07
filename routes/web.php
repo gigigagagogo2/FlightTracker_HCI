@@ -101,3 +101,7 @@ Route::post('/profile/update-picture', [UserController::class, 'updatePicture'])
 Route::post('/profile/update', [UserController::class, 'updateProfile'])->middleware('auth')->name('user.updateProfile');
 
 Route::get('/personalmap', [UserController::class, 'showMap'])->middleware('auth')->name('user.personal.map');
+
+Route::view('/privacy', 'privacy')->name('privacy');
+
+Route::view('/terms', 'terms')->name('terms');

@@ -16,8 +16,14 @@ class User extends Authenticatable
 
     public function flights()
     {
-        return $this->belongsToMany(Flight::class, 'user_flight');
+        return $this->belongsToMany(Flight::class, 'user_flight')->withPivot('notified');
     }
 
+    public function notNotifiedFlightsRelation()
+    {
+        return $this->belongsToMany(Flight::class, 'user_flight')
+            ->withPivot('notified')
+            ->wherePivot('notified', false);
+    }
 
 }

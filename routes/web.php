@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FlightController;
+use App\Http\Controllers\FlightNotificationController;
 use App\Http\Controllers\FlightSimulationController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
@@ -105,3 +106,7 @@ Route::get('/personalmap', [UserController::class, 'showMap'])->middleware('auth
 Route::get('/profile-picture/{filename}', [UserController::class, 'showProfilePicture'])
     ->middleware('auth')
     ->name('profile.picture');
+
+Route::post('/api/volo-notificato/{flight}/{user}', [FlightNotificationController::class, 'markAsNotified'])
+    ->name('flight.markNotified')
+    ->middleware('auth');

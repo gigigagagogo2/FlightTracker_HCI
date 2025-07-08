@@ -12,7 +12,6 @@
     align-items: center;
 }
 
-
 /* Link navbar */
 .navbar .nav-link {
     color: #333;
@@ -35,4 +34,75 @@
 /* Rimuovi ultimo margine */
 .navbar-nav .nav-item:last-child {
     margin-right: 0;
+}
+
+/* Icona Home */
+.home-icon {
+    font-size: 24px;
+    color: #6c757d;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    transition: all 0.3s ease;
+}
+.home-icon:hover {
+    transform: scale(1.1);
+    color: #007bff !important;
+    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
+}
+
+/* Icona Mappa */
+.map-icon {
+    font-size: 24px;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    transition: all 0.3s ease;
+}
+.map-icon:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
+}
+
+/* Icona Profilo */
+.profile-icon {
+    font-size: 24px;
+    color: #6c757d;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    transition: all 0.3s ease;
+}
+.profile-icon:hover {
+    transform: scale(1.1);
+    color: #007bff !important;
+    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
+}
+
+/* Foto profilo */
+.profile-pic {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    transition: all 0.3s ease;
+}
+.profile-pic:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
+}
+
+/* Hover ombra più marcata per icone dentro nav-link */
+.nav-link:hover .home-icon,
+.nav-link:hover .map-icon,
+.nav-link:hover .profile-icon {
+    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
+}
+
+/* Responsive - ridimensiona icone e foto su schermi piccoli */
+@media (max-width: 768px) {
+    .home-icon,
+    .map-icon,
+    .profile-icon {
+        font-size: 20px;
+    }
+    .profile-pic {
+        width: 20px;
+        height: 20px;
+    }
 }

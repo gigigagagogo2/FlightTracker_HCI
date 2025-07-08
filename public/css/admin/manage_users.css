@@ -26,3 +26,7 @@ h2 {
     background-color: #e9ecef;
     color: #495057;
 }
+
+footer.site-footer {
+    margin-top: 20rem;
+}

@@ -23,22 +23,61 @@ h2 {
     color: #495057;
 }
 
+.form-control {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Pulsanti allineati a destra */
+.text-end {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Stile coerente e moderno */
+.btn {
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Bottone Salva (verde) */
 .btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background-color: #28a745;
+    color: white;
 }
 
 .btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0b5ed7;
+    background-color: #218838;
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.25);
 }
 
+/* Bottone Annulla (rosso, come cancel-btn) */
 .btn-secondary {
-    background-color: #adb5bd;
-    border-color: #adb5bd;
+    background-color: #dc3545;
+    color: white;
 }
 
 .btn-secondary:hover {
-    background-color: #8e9a9f;
-    border-color: #8e9a9f;
+    background-color: #c82333;
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.25);
+}
+
+/* Validazione */
+.text-danger {
+    font-size: 14px;
 }

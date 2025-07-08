@@ -110,3 +110,7 @@ Route::get('/profile-picture/{filename}', [UserController::class, 'showProfilePi
 Route::post('/api/volo-notificato/{flight}/{user}', [FlightNotificationController::class, 'markAsNotified'])
     ->name('flight.markNotified')
     ->middleware('auth');
+
+Route::view('/privacy', 'privacy')->name('privacy');
+
+Route::view('/terms', 'terms')->name('terms');

@@ -1,24 +1,32 @@
 body {
     background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 h2 {
     font-weight: 600;
     color: #333;
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
 label {
     font-weight: 500;
+    color: #495057;
 }
 
-form .form-control, form .form-select {
-    border-radius: 0.375rem;
+form .form-control,
+form .form-select {
+    border-radius: 8px;
     border: 1px solid #ced4da;
     box-shadow: none;
-    transition: border-color 0.2s ease-in-out;
+    padding: 10px 14px;
+    font-size: 15px;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-form .form-control:focus, form .form-select:focus {
+form .form-control:focus,
+form .form-select:focus {
     border-color: #86b7fe;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
@@ -26,9 +34,42 @@ form .form-control:focus, form .form-select:focus {
 
 .text-danger {
     font-size: 0.875rem;
+    margin-top: 0.25rem;
 }
 
-button.btn {
+/* Pulsanti coerenti */
+button.btn,
+a.btn {
     font-weight: 500;
-    padding: 0.5rem 1.25rem;
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Bottone Aggiungi (verde) */
+.btn-primary {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #218838;
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.25);
+}
+
+/* Bottone Annulla (rosso) */
+.btn-light.border {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-light.border:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.25);
 }

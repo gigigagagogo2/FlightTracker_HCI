@@ -50,7 +50,7 @@ class UserController extends Controller
     {
 
         if (!$request->hasFile('profile_picture')) {
-            return back()->with('error_message', 'Impossibile caricare l\'immagine selezionata');
+            return back()->with('error', 'Impossibile caricare l\'immagine selezionata');
         }
 
         $request->validate([
@@ -82,7 +82,7 @@ class UserController extends Controller
         $user->profile_picture_path = $filename;
         $user->save();
 
-        return redirect()->route('user.profile')->with('success_message', 'Immagine del profilo aggiornata con successo.');
+        return redirect()->route('user.profile')->with('success', 'Immagine del profilo aggiornata con successo.');
     }
 
     public function updateProfile(Request $request)

@@ -24,40 +24,40 @@
             </div>
         @endif
 
-            @if (session('error_message'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error_message') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
-                </div>
-            @endif
-
-            @error('profile_picture')
+        @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ $message }}
+                {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
             </div>
-            @enderror
+        @endif
 
-            @error('nickname')
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ $message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
-            </div>
-            @enderror
+        @error('profile_picture')
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
+        </div>
+        @enderror
 
-            @error('email')
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ $message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
-            </div>
-            @enderror
+        @error('nickname')
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
+        </div>
+        @enderror
 
-            @error('password')
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ $message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
-            </div>
-            @enderror
+        @error('email')
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
+        </div>
+        @enderror
+
+        @error('password')
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Chiudi"></button>
+        </div>
+        @enderror
 
         <!-- FORM 1: solo immagine -->
         <form id="pictureForm" action="{{ route('user.updatePicture') }}" method="POST" enctype="multipart/form-data">

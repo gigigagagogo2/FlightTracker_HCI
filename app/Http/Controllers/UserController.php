@@ -49,17 +49,21 @@ class UserController extends Controller
     public function updatePicture(Request $request)
     {
 
+        if (!$request->hasFile('profile_picture')) {
+            return back()->with('error_message', 'Impossibile caricare l\'immagine selezionata');
+        }
+
         $request->validate([
             'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'profile_picture.required' => 'Seleziona un file immagine.',
+            'profile_picture.image' => 'Il file caricato non è un\'immagine valida.',
+            'profile_picture.mimes' => 'Il formato dell\'immagine deve essere: jpeg, png, jpg o gif.',
+            'profile_picture.max' => 'L\'immagine non può superare i 2MB.',
         ]);
 
-        Log::info("diocane");
         $user = Auth::user();
-        Log::info("diocane1");
         $baseName = $user->nickname . '_picture';
-        Log::info("diocane2");
-
-
 
         // Elimina tutte le vecchie immagini con lo stesso nome base
         $files = Storage::files('profiles');
@@ -78,7 +82,7 @@ class UserController extends Controller
         $user->profile_picture_path = $filename;
         $user->save();
 
-        return redirect()->route('user.profile');
+        return redirect()->route('user.profile')->with('success_message', 'Immagine del profilo aggiornata con successo.');
     }
 
     public function updateProfile(Request $request)
@@ -89,6 +93,13 @@ class UserController extends Controller
             'nickname' => 'required|string|max:255|unique:users,nickname,' . $user->id,
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6',
+        ], [
+            'nickname.required' => 'Il nickname è obbligatorio.',
+            'nickname.unique' => 'Questo nickname è già in uso.',
+            'email.required' => 'L\'email è obbligatoria.',
+            'email.email' => 'Inserisci un indirizzo email valido.',
+            'email.unique' => 'Questa email è già registrata.',
+            'password.min' => 'La password deve contenere almeno 6 caratteri.',
         ]);
 
         $user->nickname = $request->input('nickname');
@@ -102,7 +113,6 @@ class UserController extends Controller
 
         return redirect()->route('user.profile')->with('success', 'Profilo aggiornato con successo.');
     }
-
 
 }
 

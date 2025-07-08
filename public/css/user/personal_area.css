@@ -68,7 +68,6 @@ body {
     transition: 0.3s ease;
 }
 
-
 .edit-icon img {
     width: 14px;
     height: 14px;
@@ -101,17 +100,48 @@ input[type="file"] {
     cursor: not-allowed;
 }
 
-.edit-btn, .save-btn {
+/* Nuovi stili per i pulsanti */
+.edit-btn, .save-btn, .cancel-btn {
     padding: 10px 20px;
     font-size: 15px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 5px 8px;
 }
 
-.edit-btn:hover, .save-btn:hover {
-    background-color: #45a045;
+/* Modifica */
+.edit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #0069d9;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Salva */
+.save-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Annulla */
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+    display: inline-block;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }

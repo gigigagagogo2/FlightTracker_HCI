@@ -35,7 +35,7 @@ class LoginController extends Controller
 
         // Login fallito
         return back()->withErrors([
-            'email' => 'credenziali non valide.',
+            'email' => 'Credenziali non valide.',
         ])->onlyInput('email');
     }
 }

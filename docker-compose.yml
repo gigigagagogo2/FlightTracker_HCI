@@ -37,7 +37,6 @@ services:
       - "8000:8000"
     volumes:
       - .:/var/www/html
-      - /var/www/html/vendor
     networks:
       - my-network
     depends_on:

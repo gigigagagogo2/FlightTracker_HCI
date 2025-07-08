@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="{{ asset('css/main-content.css') }}">
     <title>Area Personale</title>
@@ -15,38 +15,44 @@
 @include("navbar")
 <main class="main-content">
 
-<div class="profile-card">
-    <!-- FORM 1: solo immagine -->
-    <form id="pictureForm" action="{{ route('user.updatePicture') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <label for="profile_picture" class="profile-image-wrapper">
-            <div class="profile-image-circle">
-                <!-- ??: Se la variabile a sinistra non e' nulla restituisce il suo valore -->
-                <img src="{{ asset(Auth::user()->profile_picture_path ?? 'images/default_user.jpg') }}" alt="Foto profilo">
-                <span class="edit-icon">
+    <div class="profile-card">
+        <!-- FORM 1: solo immagine -->
+        <form id="pictureForm" action="{{ route('user.updatePicture') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <label for="profile_picture" class="profile-image-wrapper">
+                <div class="profile-image-circle">
+                    <img
+                        src="{{ $user->profile_picture_path
+                            ? route('profile.picture', ['filename' => $user->profile_picture_path])
+                            : asset('images/default_user.jpg')
+                        }}"
+                        alt="Foto profilo"
+                    >
+                    <span class="edit-icon">
                     <i class="bi bi-pencil"></i>
-                </span>
+                    </span>
+                </div>
+            </label>
+            <input type="file" id="profile_picture" name="profile_picture"
+                   onchange="document.getElementById('pictureForm').submit();">
+        </form>
+
+        <!-- FORM 2: info profilo -->
+        <form id="profileForm" action="{{ route('user.updateProfile') }}" method="POST">
+            @csrf
+
+            <div class="profile-info">
+                <input type="text" name="nickname" value="{{ Auth::user()->nickname }}" class="form-input" readonly>
+                <input type="email" name="email" value="{{ Auth::user()->email }}" class="form-input" readonly>
+                <input type="password" name="password" value="********" class="form-input" readonly>
             </div>
-        </label>
-        <input type="file" id="profile_picture" name="profile_picture" onchange="document.getElementById('pictureForm').submit();">
-    </form>
 
-    <!-- FORM 2: info profilo -->
-    <form id="profileForm" action="{{ route('user.updateProfile') }}" method="POST">
-        @csrf
+            <button type="button" class="edit-btn" onclick="enableEdit()">Modifica profilo</button>
+            <button type="button" class="cancel-btn" style="display: none;" onclick="cancelEdit()">Annulla</button>
+            <button type="submit" class="save-btn" style="display: none;">Salva modifiche</button>
+        </form>
 
-        <div class="profile-info">
-            <input type="text" name="nickname" value="{{ Auth::user()->nickname }}" class="form-input" readonly>
-            <input type="email" name="email" value="{{ Auth::user()->email }}" class="form-input" readonly>
-            <input type="password" name="password" value="********" class="form-input" readonly>
-        </div>
-
-        <button type="button" class="edit-btn" onclick="enableEdit()">Modifica profilo</button>
-        <button type="button" class="cancel-btn" style="display: none;" onclick="cancelEdit()">Annulla</button>
-        <button type="submit" class="save-btn" style="display: none;">Salva modifiche</button>
-    </form>
-
-</div>
+    </div>
 </main>
 
 @include("footer")

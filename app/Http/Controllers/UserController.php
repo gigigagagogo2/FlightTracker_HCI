@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -13,6 +14,24 @@ class UserController extends Controller
         return view('user/personal_area', [
             'user' => Auth::user(),
         ]);
+    }
+
+    public function showProfilePicture($filename)
+    {
+        $user = Auth::user();
+
+        // Un user puo vedere solo la sua foto
+        if ($user->profile_picture_path !== $filename) {
+            abort(403);
+        }
+
+        $path = storage_path('app/private/profiles/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path);
     }
 
     public function showMap()
@@ -29,25 +48,37 @@ class UserController extends Controller
     // Metodo per aggiornare l'immagine del profilo
     public function updatePicture(Request $request)
     {
-        // Validazione dell'immagine
+
         $request->validate([
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Limita a determinati formati
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Recupera l'utente loggato
+        Log::info("diocane");
         $user = Auth::user();
+        Log::info("diocane1");
+        $baseName = $user->nickname . '_picture';
+        Log::info("diocane2");
 
-        $filename = Auth::user()->nickname . '_picture' . '.' . $request->file('profile_picture')->getClientOriginalExtension();
-        $request->file('profile_picture')->storeAs('profiles', $filename, 'public');
 
 
-        // Salva il percorso nel database
-        $user->profile_picture_path = 'storage/profiles/' . $filename;
+        // Elimina tutte le vecchie immagini con lo stesso nome base
+        $files = Storage::files('profiles');
+        foreach ($files as $file) {
+            if (str_starts_with(basename($file), $baseName)) {
+                Storage::delete($file);
+            }
+        }
+
+        // Salva la nuova immagine
+        $extension = $request->file('profile_picture')->getClientOriginalExtension();
+        $filename = $baseName . '.' . $extension;
+        $request->file('profile_picture')->storeAs('profiles', $filename);
+
+        // Aggiorna il percorso
+        $user->profile_picture_path = $filename;
         $user->save();
 
-        // Restituisce la risposta con il nuovo percorso dell'immagine
-        return redirect()->route('user.profile')->with('success', 'Immagine aggiornata con successo.');
-
+        return redirect()->route('user.profile');
     }
 
     public function updateProfile(Request $request)

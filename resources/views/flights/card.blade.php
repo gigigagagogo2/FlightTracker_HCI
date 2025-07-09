@@ -57,10 +57,14 @@
             </div>
         </div>
 
-        <!-- Barra di avanzamento -->
-        <div class="progress my-4" style="height: 25px;">
-            <div id="progress-bar" class="progress-bar bg-warning text-dark fw-bold" role="progressbar" style="width:0%;">
-                0%
+        <div class="progress my-4 position-relative" style="height: 25px;">
+            <!-- Testo centrato sopra la barra -->
+            <span id="progress-label" class="position-absolute w-100 text-center fw-bold"
+                  style="z-index: 1; line-height: 25px;">
+        0%
+    </span>
+            <!-- La barra vera e propria -->
+            <div id="progress-bar" class="progress-bar bg-warning text-dark" role="progressbar" style="width: 0%;">
             </div>
         </div>
 
@@ -78,13 +82,13 @@
 
     async function initMap() {
         await google.maps.importLibrary('maps');
-        const { spherical } = await google.maps.importLibrary("geometry");
+        const {spherical} = await google.maps.importLibrary("geometry");
         const module = await import('/js/RotatableOverlay.js');
         const RotatableOverlay = module.default;
 
         map = new google.maps.Map(document.getElementById('map'), {
             zoom: 4,
-            center: { lat: 48.0, lng: 10.0 },
+            center: {lat: 48.0, lng: 10.0},
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             streetViewControl: false,
             fullscreenControl: false,
@@ -94,8 +98,8 @@
             gestureHandling: "greedy",
             minZoom: 2,
             styles: [
-                { featureType: "poi", stylers: [{ visibility: "off" }] },
-                { featureType: "transit", stylers: [{ visibility: "off" }] }
+                {featureType: "poi", stylers: [{visibility: "off"}]},
+                {featureType: "transit", stylers: [{visibility: "off"}]}
             ]
         });
 
@@ -130,7 +134,7 @@
             strokeWeight: 2,
             zIndex: 1,
             icons: [{
-                icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4 },
+                icon: {path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4},
                 offset: '0',
                 repeat: '20px'
             }],
@@ -144,7 +148,7 @@
         setInterval(() => {
             offset = (offset + 0.5) % 20;
             route.set('icons', [{
-                icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4 },
+                icon: {path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4},
                 offset: `${offset}px`,
                 repeat: '20px'
             }]);
@@ -162,7 +166,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 },
-                body: JSON.stringify({ ids: [{{ $flight->id }}] }),
+                body: JSON.stringify({ids: [{{ $flight->id }}]}),
             });
 
             if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
@@ -199,6 +203,14 @@
 
             document.getElementById("current-speed").innerText =
                 `${Math.round(data.speed)} km/h`;
+
+            const pb = document.getElementById("progress-bar");
+            const label = document.getElementById("progress-label");
+            const percent = Math.round(data.progress * 100);
+
+            pb.style.width = `${percent}%`;
+            label.innerText = `${percent}%`;
+
 
         } catch (err) {
             console.error("Errore aggiornamento posizione:", err);

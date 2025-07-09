@@ -54,7 +54,7 @@
 
                 <!-- Barra di avanzamento -->
                 <div class="progress my-4" style="height: 25px;">
-                    <div id="progress-bar" class="progress-bar bg-warning text-dark fw-bold" role="progressbar" style="width:0%;">
+                    <div id="progress-bar" class="progress-bar bg-warning text-dark fw-bold" role="progressbar" style="width:0;">
                         0%
                     </div>
                 </div>

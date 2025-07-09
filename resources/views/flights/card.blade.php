@@ -3,6 +3,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Monitoraggio Volo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -71,15 +72,17 @@
 @include("footer")
 
 <script type="module">
-    let map;
-    let overlay;
-    let updates = -1;
+
+    let map, overlay, route;
+    const currentFlightId = {{ $flight->id }};
 
     async function initMap() {
         await google.maps.importLibrary('maps');
-        const iniziale = new google.maps.LatLng(0, 0);
+        const { spherical } = await google.maps.importLibrary("geometry");
+        const module = await import('/js/RotatableOverlay.js');
+        const RotatableOverlay = module.default;
 
-        const mapOptions = {
+        map = new google.maps.Map(document.getElementById('map'), {
             zoom: 4,
             center: { lat: 48.0, lng: 10.0 },
             mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -94,29 +97,33 @@
                 { featureType: "poi", stylers: [{ visibility: "off" }] },
                 { featureType: "transit", stylers: [{ visibility: "off" }] }
             ]
-        };
+        });
 
-        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        // Coordinate di partenza/arrivo
+        const startPoint = new google.maps.LatLng(
+            {{ $flight->departureAirport->latitude }},
+            {{ $flight->departureAirport->longitude }}
+        );
 
-        const startLatitude = {{ $flight->departureAirport->latitude }};
-        const startLongitude = {{ $flight->departureAirport->longitude }};
-        const endLatitude = {{ $flight->arrivalAirport->latitude }};
-        const endLongitude = {{ $flight->arrivalAirport->longitude }};
+        const endPoint = new google.maps.LatLng(
+            {{ $flight->arrivalAirport->latitude }},
+            {{ $flight->arrivalAirport->longitude }}
+        );
 
-        const startPoint = new google.maps.LatLng(startLatitude, startLongitude);
-        const endPoint = new google.maps.LatLng(endLatitude, endLongitude);
-
-        const {spherical} = await google.maps.importLibrary("geometry");
+        // Heading
         const heading = spherical.computeHeading(startPoint, endPoint);
         const iconHeading = -45 + heading;
 
-        const module = await import('/js/RotatableOverlay.js');
-        const RotatableOverlay = module.default;
+        // Primo fetch per inizializzare posizione
+        const data = await fetchFlightData();
+        if (!data || data.progress === 1) return;
+
+        const iniziale = new google.maps.LatLng(data.lat, data.lng);
 
         overlay = new RotatableOverlay(iniziale, '/images/plane-map-icon.svg', iconHeading);
         overlay.setMap(map);
 
-        const rotta = new google.maps.Polyline({
+        route = new google.maps.Polyline({
             path: [startPoint, endPoint],
             geodesic: true,
             strokeOpacity: 0,
@@ -124,58 +131,77 @@
             zIndex: 1,
             icons: [{
                 icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4 },
-                offset: '0px',
+                offset: '0',
                 repeat: '20px'
             }],
             map: map
         });
 
+        map.panTo(iniziale);
+
+        // Animazione linea tratteggio
         let offset = 0;
         setInterval(() => {
             offset = (offset + 0.5) % 20;
-            rotta.set('icons', [{
+            route.set('icons', [{
                 icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4 },
                 offset: `${offset}px`,
                 repeat: '20px'
             }]);
-        }, 50);
+        }, 100);
 
-        const posizioneIniziale = await aggiornaVolo();
-        if (posizioneIniziale) map.panTo(posizioneIniziale);
-        setInterval(aggiornaVolo, 500);
+        await aggiornaPosizione();
+        setInterval(aggiornaPosizione, 10000);
     }
 
-    let isRequestInProgress = false;
+    async function fetchFlightData() {
+        try {
+            const res = await fetch("{{ url('/api/simulazione-voli') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ ids: [{{ $flight->id }}] }),
+            });
 
-    async function aggiornaVolo() {
-        if (isRequestInProgress) return;
-        isRequestInProgress = true;
+            if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
+
+            const allData = await res.json();
+            return allData[{{ $flight->id }}] || null;
+
+        } catch (err) {
+            console.error("Errore nel fetch dei dati volo:", err);
+            return null;
+        }
+    }
+
+    async function aggiornaPosizione() {
 
         try {
-            const res = await fetch("{{ url('/api/simulazione-volo/' . $flight->id) }}");
-            const data = await res.json();
-            updates++;
+            const data = await fetchFlightData();
+            if (!data) return;
+
+            // Rimuovi overlay e rotta se il volo è concluso
+            if (data.progress === 1) {
+                if (overlay) overlay.setMap(null);
+                if (route) route.setMap(null);
+                overlay = null;
+                route = null;
+                return;
+            }
+
             const nuovaPosizione = new google.maps.LatLng(data.lat, data.lng);
             overlay.setPosition(nuovaPosizione);
 
-            if (data.progress * 100 < 5 || data.progress * 100 > 95 || updates % 20 === 0) {
-                document.getElementById("current-speed").innerText = `${parseInt(data.speed)} km/h`;
-            }
+            document.getElementById("current-coordinates").innerText =
+                `${nuovaPosizione.lat().toFixed(2)} / ${nuovaPosizione.lng().toFixed(2)}`;
 
-            if (updates % 20 === 0) {
-                document.getElementById("current-coordinates").innerText =
-                    `${nuovaPosizione.lat().toFixed(4)} / ${nuovaPosizione.lng().toFixed(4)}`;
-                const pb = document.getElementById("progress-bar");
-                pb.style.width = `${data.progress * 100}%`;
-                pb.innerText = `${Math.round(data.progress * 100)}%`;
-            }
+            document.getElementById("current-speed").innerText =
+                `${Math.round(data.speed)} km/h`;
 
-            return nuovaPosizione;
         } catch (err) {
-            console.error("Errore durante la richiesta:", err);
-            return null;
-        } finally {
-            isRequestInProgress = false;
+            console.error("Errore aggiornamento posizione:", err);
         }
     }
 

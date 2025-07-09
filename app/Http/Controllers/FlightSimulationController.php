@@ -4,16 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Flight;
 use App\Services\FlightSimulationService;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class FlightSimulationController extends Controller
 {
-    public function getFlightData(int $id)
+    public function getMultipleFlightData(Request $request)
     {
-        $simulationService = new FlightSimulationService();
-        $data = $simulationService->simulateFlight($id);
+        $ids = $request->input('ids');
 
-        return response()->json($data);
+        $flights = Flight::with(['departureAirport', 'arrivalAirport'])
+            ->whereIn('id', $ids)
+            ->get();
+
+        $service = new FlightSimulationService();
+        return response()->json($service->simulateMultipleFlights($flights));
     }
 
 

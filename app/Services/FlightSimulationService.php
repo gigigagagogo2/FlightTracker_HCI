@@ -7,40 +7,44 @@ use Carbon\Carbon;
 
 class FlightSimulationService
 {
-    public function simulateFlight(int $flightId): array
+    private function simulateSingleFlight(Flight $flight): ?array
     {
-
-        $flight = Flight::with(['departureAirport', 'arrivalAirport'])->findOrFail($flightId);
-
         $startTime = Carbon::parse($flight->departure_time);
         $endTime = Carbon::parse($flight->arrival_time);
+
         $totalTime = $startTime->diffInSeconds($endTime);
         $progress = $this->getProgress($startTime, $totalTime);
 
         $startCoords = ['lat' => $flight->departureAirport->latitude, 'lng' => $flight->departureAirport->longitude];
         $endCoords = ['lat' => $flight->arrivalAirport->latitude, 'lng' => $flight->arrivalAirport->longitude];
 
-        if ($progress == 0) {
-            $currentPosition = ['lat' => $flight->departureAirport->latitude, 'lng' => $flight->departureAirport->longitude];
-            $speed = 0;
-        } else if ($progress == 1) {
-            $currentPosition = ['lat' => $flight->arrivalAirport->latitude, 'lng' => $flight->arrivalAirport->longitude];
+        if ($progress == 1) {
+            return ['id' => $flight->id, 'progress' => $progress,];
+        } elseif ($progress == 0) {
+            $currentPosition = $startCoords;
             $speed = 0;
         } else {
             $currentPosition = $this->getCurrentPoint($startCoords, $endCoords, $progress);
             $distance = $this->haversineGreatCircleDistance($startCoords, $endCoords);
-            $averageSpeed = $distance / $totalTime * 3.6; // km/h
+            $averageSpeed = $distance / $totalTime * 3.6;
             $elapsedTime = $startTime->diffInSeconds(Carbon::now(), true);
             $speed = $this->getActualSpeed($averageSpeed, $elapsedTime, $totalTime);
         }
 
-        return [
-            'lat' => (float) $currentPosition['lat'],
-            'lng' => (float) $currentPosition['lng'],
-            'speed' => $speed,
-            'progress' => $progress,
-            'arrival_city' => $flight->arrivalAirport->city
-        ];
+        return ['id' => $flight->id, 'lat' => (float)$currentPosition['lat'], 'lng' => (float)$currentPosition['lng'], 'speed' => $speed, 'progress' => $progress, 'arrival_city' => $flight->arrivalAirport->city, 'departure_city' => $flight->departureAirport->city,];
+    }
+
+    // Questo metodo ritorna solo i voli non gia atterrati
+    public function simulateMultipleFlights($flights): array
+    {
+        $results = [];
+
+        foreach ($flights as $flight) {
+            $results[$flight->id] = $this->simulateSingleFlight($flight);
+
+        }
+
+        return $results;
     }
 
     /**

@@ -21,7 +21,8 @@
     <div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow"
          style="width: 24rem; display: none; z-index: 999;">
         <div class="card-body position-relative">
-            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Chiudi" onclick="chiudiCard()"></button>
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Chiudi"
+                    onclick="chiudiCard()"></button>
             <h5 class="card-title" id="flightModelName">Modello Aereo</h5>
             <p class="card-text mb-1"><strong>Aeroporto di partenza:</strong> <span id="departureAirport">-</span></p>
             <p class="card-text mb-1"><strong>Aeroporto di arrivo:</strong> <span id="arrivalAirport">-</span></p>
@@ -33,8 +34,7 @@
         </div>
     </div>
 
-    @include('user/notify_popup')
-    <!-- TODO:sistemare -->
+    {{--    @include('user/notify_popup')--}}
     @include('footer')
 
     <script type="module">
@@ -43,7 +43,6 @@
         /** @type {Object.<number, RotatableOverlay>} */
         let overlays = {};
         let routes = {};
-        let updates = 0;
         let currentFlightId = null;
 
         async function initMap() {
@@ -65,13 +64,24 @@
             const module = await import('/js/RotatableOverlay.js');
             const RotatableOverlay = module.default;
 
-            const flightPromises = flights.map(async (flight) => {
-                try {
-                    const res = await fetch(`/api/simulazione-volo/${flight.id}`);
-                    if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
-                    const data = await res.json();
+            try {
+                const res = await fetch('/api/simulazione-voli', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ids: flights.map(f => f.id)})
+                });
 
-                    if (data.progress === 0 || data.progress === 1){
+                if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
+                const flightSimData = await res.json(); // Oggetto con chiave = flight.id
+
+
+                const flightPromises = flights.map(async (flight) => {
+                    const data = flightSimData[flight.id];
+
+                    if (!data || data.progress === 1) {
                         return;
                     }
 
@@ -88,7 +98,7 @@
                     const heading = spherical.computeHeading(startPoint, endPoint);
                     const iconHeading = -45 + heading;
 
-                    const iniziale = new google.maps.LatLng(0, 0);
+                    const iniziale = new google.maps.LatLng(data.lat, data.lng);
 
                     const overlay = new RotatableOverlay(
                         iniziale,
@@ -96,12 +106,10 @@
                         iconHeading,
                     );
 
-                    overlay.addListener('click', () => {
-                        // Closure, const value are saved inside the inner function (e.g. flight, overlay)
-                        currentFlightId = flight.id;
-                        const data = overlay.flightData;
+                    overlay.flightData = data;
 
-                        if (!data) return;
+                    overlay.addListener('click', () => {
+                        currentFlightId = flight.id;
 
                         document.getElementById('flightInfoCard').style.display = 'block';
                         document.getElementById('flightModelName').innerText = flight.airplane_model.name;
@@ -116,7 +124,6 @@
                     overlay.setMap(map);
                     overlays[flight.id] = overlay;
 
-                    // Disegna rotta tratteggiata
                     routes[flight.id] = new google.maps.Polyline({
                         path: [startPoint, endPoint],
                         geodesic: true,
@@ -135,70 +142,83 @@
                         }],
                         map: map
                     });
-                }catch(err) {
-                    console.error(`Errore nel disegno iniziale di ${flight.id}`, err);
-                }
-            });
+                });
 
-            await Promise.all(flightPromises);
+                await Promise.all(flightPromises);
+            } catch (err) {
+                console.error("Errore nella simulazione dei voli:", err);
+            }
 
             let offset = 0;
 
             setInterval(() => {
-                offset = (offset + 0.5) % 20;
+                offset = (offset + 1) % 20;
 
-                for (const flight of flights) {
-                    routes[flight.id].set('icons', [{
-                        icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000000', scale: 4 },
-                        offset: `${offset}px`,
-                        repeat: '20px'
-                    }]);
-                }
-            }, 50);
+                flights.forEach(flight => {
+                    const route = routes[flight.id];
+                    if (!route) return;
+
+                    const icons = route.get('icons');
+                    if (!icons || icons.length === 0) return;
+
+                    icons[0].offset = `${offset}px`;
+                    route.set('icons', icons);
+                });
+            }, 100);
 
             await aggiornaPosizioni();
-
-            setInterval(aggiornaPosizioni, 500);
+            setInterval(aggiornaPosizioni, 10000);
         }
 
-        let isRequestInProgress = false;
 
         async function aggiornaPosizioni() {
-            if (isRequestInProgress) return;
-            isRequestInProgress = true;
+            try {
 
-            updates++;
-            const positionPromises = flights.map(async (flight) =>  {
-                try {
-                    const res = await fetch(`/api/simulazione-volo/${flight.id}`);
-                    if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
-                    const data = await res.json();
+                // Estrai gli ID dei voli da tracciare
+                const ids = flights.map(f => f.id);
 
-                    const nuovaPosizione = new google.maps.LatLng(data.lat, data.lng);
-                    overlays[flight.id].setPosition(nuovaPosizione);
-                    overlays[flight.id].flightData = data;
+                // Invia richiesta POST con tutti gli ID
+                const res = await fetch('/api/simulazione-voli', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ids})
+                });
 
-                    // Se questo è il volo attualmente visualizzato nella card, aggiorna anche i dati
-                    if (flight.id === currentFlightId) {
+                if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
+                const data = await res.json();
+
+                for (const flightId in data) {
+                    const flightData = data[flightId];
+
+                    if (flightData.progress === 1) {
+                        if (overlays[flightId]) overlays[flightId].setMap(null);
+                        if (routes[flightId]) routes[flightId].setMap(null);
+                        delete overlays[flightId];
+                        delete routes[flightId];
+                        continue;
+                    }
+
+                    const nuovaPosizione = new google.maps.LatLng(flightData.lat, flightData.lng);
+
+                    if (overlays[flightId]) {
+                        overlays[flightId].setPosition(nuovaPosizione);
+                        overlays[flightId].flightData = flightData;
+                    }
+
+                    if (parseInt(flightId) === currentFlightId) {
                         document.getElementById('flightCoords').innerText = `${nuovaPosizione.lat().toFixed(2)}, ${nuovaPosizione.lng().toFixed(2)}`;
-                        document.getElementById('flightSpeed').innerText = `${data.speed ?? '-'}`;
-                        document.getElementById('flightProgress').style.width = `${Math.round(data.progress * 100)}%`;
-                        document.getElementById('flightProgress').innerText = `${Math.round(data.progress * 100)}%`;
+                        document.getElementById('flightSpeed').innerText = `${flightData.speed ?? '-'}`;
+                        document.getElementById('flightProgress').style.width = `${Math.round(flightData.progress * 100)}%`;
+                        document.getElementById('flightProgress').innerText = `${Math.round(flightData.progress * 100)}%`;
                     }
-
-                    if (data.progress === 0 || data.progress === 1) {
-                        overlays[flight.id].setMap(null);
-                        routes[flight.id].setMap(null);
-                    }
-
-                } catch (err) {
-                    console.error(`Errore aggiornamento volo ${flight.id}:`, err);
-                } finally {
-                    isRequestInProgress = false;
                 }
-            });
-            await Promise.all(positionPromises);
 
+            } catch (err) {
+                console.error('Errore aggiornamento posizioni:', err);
+            }
         }
 
         initMap();

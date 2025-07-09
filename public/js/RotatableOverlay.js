@@ -5,7 +5,6 @@ export default class RotatableOverlay extends google.maps.OverlayView {
         this.imageUrl = imageUrl;
         this.angle = angle;
         this.div = null;
-        this.flightData = null;
     }
 
     onAdd() {

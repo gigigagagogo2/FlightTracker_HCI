@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Flight;
+use Illuminate\Http\Request;
 
 class FlightController extends Controller
 {
@@ -11,17 +11,11 @@ class FlightController extends Controller
     {
         $query = $request->input('query');
 
-        $flights = Flight::with(['airplaneModel','departureAirport', 'arrivalAirport'])
-            ->whereHas('departureAirport', function ($q) use ($query) {
-                $q->whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($query) . "%"])
-                    ->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
-            })
-            ->orWhereHas('arrivalAirport', function ($q) use ($query) {
-                $q->whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($query) . "%"])
-                    ->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
-            })
-            ->take(10)
-            ->get();
+        $flights = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])->whereHas('departureAirport', function ($q) use ($query) {
+            $q->whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
+        })->orWhereHas('arrivalAirport', function ($q) use ($query) {
+            $q->whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
+        })->take(10)->get();
 
         return response()->json($flights);
     }
@@ -29,8 +23,14 @@ class FlightController extends Controller
     public function show($id)
     {
         $flight = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])->findOrFail($id);
-        return view('/flights/show_card', compact('flight'));
+
+        if ($flight->status === 'red') {
+            return view('flights.archived', compact('flight'));
+        }
+
+        return view('flights.card', compact('flight'));
     }
+
 
     public function aggiungiPreferito($id)
     {

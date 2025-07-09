@@ -90,7 +90,7 @@ Route::get('/search-flights', [FlightController::class, 'search'])->name('flight
 
 Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.show');
 
-Route::get('/api/simulazione-volo/{id}', [FlightSimulationController::class, 'getFlightData']);
+Route::post('/api/simulazione-voli', [FlightSimulationController::class, 'getMultipleFlightData']);
 
 Route::post('/flights/preferiti/{id}', [FlightController::class, 'aggiungiPreferito'])->middleware('auth');
 Route::delete('/flights/preferiti/{id}', [FlightController::class, 'rimuoviPreferito'])->middleware('auth');

@@ -52,6 +52,20 @@ services:
         networks:
             - my-network
 
+    laravel-cron:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel-cron
+        restart: unless-stopped
+        volumes:
+            - .:/var/www/html
+        environment:
+            CONTAINER_TYPE: "cron"
+        networks:
+            - my-network
+        depends_on:
+            - db
 volumes:
     db_data:
 

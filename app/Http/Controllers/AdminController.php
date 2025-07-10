@@ -118,5 +118,55 @@ class AdminController extends Controller
         return redirect()->route('admin.flights')->with('success', 'Volo aggiornato con successo.');
     }
 
+    public function airports()
+    {
+        $airports = Airport::all();
+        return view('admin/manage_airports', compact('airports'));
+    }
+
+    public function deleteAirport(Airport $airport)
+    {
+        $airport->delete();
+
+        return redirect()->route('admin.airports')->with('success', 'Aereoporto eliminato con successo.');
+    }
+
+    public function createAirport() {
+        return view('admin.create_airport');
+    }
+
+    public function storeAirport(Request $request) {
+        $validated = $request->validate([
+            'name'      => 'required|string|max:255',
+            'city'      => 'required|string|max:255',
+            'country'   => 'required|string|max:255',
+            'latitude'  => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        Airport::create($validated);
+
+        return redirect()->route('admin.airports')->with('success', 'Aeroporto aggiunto con successo.');
+    }
+    public function editAirport(Airport $airport)
+    {
+        return view('admin.edit_airport', compact('airport'));
+    }
+
+    public function updateAirport(Request $request, Airport $airport)
+    {
+        $validated = $request->validate([
+            'name'      => 'required|string|max:255',
+            'city'      => 'required|string|max:255',
+            'country'   => 'required|string|max:255',
+            'latitude'  => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        $airport->update($validated);
+
+        return redirect()->route('admin.airports')->with('success', 'Aeroporto aggiornato con successo.');
+    }
+
 }
 

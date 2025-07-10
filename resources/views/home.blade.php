@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="{{ asset('css/navbar.css')}}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
 </head>
 <body>
 @include('navbar')

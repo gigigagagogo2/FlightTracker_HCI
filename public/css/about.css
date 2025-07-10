@@ -1,0 +1,24 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.about-hero {
+    height: 300px;
+    background: linear-gradient(to right, #2193b0, #6dd5ed);
+    background-size: cover;
+    background-position: center;
+}
+
+.team-photo {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    object-position: center;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
+
+.team-photo:hover {
+    transform: scale(1.05);
+}

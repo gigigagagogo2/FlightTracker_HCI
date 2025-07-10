@@ -39,7 +39,9 @@ class FlightSimulationService
             'lng' => (float) $currentPosition['lng'],
             'speed' => $speed,
             'progress' => $progress,
-            'arrival_city' => $flight->arrivalAirport->city
+            'arrival_city' => $flight->arrivalAirport->city,
+            'departure_country' => $flight->departureAirport->country,
+            'arrival_country' => $flight->arrivalAirport->country
         ];
     }
 

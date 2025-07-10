@@ -1,41 +1,22 @@
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>
 
 @if(Auth::check())
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
+        const userId = {{ Auth::id() }};
+        const socket = io('http://localhost:3000', {
+            query: {
+                user_id: userId
+            }
+        });
 
-        @php
-            $user = Auth::user();
-            $notNotifiedFlights = $user->notNotifiedFlightsRelation()->pluck('id');
-        @endphp
+        socket.on('notification', (flightIds) => {
+            for (const flightId of flightIds) {
+                showLandingToast(flightId);
+            }
+        });
 
-        const notNotifiedUserFlights = new Set(@json($notNotifiedFlights));
-
-        function checkFlightsLanding() {
-
-            notNotifiedUserFlights.forEach(id => {
-                fetch(`/api/simulazione-volo/${id}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.progress === 1) {
-                            showLandingToast(id, data);
-
-                            fetch(`/api/volo-notificato/${id}/{{ $user->id }}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                },
-                                body: JSON.stringify({})
-                            });
-
-                            notNotifiedUserFlights.delete(id);
-                        }
-                    })
-                    .catch(err => console.error("Errore controllo atterraggio:", err));
-            });
-        }
-
-        function showLandingToast(flightId, data) {
+        function showLandingToast(flightId) {
             const container = document.querySelector('.toast-container');
 
             const toast = document.createElement('div');
@@ -45,13 +26,15 @@
             toast.setAttribute('aria-atomic', 'true');
 
             toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        Il volo #${flightId} è atterrato a ${data.arrival_city}.
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Chiudi"></button>
-                </div>
-            `;
+        <div class="d-flex">
+            <div class="toast-body">
+                <a href="/flights/${flightId}" class="text-white text-decoration-none">
+                    Il volo #${flightId} è atterrato.
+                </a>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Chiudi"></button>
+        </div>
+    `;
 
             container.appendChild(toast);
 
@@ -60,9 +43,8 @@
 
             setTimeout(() => toast.remove(), 5000);
         }
-
-        setInterval(checkFlightsLanding, 2000);
     </script>
 @endif
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>

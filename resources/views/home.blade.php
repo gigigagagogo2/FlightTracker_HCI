@@ -26,7 +26,8 @@
                 <span class="input-group-text search-icon">
                     <i class="bi bi-search"></i>
                 </span>
-                <input type="text" class="form-control search-input" id="search-input" placeholder="Inserisci volo" name="query" autocomplete="off">
+                <input type="text" class="form-control search-input" id="search-input" placeholder="Inserisci volo"
+                       name="query" autocomplete="off">
             </div>
         </form>
     </div>
@@ -35,7 +36,6 @@
         <!-- I voli verranno qui -->
     </div>
 </div>
-@include('user/notify_popup')
 @include('footer')
 <script>
     const input = document.getElementById("search-input");
@@ -50,6 +50,7 @@
         index = (index + 1) % words.length;
         input.setAttribute("placeholder", "Inserisci " + words[index]);
     }
+
     function resetSearch() {
         title.style.display = "block";  // Mostra di nuovo il titolo
         searchSection.classList.remove("search-fixed");  // Rimuove la classe fissa
@@ -69,10 +70,10 @@
         }
 
         data.forEach(flight => {
-            const statusClass = ['green','yellow', 'red'].includes(flight.status)
+            const statusClass = ['green', 'yellow', 'red'].includes(flight.status)
                 ? flight.status
                 : 'gray';
-            if(statusClass != 'red'){
+            if (statusClass != 'red') {
                 const card = document.createElement("div");
                 card.className = "flight-card mb-3 p-3 border";
                 card.style.cursor = "pointer";
@@ -81,10 +82,10 @@
                 });
 
                 const departureCity = flight.departure_airport.city;
-                const arrivalCity   = flight.arrival_airport.city;
-                const departureTime  = new Date(flight.departure_time).toLocaleString();
-                const arrivalTime    = new Date(flight.arrival_time).toLocaleString();
-                const planeImage     = flight.airplane_model.image_path;
+                const arrivalCity = flight.arrival_airport.city;
+                const departureTime = new Date(flight.departure_time).toLocaleString();
+                const arrivalTime = new Date(flight.arrival_time).toLocaleString();
+                const planeImage = flight.airplane_model.image_path;
 
                 card.innerHTML = `
   <div class="d-flex align-items-center w-100 position-relative">
@@ -140,5 +141,6 @@
 
     setInterval(updatePlaceholder, 3000);
 </script>
+
 </body>
 </html>

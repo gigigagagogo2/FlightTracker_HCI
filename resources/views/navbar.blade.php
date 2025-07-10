@@ -1,3 +1,4 @@
+@include('user/notify_popup')
 {{-- Collegamento al CSS personalizzato della navbar --}}
 <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 

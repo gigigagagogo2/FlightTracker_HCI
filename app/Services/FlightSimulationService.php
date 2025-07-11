@@ -19,16 +19,18 @@ class FlightSimulationService
         $endCoords = ['lat' => $flight->arrivalAirport->latitude, 'lng' => $flight->arrivalAirport->longitude];
 
         if ($progress == 1) {
-            return ['id' => $flight->id, 'progress' => $progress,];
+            return ['id' => $flight->id, 'progress' => $progress, 'status' => 'red'];
         } elseif ($progress == 0) {
             $currentPosition = $startCoords;
             $speed = 0;
+            $status = 'yellow';
         } else {
             $currentPosition = $this->getCurrentPoint($startCoords, $endCoords, $progress);
             $distance = $this->haversineGreatCircleDistance($startCoords, $endCoords);
             $averageSpeed = $distance / $totalTime * 3.6;
             $elapsedTime = $startTime->diffInSeconds(Carbon::now(), true);
             $speed = $this->getActualSpeed($averageSpeed, $elapsedTime, $totalTime);
+            $status = 'green';
         }
 
         return [
@@ -39,7 +41,8 @@ class FlightSimulationService
             'departure_city' => $flight->departureAirport->city,
             'arrival_city' => $flight->arrivalAirport->city,
             'departure_country' => $flight->departureAirport->country,
-            'arrival_country' => $flight->arrivalAirport->country
+            'arrival_country' => $flight->arrivalAirport->country,
+            'status' => $status,
         ];
     }
 

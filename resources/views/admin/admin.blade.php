@@ -8,10 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin/main-content.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
 @include("navbar")
+
 
 <main class="main-content">
     <div class="container py-5">
@@ -33,6 +35,15 @@
                     <a href="{{ route('admin.flights') }}" class="btn btn-outline-success mt-3">Vai</a>
                 </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm admin-card p-4">
+                    <i class="fas fa-building display-4 text-warning mb-3"></i>
+                    <h5 class="card-title">Gestisci Aereoporti</h5>
+                    <a href="{{ route('admin.airports') }}" class="btn btn-outline-warning mt-3">Vai</a>
+                </div>
+            </div>
+
         </div>
     </div>
 </main>

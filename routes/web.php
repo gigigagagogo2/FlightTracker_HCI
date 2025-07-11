@@ -106,6 +106,34 @@ Route::get('/profile-picture/{filename}', [UserController::class, 'showProfilePi
     ->middleware('auth')
     ->name('profile.picture');
 
+Route::get('/admin/airports', [AdminController::class, 'airports'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.airports');
+
+Route::delete('/admin/airports/{airport}', [AdminController::class, 'deleteAirport'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.airport.delete');
+
+// Mostra il form
+Route::get('/admin/airports/create', [AdminController::class, 'createAirport'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.airport.create');
+
+// Salva il nuovo aeroporto
+Route::post('/admin/airports', [AdminController::class, 'storeAirport'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.airport.store');
+
+Route::get('/admin/airports/{airport}/edit', [AdminController::class, 'editAirport'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.airport.edit');
+
+Route::put('/admin/airports/{airport}', [AdminController::class, 'updateAirport'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.airport.update');
+
 Route::view('/privacy', 'privacy')->name('privacy');
 
 Route::view('/terms', 'terms')->name('terms');
+
+Route::view('/about', 'about')->name('about');

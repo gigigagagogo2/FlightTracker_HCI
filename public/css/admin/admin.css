@@ -6,6 +6,7 @@ body {
 .admin-card {
     transition: transform 0.2s ease;
     border-radius: 1rem;
+
 }
 
 .admin-card:hover {

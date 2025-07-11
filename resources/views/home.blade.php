@@ -114,8 +114,6 @@
                 </button>
             </div>
         </div>
-
-
     </div>
 
     <div class="container mt-5" id="result-container" style="display: none;">

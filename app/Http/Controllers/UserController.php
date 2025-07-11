@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -91,7 +93,13 @@ class UserController extends Controller
 
         $request->validate([
             'nickname' => 'required|string|max:255|unique:users,nickname,' . $user->id,
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$/',
+                Rule::unique('users')->ignore($user->id),
+            ],
             'password' => 'nullable|string|min:6',
         ], [
             'nickname.required' => 'Il nickname è obbligatorio.',
@@ -105,7 +113,7 @@ class UserController extends Controller
         $user->nickname = $request->input('nickname');
         $user->email = $request->input('email');
 
-        if ($request->filled('password')) {
+        if ($request->filled('password') && $request->input('password') !== '********') {
             $user->password = Hash::make($request->input('password'));
         }
 

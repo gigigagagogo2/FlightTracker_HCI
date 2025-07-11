@@ -35,13 +35,7 @@
                 </button>
             </div>
 
-            <div class="checkbox-container">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-landed" name="show_landed">
-                    <span class="slider"></span>
-                    <span class="toggle-label">Mostra voli atterrati</span>
-                </label>
-            </div>
+
         </form>
     </div>
 
@@ -53,14 +47,15 @@
     </div>
 
 
+    <!-- Contenitore per le card statiche iniziali -->
     <div class="row mt-5 ps-3" id="cards-container">
-        <div id="result-container" class="container mt-5">
-            <!-- I voli verranno qui -->
-        </div>
-        <!-- Fine esempio scheda -->
+        <!-- Card con immagini create da creaCardVolo -->
     </div>
 
-
+    <!-- Contenitore per i risultati dinamici della ricerca -->
+    <div class="container mt-5" id="result-container" style="display: none;">
+        <!-- Card ricerca dinamica -->
+    </div>
 
 </div>
 @include('user/notify_popup')
@@ -72,7 +67,8 @@
     const searchSection = document.getElementById("search-section");
     const resultContainer = document.getElementById("result-container");
     const cancelBtn = document.getElementById("cancel-btn");
-    const showLandedCheckbox = document.getElementById("show-landed");
+    let currentFlights = [];
+
 
     let index = 0;
     const words = ["volo", "aereoporto", "citta"];
@@ -81,36 +77,66 @@
         index = (index + 1) % words.length;
         input.setAttribute("placeholder", "Inserisci " + words[index]);
     }
-
+    function isSearchActive() {
+        return input === document.activeElement && input.value.trim().length > 0;
+    }
     function resetSearch() {
         title.style.display = "block";  // Mostra di nuovo il titolo
         searchSection.classList.remove("search-fixed");  // Rimuove la classe fissa
         resultContainer.innerHTML = "";
         input.value = "";  // Pulisce l'input
-        showLandedCheckbox.checked = false;  // Deseleziona il checkbox
         cancelBtn.classList.add("hidden");  // Nasconde il bottone
         input.blur();
-    }
 
+        // MOSTRA di nuovo le card statiche
+        document.getElementById("cards-container").style.display = "flex";
+        resultContainer.style.display = "none";
+        deselectAll();
+    }
+    function isFilterActive() {
+        return document.querySelector(".button.selected") !== null;
+    }
     function showResults(data) {
+        currentFlights = data;
         title.style.display = "none";
         searchSection.classList.add("search-fixed");
         resultContainer.innerHTML = "";
-
         if (data.length === 0) {
             resultContainer.innerHTML = '<p class="text-center text-muted">Nessun volo trovato.</p>';
             return;
         }
 
-        data.forEach(flight => {
+        // Applica filtro attivo, se presente
+        let filteredData = [...data]; // copia dell'array
+
+        const activeBtn = document.querySelector(".button.selected");
+
+// Se non c'è filtro attivo (quindi solo ricerca), rimuovi i voli rossi
+        if (!activeBtn) {
+            filteredData = filteredData.filter(f => f.status !== "red");
+        }
+
+// Se c'è un filtro attivo, applicalo sopra i risultati già filtrati dai rossi (se serve)
+        if (activeBtn) {
+            const id = activeBtn.id;
+            const filtro = {
+                "btn-in-arrivo": filtri.inArrivoProssimi,
+                "btn-in-partenza": filtri.inPartenzaProssimi,
+                "btn-atterrati": filtri.atterrati,
+                "btn-italia": filtri.inItalia
+            }[id];
+
+            if (filtro) {
+                filteredData = filteredData.filter(filtro);
+            }
+        }
+
+
+        filteredData.forEach(flight => {
             const statusClass = ['green','yellow', 'red'].includes(flight.status)
                 ? flight.status
                 : 'gray';
 
-            // Filtra voli atterrati se il checkbox non è selezionato
-            if(statusClass === 'red' && !showLandedCheckbox.checked){
-                return;
-            }
 
             const card = document.createElement("div");
             card.className = "flight-card mb-3 p-3 border";
@@ -142,15 +168,13 @@
     </div>
 `;
 
-
-
             resultContainer.appendChild(card);
         });
     }
 
     function fetchAllFlights() {
-        const showLanded = showLandedCheckbox.checked ? '1' : '0';
-        fetch(`/search-flights?query=&show_landed=${showLanded}`)
+
+        fetch(`/search-flights?query=`)
             .then(r => r.json())
             .then(showResults)
             .catch(err => console.error(err));
@@ -158,17 +182,25 @@
 
     input.addEventListener("focus", () => {
         if (!input.value.trim()) fetchAllFlights();
+
+        // Nasconde le card statiche e mostra i risultati dinamici
+        document.getElementById("cards-container").style.display = "none";
+        resultContainer.style.display = "block";
     });
+
 
     input.addEventListener("input", () => {
         const q = input.value.trim();
-        const showLanded = showLandedCheckbox.checked ? '1' : '0';
+
+        // Nasconde le card statiche con immagini e mostra quelle dinamiche
+        document.getElementById("cards-container").style.display = "none";
+        resultContainer.style.display = "block";
 
         if (q.length === 0) {
             fetchAllFlights();
             return;
         }
-        fetch(`/search-flights?query=${encodeURIComponent(q)}&show_landed=${showLanded}`)
+        fetch(`/search-flights?query=${encodeURIComponent(q)}`)
             .then(r => r.json())
             .then(showResults)
             .catch(err => console.error(err));
@@ -177,41 +209,6 @@
     input.addEventListener("keydown", e => {
         if (e.key === "Escape") {
             resetSearch();
-        }
-    });
-
-    // Event listener per il bottone Annulla - MODIFICATO
-    cancelBtn.addEventListener("click", () => {
-        // Invece di resettare tutto, deseleziona solo il checkbox
-        showLandedCheckbox.checked = false;
-        cancelBtn.classList.add("hidden");  // Nasconde il bottone
-
-        // Aggiorna i risultati con la nuova selezione
-        if (searchSection.classList.contains("search-fixed")) {
-            const q = input.value.trim();
-            const showLanded = '0'; // Ora è sempre 0 perché abbiamo deselezionato
-
-            if (q.length === 0) {
-                fetchAllFlights();
-            } else {
-                fetch(`/search-flights?query=${encodeURIComponent(q)}&show_landed=${showLanded}`)
-                    .then(r => r.json())
-                    .then(showResults)
-                    .catch(err => console.error(err));
-            }
-        }
-    });
-
-    // Event listener per il checkbox
-    showLandedCheckbox.addEventListener("change", () => {
-        if (showLandedCheckbox.checked) {
-            cancelBtn.classList.remove("hidden");  // Mostra il bottone quando è selezionato
-        } else {
-            cancelBtn.classList.add("hidden");  // Nasconde il bottone quando è deselezionato
-        }
-
-        if (searchSection.classList.contains("search-fixed")) {
-            fetchAllFlights();
         }
     });
 
@@ -303,41 +300,72 @@
         buttons.forEach(b => b.classList.remove("selected"));
     }
 
+    function applicaFiltroAttivo() {
+        deselectAll();
+        const selectedBtn = document.querySelector(".button.selected");
+        const id = selectedBtn?.id;
+        const filtro = {
+            "btn-in-arrivo": filtri.inArrivoProssimi,
+            "btn-in-partenza": filtri.inPartenzaProssimi,
+            "btn-atterrati": filtri.atterrati,
+            "btn-italia": filtri.inItalia
+        }[id];
+
+        if (!filtro) return;
+
+        if (isSearchActive()) {
+            // Modalità ricerca attiva → usa voli dinamici
+            const query = input.value.trim();
+            fetch(`/search-flights?query=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    currentFlights = data;
+                    showResults(data);
+                })
+                .catch(err => console.error("Errore filtro ricerca:", err));
+
+            // UI: mostra risultati dinamici, nascondi statiche
+            document.getElementById("cards-container").style.display = "none";
+            resultContainer.style.display = "block";
+        } else {
+            // Modalità homepage statica → usa mostraVoliConFiltro
+            fetch("/search-flights?query=")
+                .then(r => r.json())
+                .then(data => {
+                    voli = data;
+                    const cardsContainer = document.getElementById("cards-container");
+                    cardsContainer.style.display = "flex";
+                    resultContainer.style.display = "none";
+                    mostraVoliConFiltro(data, filtro, "Nessun volo trovato con questo filtro.");
+                })
+                .catch(err => console.error("Errore filtro statico:", err));
+        }
+    }
+
+
     // Event listeners per i bottoni - APPROCCIO ORIGINALE CHE FUNZIONAVA
     document.getElementById("btn-in-arrivo").addEventListener("click", () => {
-        deselectAll();
+
         document.getElementById("btn-in-arrivo").classList.add("selected");
-        fetch("/search-flights?query=")
-            .then(r => r.json())
-            .then(v => mostraVoliConFiltro(v, filtri.inArrivoProssimi, "Nessun volo in arrivo entro 2 ore."))
-            .catch(err => console.error(err));
+        applicaFiltroAttivo();
     });
 
     document.getElementById("btn-in-partenza").addEventListener("click", () => {
-        deselectAll();
+
         document.getElementById("btn-in-partenza").classList.add("selected");
-        fetch("/search-flights?query=")
-            .then(r => r.json())
-            .then(v => mostraVoliConFiltro(v, filtri.inPartenzaProssimi, "Nessun volo in partenza entro 2 ore."))
-            .catch(err => console.error(err));
+        applicaFiltroAttivo();
     });
 
     document.getElementById("btn-atterrati").addEventListener("click", () => {
-        deselectAll();
+
         document.getElementById("btn-atterrati").classList.add("selected");
-        fetch("/search-flights?query=")
-            .then(r => r.json())
-            .then(v => mostraVoliConFiltro(v, filtri.atterrati, "Nessun volo atterrato disponibile."))
-            .catch(err => console.error(err));
+        applicaFiltroAttivo();
     });
 
     document.getElementById("btn-italia").addEventListener("click", () => {
-        deselectAll();
+
         document.getElementById("btn-italia").classList.add("selected");
-        fetch("/search-flights?query=")
-            .then(r => r.json())
-            .then(v => mostraVoliConFiltro(v, filtri.inItalia, "Nessun volo in partenza o arrivo in Italia."))
-            .catch(err => console.error(err));
+        applicaFiltroAttivo();
     });
     function caricaVoli() {
         fetch("/search-flights?query=")

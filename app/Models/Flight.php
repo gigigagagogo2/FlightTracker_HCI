@@ -61,13 +61,18 @@ class Flight extends Model
             return 'green';
         }
 
-        return 'red';
+        if ($now->greaterThan($this->arrival_time)) {
+            return 'red';
+        }
+
+        return 'grey';
 
     }
 
     /**
      * Verifica se il volo è nei preferiti dell'utente autenticato.
      */
+
     public function isPreferito(): bool
     {
         // Verifica se l'utente autenticato è presente nella relazione molti-a-molti

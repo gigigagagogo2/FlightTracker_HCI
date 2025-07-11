@@ -29,10 +29,7 @@
                     <input type="text" class="form-control search-input" id="search-input" placeholder="Inserisci volo" name="query" autocomplete="off">
                 </div>
 
-                <button type="button" class="cancel-button hidden" id="cancel-btn">
-                    <i class="bi bi-x-circle-fill me-1"></i>
-                    Annulla
-                </button>
+
             </div>
 
 
@@ -48,7 +45,7 @@
 
 
     <!-- Contenitore per le card statiche iniziali -->
-    <div class="row mt-5 ps-3" id="cards-container">
+    <div class="row mt-5 px-3" id="cards-container">
         <!-- Card con immagini create da creaCardVolo -->
     </div>
 
@@ -62,6 +59,10 @@
 @include('footer')
 
 <script>
+
+    let isSearchActive = false;
+
+
     const input = document.getElementById("search-input");
     const title = document.getElementById("search-title");
     const searchSection = document.getElementById("search-section");
@@ -77,18 +78,15 @@
         index = (index + 1) % words.length;
         input.setAttribute("placeholder", "Inserisci " + words[index]);
     }
-    function isSearchActive() {
-        return input === document.activeElement && input.value.trim().length > 0;
-    }
-    function resetSearch() {
-        title.style.display = "block";  // Mostra di nuovo il titolo
-        searchSection.classList.remove("search-fixed");  // Rimuove la classe fissa
-        resultContainer.innerHTML = "";
-        input.value = "";  // Pulisce l'input
-        cancelBtn.classList.add("hidden");  // Nasconde il bottone
-        input.blur();
 
-        // MOSTRA di nuovo le card statiche
+    function resetSearch() {
+        isSearchActive = false;
+        title.style.display = "block";
+        searchSection.classList.remove("search-fixed");
+        resultContainer.innerHTML = "";
+        input.value = "";
+        cancelBtn.classList.add("hidden");
+        input.blur();
         document.getElementById("cards-container").style.display = "flex";
         resultContainer.style.display = "none";
         deselectAll();
@@ -106,17 +104,16 @@
             return;
         }
 
-        // Applica filtro attivo, se presente
         let filteredData = [...data]; // copia dell'array
 
         const activeBtn = document.querySelector(".button.selected");
 
-// Se non c'è filtro attivo (quindi solo ricerca), rimuovi i voli rossi
+        // Se non c'è filtro attivo (quindi solo ricerca), rimuovi i voli rossi
         if (!activeBtn) {
             filteredData = filteredData.filter(f => f.status !== "red");
         }
 
-// Se c'è un filtro attivo, applicalo sopra i risultati già filtrati dai rossi (se serve)
+        // Se c'è un filtro attivo, applicalo sopra i risultati già filtrati dai rossi (se serve)
         if (activeBtn) {
             const id = activeBtn.id;
             const filtro = {
@@ -131,7 +128,6 @@
             }
         }
 
-
         filteredData.forEach(flight => {
             const statusClass = ['green','yellow', 'red'].includes(flight.status)
                 ? flight.status
@@ -139,7 +135,7 @@
 
 
             const card = document.createElement("div");
-            card.className = "flight-card mb-3 p-3 border";
+            card.className = "flight-card custom-shadow";
             card.style.cursor = "pointer";
             card.addEventListener("click", () => {
                 window.location.href = `/flights/${flight.id}`;
@@ -152,21 +148,17 @@
             const planeImage     = flight.airplane_model.image_path;
 
             card.innerHTML = `
-    <div class="d-flex align-items-center position-relative px-4 py-4" style="width:100vw; min-height:140px; background:white; border-radius:8px; margin-left:-16px; margin-right:-16px;">
-        <!-- Immagine -->
-        <img src="${planeImage}" alt="Aereo" class="flight-image me-4" style="width:100px; height:auto; flex-shrink:0;">
-
-        <!-- Info -->
-        <div class="flex-grow-1">
-            <h4 class="mb-2">${departureCity} → ${arrivalCity}</h4>
-            <p class="mb-1 fs-5">${departureTime} - ${arrivalTime}</p>
-            <small>Modello: ${flight.airplane_model.name}</small>
-        </div>
-
-        <!-- Pallino posizionato assolutamente -->
-        <span class="status-dot ${statusClass} status-dot-absolute"></span>
-    </div>
-`;
+        <div class="container-fluid px-0">
+            <div class="d-flex align-items-center position-relative px-4 py-2 w-100" style="min-height:100px; background:white; border-radius:8px;">
+                <img src="${planeImage}" alt="Aereo" class="flight-image me-3" style="width:70px; height:auto; flex-shrink:0;">
+                <div class="flex-grow-1">
+                    <h5 class="mb-1">${departureCity} → ${arrivalCity}</h5>
+                    <p class="mb-1 fs-6">${departureTime} - ${arrivalTime}</p>
+                    <small>Modello: ${flight.airplane_model.name}</small>
+                </div>
+                <span class="status-dot ${statusClass} status-dot-absolute"></span>
+            </div>
+        </div>`;
 
             resultContainer.appendChild(card);
         });
@@ -181,6 +173,7 @@
     }
 
     input.addEventListener("focus", () => {
+        isSearchActive = true;
         if (!input.value.trim()) fetchAllFlights();
 
         // Nasconde le card statiche e mostra i risultati dinamici
@@ -225,16 +218,16 @@
         const arrivoCitta = volo.arrival_airport.city;
 
         return `
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-        <div class="card h-100 shadow-sm" style="cursor:pointer;">
-            <div style="width:100%; height:200px; overflow:hidden;">
-                <img src="/images/city/city${immagineNumero}.jpg" class="card-img-top" alt="Immagine volo" style="width:100%; height:100%; object-fit:cover;">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100 shadow-sm" style="cursor:pointer;">
+                <div style="width:100%; height:200px; overflow:hidden;">
+                    <img src="/images/city/city${immagineNumero}.jpg" class="card-img-top" alt="Immagine volo" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">${partenzaCitta} → ${arrivoCitta}</h5>
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">${partenzaCitta} → ${arrivoCitta}</h5>
-            </div>
-        </div>
-    </div>`;
+        </div>`;
     }
 
     function mostraVoliConFiltro(voli, filtro, messaggioNessuno) {
@@ -266,18 +259,18 @@
             // arrivo entro le prossime 2 ore
             return at >= now && at <= now + 2 * 3600_000;
         },
-        inPartenzaProssimi: volo => {
+            inPartenzaProssimi: volo => {
             if (!volo.departure_time) return false;
             const now = Date.now();
             const dt  = new Date(volo.departure_time).getTime();
             // partenza entro le prossime 2 ore
             return dt >= now && dt <= now + 2 * 3600_000;
         },
-        atterrati: volo => {
+            atterrati: volo => {
             // il tuo API marca lo status come "red" per atterrato
             return volo.status === "red";
         },
-        inItalia: volo => {
+            inItalia: volo => {
             // controlla paese di partenza o arrivo
             const c1 = (volo.departure_airport.country  || "").toLowerCase();
             const c2 = (volo.arrival_airport.country    || "").toLowerCase();
@@ -301,79 +294,51 @@
     }
 
     function applicaFiltroAttivo() {
-        deselectAll();
-        const selectedBtn = document.querySelector(".button.selected");
-        const id = selectedBtn?.id;
-        const filtro = {
-            "btn-in-arrivo": filtri.inArrivoProssimi,
-            "btn-in-partenza": filtri.inPartenzaProssimi,
-            "btn-atterrati": filtri.atterrati,
-            "btn-italia": filtri.inItalia
-        }[id];
-
-        if (!filtro) return;
-
-        if (isSearchActive()) {
-            // Modalità ricerca attiva → usa voli dinamici
-            const query = input.value.trim();
-            fetch(`/search-flights?query=${encodeURIComponent(query)}`)
-                .then(r => r.json())
-                .then(data => {
-                    currentFlights = data;
-                    showResults(data);
-                })
-                .catch(err => console.error("Errore filtro ricerca:", err));
-
-            // UI: mostra risultati dinamici, nascondi statiche
-            document.getElementById("cards-container").style.display = "none";
-            resultContainer.style.display = "block";
-        } else {
-            // Modalità homepage statica → usa mostraVoliConFiltro
-            fetch("/search-flights?query=")
-                .then(r => r.json())
-                .then(data => {
-                    voli = data;
-                    const cardsContainer = document.getElementById("cards-container");
-                    cardsContainer.style.display = "flex";
-                    resultContainer.style.display = "none";
-                    mostraVoliConFiltro(data, filtro, "Nessun volo trovato con questo filtro.");
-                })
-                .catch(err => console.error("Errore filtro statico:", err));
-        }
+        if (currentFlights.length === 0) return;
+        showResults(currentFlights);
     }
 
+    const bottoneFiltri = document.querySelectorAll(".button-bar .button");
 
-    // Event listeners per i bottoni - APPROCCIO ORIGINALE CHE FUNZIONAVA
-    document.getElementById("btn-in-arrivo").addEventListener("click", () => {
+    bottoneFiltri.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const isAlreadySelected = btn.classList.contains("selected");
 
-        document.getElementById("btn-in-arrivo").classList.add("selected");
-        applicaFiltroAttivo();
+            // Deseleziona tutti i bottoni
+            deselectAll();
+
+            if (!isAlreadySelected) {
+                // Se NON era già selezionato → lo seleziono ora
+                btn.classList.add("selected");
+            }
+
+            // Applico filtro in base alla modalità
+            if (isSearchActive) {
+                applicaFiltroAttivo();
+            } else {
+                const filtro = {
+                    "btn-in-arrivo": filtri.inArrivoProssimi,
+                    "btn-in-partenza": filtri.inPartenzaProssimi,
+                    "btn-atterrati": filtri.atterrati,
+                    "btn-italia": filtri.inItalia
+                }[btn.id];
+
+                if (btn.classList.contains("selected") && filtro) {
+                    mostraVoliConFiltro(voli, filtro, "Nessun volo corrispondente trovato.");
+                } else {
+                    mostraVoliConFiltro(voli, () => true, "Nessun volo disponibile.");
+                }
+            }
+        });
     });
 
-    document.getElementById("btn-in-partenza").addEventListener("click", () => {
-
-        document.getElementById("btn-in-partenza").classList.add("selected");
-        applicaFiltroAttivo();
-    });
-
-    document.getElementById("btn-atterrati").addEventListener("click", () => {
-
-        document.getElementById("btn-atterrati").classList.add("selected");
-        applicaFiltroAttivo();
-    });
-
-    document.getElementById("btn-italia").addEventListener("click", () => {
-
-        document.getElementById("btn-italia").classList.add("selected");
-        applicaFiltroAttivo();
-    });
     function caricaVoli() {
         fetch("/search-flights?query=")
             .then(r => r.json())
             .then(v => {
+                voli = v;
                 console.log(`Caricati ${v.length} voli inizialmente`);
-                // Puoi mostrare tutti i voli o lasciare vuoto
-                // mostraVoliConFiltro(v, () => true, "Nessun volo disponibile.");
+                mostraVoliConFiltro(voli, () => true, "Nessun volo disponibile.");
             })
             .catch(err => console.error("Errore caricamento iniziale:", err));
     }

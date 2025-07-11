@@ -31,7 +31,16 @@ class FlightSimulationService
             $speed = $this->getActualSpeed($averageSpeed, $elapsedTime, $totalTime);
         }
 
-        return ['id' => $flight->id, 'lat' => (float)$currentPosition['lat'], 'lng' => (float)$currentPosition['lng'], 'speed' => $speed, 'progress' => $progress, 'arrival_city' => $flight->arrivalAirport->city, 'departure_city' => $flight->departureAirport->city,];
+        return [
+            'lat' => (float) $currentPosition['lat'],
+            'lng' => (float) $currentPosition['lng'],
+            'speed' => $speed,
+            'progress' => $progress,
+            'departure_city' => $flight->departureAirport->city,
+            'arrival_city' => $flight->arrivalAirport->city,
+            'departure_country' => $flight->departureAirport->country,
+            'arrival_country' => $flight->arrivalAirport->country
+        ];
     }
 
     // Questo metodo ritorna solo i voli non gia atterrati

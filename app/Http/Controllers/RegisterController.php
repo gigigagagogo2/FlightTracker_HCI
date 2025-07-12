@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+
 
 class RegisterController extends Controller
 {
@@ -14,11 +16,15 @@ class RegisterController extends Controller
         // valida i dati ricevuti dal form
         $validated = $request->validate([
             'nickname' => 'required|string|max:255|unique:users,nickname',
-            'email' => 'required|email|unique:users,email',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$/',
+            ],
             'password' => 'required|string|confirmed',
 
         ]);
-
         // Crea lo user
         $user = User::create([
             'nickname' => $validated['nickname'],

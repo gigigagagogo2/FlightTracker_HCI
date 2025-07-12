@@ -25,6 +25,7 @@ class RegisterController extends Controller
             'password' => 'required|string|confirmed',
 
         ]);
+
         // Crea lo user
         $user = User::create([
             'nickname' => $validated['nickname'],

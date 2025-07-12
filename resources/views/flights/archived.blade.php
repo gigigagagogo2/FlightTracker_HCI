@@ -1,5 +1,8 @@
-@php use Carbon\Carbon; @endphp
-    <!DOCTYPE html>
+@php
+    use Carbon\Carbon;
+@endphp
+
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -52,13 +55,6 @@
                     </div>
                 </div>
 
-                <!-- Barra di avanzamento -->
-                <div class="progress my-4" style="height: 25px;">
-                    <div id="progress-bar" class="progress-bar bg-warning text-dark fw-bold" role="progressbar" style="width:0;">
-                        0%
-                    </div>
-                </div>
-
                 <!-- Statistiche del Volo -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -66,7 +62,9 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-tachometer-alt fa-2x text-primary mb-2"></i>
                                 <h5>Velocità Media</h5>
-                                <h3 id="average-speed" class="text-primary">-- km/h</h3>
+                                <h3 id="average-speed" class="text-primary">
+                                    {{ round($averageSpeed, 1) . " Km/h"}}
+                                </h3>
                             </div>
                         </div>
                     </div>
@@ -116,7 +114,9 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-route fa-2x text-info mb-2"></i>
                                 <h5>Distanza Percorsa</h5>
-                                <p id="distance-traveled" class="mb-0">-- km</p>
+                                <p id="distance-traveled" class="mb-0">
+                                    {{ round($distance, 1) . " Km"}}
+                                </p>
                             </div>
                         </div>
                     </div>

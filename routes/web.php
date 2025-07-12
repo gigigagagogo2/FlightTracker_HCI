@@ -91,7 +91,7 @@ Route::delete('/admin/flights/{flight}', [AdminController::class, 'deleteFlight'
 
 Route::get('/search-flights', [FlightController::class, 'search'])->name('flights.search');
 
-Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.show');
+Route::get('/flights/{id}', [FlightController::class,  'show'])->name('flights.show');
 
 Route::post('/api/simulazione-voli', [FlightSimulationController::class, 'getMultipleFlightData']);
 

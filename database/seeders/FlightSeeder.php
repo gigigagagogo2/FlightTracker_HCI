@@ -73,5 +73,30 @@ class FlightSeeder extends Seeder
             'departure_time'       => Carbon::now()->addHours(-1),
             'arrival_time'         => Carbon::now()->addMinutes(),
         ]);
+        Flight::create([
+            'airplane_model_id'    => $airplanes->random()->id,
+            'departure_airport_id' => $departure->id,
+            'arrival_airport_id'   => $arrival->id,
+            'departure_time'       => Carbon::now()->subHours(2),
+            'arrival_time'         => Carbon::now()->subMinutes(10),
+        ]);
+
+        // Volo in volo, atterraggio tra 40 minuti
+        Flight::create([
+            'airplane_model_id'    => $airplanes->random()->id,
+            'departure_airport_id' => $departure->id,
+            'arrival_airport_id'   => $arrival->id,
+            'departure_time'       => Carbon::now()->subHour(), // partito 1 ora fa
+            'arrival_time'         => Carbon::now()->addMinutes(40),
+        ]);
+
+        // Volo atterrato da 2 ore
+        Flight::create([
+            'airplane_model_id'    => $airplanes->random()->id,
+            'departure_airport_id' => $departure->id,
+            'arrival_airport_id'   => $arrival->id,
+            'departure_time'       => Carbon::now()->subHours(5),
+            'arrival_time'         => Carbon::now()->subHours(2),
+        ]);
     }
 }

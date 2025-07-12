@@ -58,7 +58,7 @@
                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                             <div class="d-flex justify-content-center gap-4">
                                 @foreach($chunk as $flight)
-                                    <div class="card shadow-sm" style="width: 22rem;">
+                                    <div class="card shadow-sm" style="width: 22rem; cursor: pointer;" onclick="window.location.href='/flights/{{ $flight->id }}'">
                                         <img src="/images/city/city{{ rand(1,18) }}.jpg" class="card-img-top fixed-img"
                                              alt="{{ $flight->departureAirport->city }} → {{ $flight->arrivalAirport->city }}">
                                         <div class="card-body">
@@ -91,7 +91,7 @@
                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                             <div class="d-flex justify-content-center gap-4">
                                 @foreach($chunk as $flight)
-                                    <div class="card shadow-sm" style="width: 22rem;">
+                                    <div class="card shadow-sm" style="width: 22rem; cursor: pointer;" onclick="window.location.href='/flights/{{ $flight->id }}'">
                                         <img src="/images/city/city{{ rand(1,18) }}.jpg" class="card-img-top fixed-img"
                                              alt="{{ $flight->departureAirport->city }} → {{ $flight->arrivalAirport->city }}">
                                         <div class="card-body">
@@ -301,7 +301,7 @@
     });
 
     const filtri = {
-        inArrivoProssimi: volo => volo.arrival_time && Date.now() <= new Date(volo.arrival_time).getTime() && new Date(volo.arrival_time).getTime() <= Date.now() + 2 * 3600000,
+        inArrivoProssimi: volo => volo.departure_time <= Date.now && volo.arrival_time && Date.now() <= new Date(volo.arrival_time).getTime() && new Date(volo.arrival_time).getTime() <= Date.now() + 2 * 3600000,
         inPartenzaProssimi: volo => volo.departure_time && Date.now() <= new Date(volo.departure_time).getTime() && new Date(volo.departure_time).getTime() <= Date.now() + 2 * 3600000,
         atterrati: volo => volo.status === "red",
         inItalia: volo => {

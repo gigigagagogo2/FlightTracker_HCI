@@ -51,19 +51,19 @@
 
     <div class="row justify-content-center g-4">
         <div class="col-12 col-sm-6 col-md-4 text-center" data-aos="flip-left" data-aos-delay="100">
-            <img src="{{ asset('images/dev_1.jpg') }}" alt="Robert" class="team-photo rounded-circle mb-2">
+            <img src="{{ asset('images/robert.jpg') }}" alt="Robert" class="team-photo rounded-circle mb-2">
             <h5 class="mb-0">Bararu Robert Daniel</h5>
             <small class="text-muted">Studente di Ingegneria Informatica UniBS</small>
         </div>
 
         <div class="col-12 col-sm-6 col-md-4 text-center" data-aos="flip-left" data-aos-delay="200">
-            <img src="{{ asset('images/dev_2.jpg') }}" alt="Samuele" class="team-photo rounded-circle mb-2">
+            <img src="{{ asset('images/samu.jpg') }}" alt="Samuele" class="team-photo rounded-circle mb-2">
             <h5 class="mb-0">Valperta Samuele</h5>
             <small class="text-muted">Studente di Ingegneria Informatica UniBS</small>
         </div>
 
         <div class="col-12 col-sm-6 col-md-4 text-center" data-aos="flip-left" data-aos-delay="300">
-            <img src="{{ asset('images/dev_3.jpg') }}" alt="Davide" class="team-photo rounded-circle mb-2">
+            <img src="{{ asset('images/davide.jpg') }}" alt="Davide" class="team-photo rounded-circle mb-2">
             <h5 class="mb-0">Fejzulla Davide</h5>
             <small class="text-muted">Studente di Ingegneria Informatica UniBS</small>
         </div>

@@ -121,194 +121,198 @@
     <div class="container mt-5" id="result-container" style="display: none;">
         <!-- Card ricerca dinamica -->
     </div>
+</div>
 
-    @include('footer')
+@include('footer')
 
-    <script>
-        const input = document.getElementById("search-input");
-        const searchTitle = document.getElementById("search-title");
-        const resultContainer = document.getElementById("result-container");
-        const cardsContainer = document.getElementById("cards-container");
-        const searchSection = document.getElementById("search-section");
+<script>
+    const input = document.getElementById("search-input");
+    const searchTitle = document.getElementById("search-title");
+    const resultContainer = document.getElementById("result-container");
+    const cardsContainer = document.getElementById("cards-container");
+    const searchSection = document.getElementById("search-section");
+    var isSearchActive = false;
 
-        let currentFlights = [];
+    let currentFlights = [];
 
-        const words = ["volo", "aeroporto", "città"];
-        let index = 0;
-        setInterval(() => {
-            index = (index + 1) % words.length;
-            input.setAttribute("placeholder", "Inserisci " + words[index]);
-        }, 3000);
+    const words = ["volo", "aeroporto", "città"];
+    let index = 0;
+    setInterval(() => {
+        index = (index + 1) % words.length;
+        input.setAttribute("placeholder", "Inserisci " + words[index]);
+    }, 3000);
 
-        // function disableSearch() {
-        //     isSearchActive = false;
-        //     searchSection.classList.remove("search-fixed");
-        //     searchTitle.style.display = "block";
-        //     resultContainer.innerHTML = "";
-        //     cardsContainer.style.display = "flex";
-        //     document.getElementById("cards-container").style.display = "flex";
-        //     resultContainer.style.display = "none";
-        //     animateShow(cardsContainer);
-        //     animateHide(resultContainer);
-        // }
+    // function disableSearch() {
+    //     isSearchActive = false;
+    //     searchSection.classList.remove("search-fixed");
+    //     searchTitle.style.display = "block";
+    //     resultContainer.innerHTML = "";
+    //     cardsContainer.style.display = "flex";
+    //     document.getElementById("cards-container").style.display = "flex";
+    //     resultContainer.style.display = "none";
+    //     animateShow(cardsContainer);
+    //     animateHide(resultContainer);
+    // }
 
-        function disableSearch() {
-            isSearchActive = false;
-            searchSection.classList.remove("search-fixed");
-            animateShow(searchTitle);
-            resultContainer.innerHTML = "";
-            animateShow(cardsContainer);
-            animateHide(resultContainer);
-        }
+    function disableSearch() {
+        isSearchActive = false;
+        searchSection.classList.remove("search-fixed");
+        searchTitle.style.display = "block";
+        cardsContainer.style.display = "block";
+        resultContainer.style.display = "none";
+        resultContainer.innerHTML = "";
+    }
 
-        function deselectAll() {
-            document.querySelectorAll(".button").forEach(b => b.classList.remove("selected"));
-        }
+    function deselectAll() {
+        document.querySelectorAll(".button").forEach(b => b.classList.remove("selected"));
+    }
 
-        function isFilterActive() {
-            return document.querySelector(".button.selected") !== null;
-        }
+    function isFilterActive() {
+        return document.querySelector(".button.selected") !== null;
+    }
 
-        function showResults(data) {
-            searchSection.classList.add("search-fixed");
-            currentFlights = data;
-            animateHide(searchTitle);
-            resultContainer.innerHTML = `
+    function showResults(data) {
+        searchSection.classList.add("search-fixed");
+        currentFlights = data;
+        searchTitle.style.display = "none";
+        resultContainer.innerHTML = `
         <h3 class="mb-4 text-left" id="search-results-title">Risultati della ricerca</h3>
         `
 
-            const titleNode = document.getElementById("search-results-title");
-            if (titleNode) resultContainer.appendChild(titleNode);
+        const titleNode = document.getElementById("search-results-title");
+        if (titleNode) resultContainer.appendChild(titleNode);
 
-            let filteredData = [...data];
-            const activeBtn = document.querySelector(".button.selected");
+        let filteredData = [...data];
+        const activeBtn = document.querySelector(".button.selected");
 
-            const id = activeBtn?.id;
-            const filtro = {
-                "btn-in-arrivo": filtri.inArrivoProssimi,
-                "btn-in-partenza": filtri.inPartenzaProssimi,
-                "btn-atterrati": filtri.atterrati,
-                "btn-italia": filtri.inItalia
-            }[id];
+        const id = activeBtn?.id;
+        const filtro = {
+            "btn-in-arrivo": filtri.inArrivoProssimi,
+            "btn-in-partenza": filtri.inPartenzaProssimi,
+            "btn-atterrati": filtri.atterrati,
+            "btn-italia": filtri.inItalia
+        }[id];
 
-            if (filtro) {
-                filteredData = filteredData.filter(filtro);
-            } else {
-                filteredData = filteredData.filter(f => f.status !== "red");
+        if (filtro) {
+            filteredData = filteredData.filter(filtro);
+        } else {
+            filteredData = filteredData.filter(f => f.status !== "red");
+        }
+
+        if (filteredData.length === 0) {
+            resultContainer.innerHTML = '<p class="text-center text-muted">Nessun volo trovato.</p>';
+            return;
+        }
+
+        filteredData.forEach(flight => {
+            const statusClass = ['green', 'yellow', 'red'].includes(flight.status) ? flight.status : 'gray';
+            const card = document.createElement("div");
+            card.className = "flight-card";
+            card.addEventListener("click", () => window.location.href = `/flights/${flight.id}`);
+
+            card.innerHTML = `
+    <div class="flight-card-content">
+        <span class="status-dot ${statusClass}"></span>
+
+        <img src="${flight.airplane_model.image_path}" alt="Aereo" class="airplane-image">
+
+        <div class="flight-info">
+            <h5 class="flight-route">
+                ${flight.departure_airport.city}
+                <span class="route-arrow">✈</span>
+                ${flight.arrival_airport.city}
+            </h5>
+
+            <p class="flight-times">
+                ${new Date(flight.departure_time).toLocaleString('it-IT', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}
+                <span class="arrow">→</span>
+                ${new Date(flight.arrival_time).toLocaleString('it-IT', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}
+            </p>
+
+            <p class="aircraft-info">
+                <span class="aircraft-emoji">✈️</span>
+                <strong class="aircraft-name">${flight.airplane_model.name}</strong>
+            </p>
+        </div>
+    </div>
+`;
+
+            resultContainer.appendChild(card);
+        });
+    }
+
+    input.addEventListener("input", () => {
+        console.log('ciao');
+        const query = input.value.trim();
+        const filtroAttivo = document.querySelector(".button.selected");
+
+        console.log(filtroAttivo);
+        if (query.length > 0 || filtroAttivo) {
+            console.log('q:' + query);
+            fetch(`/search-flights?query=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    console.log(data)
+                    searchTitle.style.display = "block";
+                    cardsContainer.style.display = "none";
+                    resultContainer.style.display = "block";
+                    showResults(data);
+                });
+        } else {
+            console.log('disabilito ricerca');
+            disableSearch();
+        }
+    });
+
+    document.querySelectorAll(".button-bar .button").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const wasSelected = btn.classList.contains("selected");
+            deselectAll();
+            if (!wasSelected) {
+                btn.classList.add("selected");
             }
-
-            if (filteredData.length === 0) {
-                resultContainer.innerHTML = '<p class="text-center text-muted">Nessun volo trovato.</p>';
+            const query = input.value.trim();
+            const filtroAttivo = document.querySelector(".button.selected");
+            if (!query && !filtroAttivo) {
+                disableSearch();
                 return;
             }
-
-            filteredData.forEach(flight => {
-                const statusClass = ['green', 'yellow', 'red'].includes(flight.status) ? flight.status : 'gray';
-                const card = document.createElement("div");
-                card.className = "flight-card custom-shadow";
-                card.style.cursor = "pointer";
-                card.addEventListener("click", () => window.location.href = `/flights/${flight.id}`);
-
-                card.innerHTML = `
-                <div class="container-fluid px-0">
-                    <div class="d-flex align-items-center position-relative px-4 py-2 w-100" style="min-height:100px; background:white; border-radius:8px;">
-                        <img src="${flight.airplane_model.image_path}" alt="Aereo" class="flight-image me-3" style="width:70px; height:auto; flex-shrink:0;">
-                        <div class="flex-grow-1">
-                            <h5 class="mb-1">${flight.departure_airport.city} → ${flight.arrival_airport.city}</h5>
-                            <p class="mb-1 fs-6">${new Date(flight.departure_time).toLocaleString()} - ${new Date(flight.arrival_time).toLocaleString()}</p>
-                            <small>Modello: ${flight.airplane_model.name}</small>
-                        </div>
-                        <span class="status-dot ${statusClass} status-dot-absolute"></span>
-                    </div>
-                </div>`;
-
-                resultContainer.appendChild(card);
-            });
-        }
-
-        input.addEventListener("input", () => {
-            const query = input.value.trim();
-            if (query.length > 0 || isFilterActive()) {
-                fetch(`/search-flights?query=${encodeURIComponent(query)}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        animateHide(cardsContainer);
-                        animateShow(resultContainer);
-                        showResults(data);
-                    });
-            } else {
-                disableSearch();
-            }
+            isSearchActive = true;
+            const url = `/search-flights?query=${encodeURIComponent(query)}`;
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    cardsContainer.style.display = "none";
+                    resultContainer.style.display = "block";
+                    showResults(data);
+                })
+                .catch(err => console.error(err));
         });
+    });
 
-
-        document.querySelectorAll(".button-bar .button").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const wasSelected = btn.classList.contains("selected");
-                deselectAll();
-                if (!wasSelected) {
-                    btn.classList.add("selected");
-                }
-                const query = input.value.trim();
-                const filtroAttivo = document.querySelector(".button.selected");
-                if (!query && !filtroAttivo) {
-                    disableSearch();
-                    return;
-                }
-                isSearchActive = true;
-                const url = `/search-flights?query=${encodeURIComponent(query)}`;
-                fetch(url)
-                    .then(r => r.json())
-                    .then(data => {
-                        animateHide(cardsContainer);
-                        animateShow(resultContainer);
-                        showResults(data);
-                    })
-                    .catch(err => console.error(err));
-            });
-        });
-
-        const filtri = {
-            inArrivoProssimi: volo => volo.arrival_time && Date.now() <= new Date(volo.arrival_time).getTime() && new Date(volo.arrival_time).getTime() <= Date.now() + 2 * 3600000,
-            inPartenzaProssimi: volo => volo.departure_time && Date.now() <= new Date(volo.departure_time).getTime() && new Date(volo.departure_time).getTime() <= Date.now() + 2 * 3600000,
-            atterrati: volo => volo.status === "red",
-            inItalia: volo => {
-                const c1 = (volo.departure_airport.country || "").toLowerCase();
-                const c2 = (volo.arrival_airport.country || "").toLowerCase();
-                return ["italia", "italy", "it"].includes(c1) || ["italia", "italy", "it"].includes(c2);
-            }
-        };
-    </script>
-
-    <script>
-        function animateShow(element) {
-            element.style.display = element.dataset.display || "block"; // fallback a block o valore custom
-            element.classList.remove("fade-exit", "fade-exit-active");
-            element.classList.add("fade-enter");
-
-            requestAnimationFrame(() => {
-                element.classList.add("fade-enter-active");
-            });
-
-            element.addEventListener("transitionend", () => {
-                element.classList.remove("fade-enter", "fade-enter-active");
-            }, {once: true});
+    const filtri = {
+        inArrivoProssimi: volo => volo.arrival_time && Date.now() <= new Date(volo.arrival_time).getTime() && new Date(volo.arrival_time).getTime() <= Date.now() + 2 * 3600000,
+        inPartenzaProssimi: volo => volo.departure_time && Date.now() <= new Date(volo.departure_time).getTime() && new Date(volo.departure_time).getTime() <= Date.now() + 2 * 3600000,
+        atterrati: volo => volo.status === "red",
+        inItalia: volo => {
+            const c1 = (volo.departure_airport.country || "").toLowerCase();
+            const c2 = (volo.arrival_airport.country || "").toLowerCase();
+            return ["italia", "italy", "it"].includes(c1) || ["italia", "italy", "it"].includes(c2);
         }
+    };
+</script>
 
-        function animateHide(element) {
-            element.classList.remove("fade-enter", "fade-enter-active");
-            element.classList.add("fade-exit");
-
-            requestAnimationFrame(() => {
-                element.classList.add("fade-exit-active");
-            });
-
-            element.addEventListener("transitionend", () => {
-                element.classList.remove("fade-exit", "fade-exit-active");
-                element.dataset.display = getComputedStyle(element).display; // salva valore prima di nascondere
-                element.style.display = "none";
-            }, {once: true});
-        }
-    </script>
 </body>
 </html>

@@ -22,6 +22,8 @@ html, body {
     align-items: center;
     height: 40vh;
     transition: all 0.3s ease;
+    margin-top: 1rem;
+
 }
 
 .search-section.search-fixed {
@@ -398,24 +400,170 @@ html, body {
     margin: 0 auto;
 }
 
-.fade-enter {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+
+/* Flight Card Styles */
+.flight-card {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: visible; /* Cambiato da hidden a visible */
+    display: block;
 }
 
-.fade-enter-active {
-    opacity: 1;
-    transform: translateY(0);
+.flight-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
 }
 
-.fade-exit {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+.flight-card-content {
+    display: flex;
+    align-items: center;
+    padding: 24px;
+    position: relative;
+    gap: 24px; /* Aggiunto gap per spaziatura uniforme */
+    overflow: visible; /* Aggiunto per assicurarsi che l'immagine non venga tagliata */
 }
 
-.fade-exit-active {
-    opacity: 0;
-    transform: translateY(20px);
+.flight-card .status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    position: absolute;
+    top: 24px;
+    right: 24px;
+}
+
+.flight-card .status-dot.green {
+    background: #10b981;
+}
+
+.flight-card .status-dot.yellow {
+    background: #f59e0b;
+}
+
+.flight-card .status-dot.red {
+    background: #ef4444;
+}
+
+.flight-card .status-dot.gray {
+    background: #6b7280;
+}
+
+.flight-card .airplane-image {
+    width: 140px; /* Aumentato da 100px */
+    height: 105px; /* Aumentato da 75px */
+    object-fit: contain;
+    border-radius: 12px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Impedisce che l'immagine si rimpicciolisca */
+    display: block; /* Assicura che l'immagine sia visualizzata correttamente */
+    max-width: none; /* Rimuove eventuali limitazioni di larghezza */
+}
+
+.flight-card .flight-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0; /* Permette il text-wrap corretto */
+}
+
+.flight-card .flight-route {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap; /* Permette il wrap se necessario */
+}
+
+.flight-card .route-arrow {
+    font-size: 18px; /* Aumentato da 16px */
+    color: #667eea;
+    animation: pulse 2s infinite;
+}
+
+.flight-card .flight-times {
+    margin: 0 0 8px 0;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.flight-card .flight-times .arrow {
+    margin: 0 8px;
+    color: #667eea;
+}
+
+.flight-card .aircraft-info {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.flight-card .aircraft-emoji {
+    font-size: 18px; /* Aumentato da 16px */
+}
+
+.flight-card .aircraft-name {
+    color: #1a1a1a;
+    font-weight: bold;
+}
+
+/* Responsive design per schermi più piccoli */
+@media (max-width: 768px) {
+    .flight-card .airplane-image {
+        width: 120px;
+        height: 90px;
+    }
+
+    .flight-card-content {
+        padding: 20px;
+        gap: 16px;
+    }
+
+    .flight-card .flight-route {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .flight-card-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .flight-card .airplane-image {
+        width: 160px;
+        height: 120px;
+        margin-bottom: 16px;
+    }
+
+    .flight-card .flight-info {
+        width: 100%;
+    }
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
 }

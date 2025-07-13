@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/admin/edit_flight.css') }}">
 </head>
 <body class="bg-light">
+@include("navbar")
 
 <div class="container py-5">
     <h2 class="text-center mb-4">Modifica volo</h2>
@@ -99,7 +100,7 @@
                         <a href="{{ route('admin.flights') }}" class="btn btn-light border rounded-2">
                             <i class="bi bi-arrow-return-left me-1"></i> Annulla
                         </a>
-                        <button type="submit" class="btn btn-primary me-2 rounded-2">
+                        <button type="submit" class="btn btn-success me-2 rounded-2">
                             <i class="bi bi-pencil-square me-1"></i> Salva modifiche
                         </button>
                     </div>

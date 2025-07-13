@@ -7,8 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body class="p-5 bg-light">
-
+<body class="bg-light">
+@include("navbar")
+<main class="p-5">
 <div class="container" style="max-width: 600px;">
     <h2 class="mb-4 text-center">Modifica Aeroporto</h2>
 
@@ -70,6 +71,8 @@
         // Add other bootstrap parameters as needed, using camel case.
     });
 </script>
+</main>
+@include("footer")
 
 <script>
     function capitalizeWords(str) {

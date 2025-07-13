@@ -10,15 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/admin/manage_flights.css') }}">
 </head>
 <body class="bg-light">
-
-<div class="position-absolute top-0 start-0 m-3 d-flex gap-2">
-    <a href="{{ route('home') }}" class="btn btn-outline-primary">
-        <i class="bi bi-house-door"></i> Home
-    </a>
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-primary">
-        <i class="bi bi-arrow-left-circle"></i> Indietro
-    </a>
-</div>
+@include("navbar")
 
 <div class="container py-5">
 

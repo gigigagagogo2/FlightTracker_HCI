@@ -10,6 +10,7 @@
 
 </head>
 <body class="bg-light">
+@include("navbar")
 
 <div class="container py-5">
     <h2 class="mb-4 text-center">Modifica Utente</h2>
@@ -44,10 +45,10 @@
             </div>
 
             <div class="text-center mt-4">
-                <a href="{{ route('admin.users') }}" class="btn btn-secondary rounded-2 me-2">
+                <a href="{{ route('admin.users') }}" class="btn btn-danger rounded-2 me-2">
                     <i class="bi bi-arrow-return-left me-1"></i> Annulla
                 </a>
-                <button type="submit" class="btn btn-primary rounded-2">
+                <button type="submit" class="btn btn-success rounded-2">
                     <i class="bi bi-pencil-square me-1"></i> Salva modifiche
                 </button>
             </div>

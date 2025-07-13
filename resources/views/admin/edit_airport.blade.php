@@ -8,8 +8,9 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body class="p-5 bg-light">
-
+<body class="bg-light">
+@include("navbar")
+<main class="p-5">
 <div class="container" style="max-width: 600px;">
     <h2 class="mb-4 text-center">Modifica Aeroporto</h2>
 
@@ -51,7 +52,8 @@
         </form>
     </div>
 </div>
-
+</main>
+@include("footer")
 
 <script>
     const countrySelect = document.getElementById('country');

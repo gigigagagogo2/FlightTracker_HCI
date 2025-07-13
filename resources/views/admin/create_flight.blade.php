@@ -11,7 +11,7 @@
 
 </head>
 <body class="bg-light">
-
+@include("navbar")
 <div class="container py-5">
     <h2 class="text-center mb-4">Aggiungi un nuovo volo</h2>
 
@@ -92,7 +92,7 @@
                         <a href="{{ route('admin.flights') }}" class="btn btn-light border rounded-2">
                             <i class="bi bi-arrow-return-left me-1"></i> Annulla
                         </a>
-                        <button type="submit" class="btn btn-primary rounded-2 me-2">
+                        <button type="submit" class="btn btn-success rounded-2 me-2">
                             <i class="bi bi-plus-circle me-1"></i> Aggiungi volo
                         </button>
                     </div>

@@ -11,7 +11,7 @@
 @include("navbar")
 <main class="p-5">
 <div class="container" style="max-width: 600px;">
-    <h2 class="mb-4 text-center">Aggiungi un Aeroporto</h2>
+    <h2 class="mb-4 text-center">Aggiungi un aeroporto</h2>
 
     <div class="mx-auto bg-white border rounded-4 shadow-sm p-4">
         <form id="airportForm" method="POST" action="{{ route('admin.airport.store') }}">
@@ -42,7 +42,7 @@
                     <i class="bi bi-arrow-return-left me-1"></i> Annulla
                 </a>
                 <button type="submit" class="btn btn-success">
-                    <i class="bi bi-plus-circle me-1"></i> Aggiungi volo
+                    <i class="bi bi-plus-circle me-1"></i> Aggiungi aeroporto
                 </button>
             </div>
         </form>

@@ -15,12 +15,12 @@
 <div class="container py-5">
 
     <!-- Titolo centrato -->
-    <h2 class="text-center mb-4">Aereoporti registrati</h2>
+    <h2 class="text-center mb-4">Aeroporti registrati</h2>
 
-    <!-- Bottone "Aggiungi volo" centrato -->
+    <!-- Bottone "Aggiungi aeroporto" centrato -->
     <div class="text-center mb-4">
         <a href="{{ route('admin.airport.create') }}" class="btn btn-success btn-sm px-3 py-2 d-inline-flex align-items-center">
-            <i class="bi bi-plus-circle me-1"></i> Aggiungi Aereoporto
+            <i class="bi bi-plus-circle me-1"></i> Aggiungi aeroporto
         </a>
     </div>
 
@@ -30,7 +30,7 @@
         <thead class="table-light text-center">
         <tr>
             <th>ID</th>
-            <th>Nome Aereoporto</th>
+            <th>Nome aeroporto</th>
             <th>Città</th>
             <th>Paese</th>
             <th>Latitudine</th>
@@ -54,7 +54,7 @@
                     <form action="{{ route('admin.airport.delete', $airport->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questo aereoporto?')">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questo aeroporto?')">
                             <i class="bi bi-trash"></i>
                         </button>
                     </form>

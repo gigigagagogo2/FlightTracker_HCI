@@ -37,7 +37,7 @@
             <div class="col-md-4">
                 <div class="card text-center shadow-sm admin-card p-4">
                     <i class="fas fa-building display-4 text-warning mb-3"></i>
-                    <h5 class="card-title">Gestisci Aereoporti</h5>
+                    <h5 class="card-title">Gestisci aeroporti</h5>
                     <a href="{{ route('admin.airports') }}" class="btn btn-outline-warning mt-3">Vai</a>
                 </div>
             </div>

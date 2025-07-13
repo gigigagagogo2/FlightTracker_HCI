@@ -130,7 +130,7 @@ class AdminController extends Controller
     {
         $airport->delete();
 
-        return redirect()->route('admin.airports')->with('success', 'Aereoporto eliminato con successo.');
+        return redirect()->route('admin.airports')->with('success', 'Aeroporto eliminato con successo.');
     }
 
     public function createAirport() {

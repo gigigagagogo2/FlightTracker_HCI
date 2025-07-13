@@ -138,6 +138,9 @@ Route::put('/admin/airports/{airport}', [AdminController::class, 'updateAirport'
     ->middleware(['auth', 'is_admin'])
     ->name('admin.airport.update');
 
+Route::post('/admin/city-lookup', [AdminController::class, 'lookupCity'])->name('admin.city.lookup');
+
+
 Route::view('/privacy', 'privacy')->name('privacy');
 
 Route::view('/terms', 'terms')->name('terms');

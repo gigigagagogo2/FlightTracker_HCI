@@ -89,6 +89,8 @@ Route::delete('/admin/flights/{flight}', [AdminController::class, 'deleteFlight'
     ->middleware(['auth', 'is_admin'])
     ->name('admin.flights.delete');
 
+Route::get('/user/flights', [App\Http\Controllers\UserController::class, 'myFlights'])->name('user.flights')->middleware('auth');
+
 Route::get('/search-flights', [FlightController::class, 'search'])->name('flights.search');
 
 Route::get('/flights/{id}', [FlightController::class,  'show'])->name('flights.show');

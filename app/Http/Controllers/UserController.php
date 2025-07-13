@@ -1,10 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Services\FlightSimulationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -16,6 +16,15 @@ class UserController extends Controller
         return view('user/personal_area', [
             'user' => Auth::user(),
         ]);
+    }
+
+    public function myFlights()
+    {
+        $user = auth()->user();
+
+        // Supponendo che tu abbia una relazione flights nell'utente
+        $flights = $user->flights()->with(['departureAirport', 'arrivalAirport', 'airplaneModel'])->get();
+        return view('user.my-flights', compact('flights'));
     }
 
     public function showProfilePicture($filename)
@@ -44,7 +53,18 @@ class UserController extends Controller
             'arrivalAirport'
         ])->get();
 
-        return view('user/personal_map', compact('flights'));
+        $service = new FlightSimulationService();
+        $flightSimData = $service->simulateMultipleFlights($flights);
+
+        $activeFlightsCount = collect($flights)->filter(function($flight) use ($flightSimData) {
+            if (!isset($flightSimData[$flight->id])) return false;
+
+            $progress = $flightSimData[$flight->id]['progress'];
+            return $progress > 0 && $progress < 1;
+        })->count();
+
+
+        return view('user/personal_map', compact('flights', 'activeFlightsCount'));
     }
 
     // Metodo per aggiornare l'immagine del profilo

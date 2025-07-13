@@ -129,7 +129,7 @@
     const resultContainer = document.getElementById("result-container");
     const cardsContainer = document.getElementById("cards-container");
     const searchSection = document.getElementById("search-section");
-    var isSearchActive = false;
+    let isSearchActive = false;
 
     let currentFlights = [];
 
@@ -139,18 +139,6 @@
         index = (index + 1) % words.length;
         input.setAttribute("placeholder", "Inserisci " + words[index]);
     }, 3000);
-
-    // function disableSearch() {
-    //     isSearchActive = false;
-    //     searchSection.classList.remove("search-fixed");
-    //     searchTitle.style.display = "block";
-    //     resultContainer.innerHTML = "";
-    //     cardsContainer.style.display = "flex";
-    //     document.getElementById("cards-container").style.display = "flex";
-    //     resultContainer.style.display = "none";
-    //     animateShow(cardsContainer);
-    //     animateHide(resultContainer);
-    // }
 
     function disableSearch() {
         isSearchActive = false;
@@ -252,24 +240,19 @@
     }
 
     input.addEventListener("input", () => {
-        console.log('ciao');
         const query = input.value.trim();
         const filtroAttivo = document.querySelector(".button.selected");
 
-        console.log(filtroAttivo);
         if (query.length > 0 || filtroAttivo) {
-            console.log('q:' + query);
             fetch(`/search-flights?query=${encodeURIComponent(query)}`)
                 .then(r => r.json())
                 .then(data => {
-                    console.log(data)
                     searchTitle.style.display = "block";
                     cardsContainer.style.display = "none";
                     resultContainer.style.display = "block";
                     showResults(data);
                 });
         } else {
-            console.log('disabilito ricerca');
             disableSearch();
         }
     });

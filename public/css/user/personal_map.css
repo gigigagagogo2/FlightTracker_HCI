@@ -1,10 +1,30 @@
-body {
-    background-color: #f5f5f5;
-    font-family: 'Segoe UI', sans-serif;
-    /*margin: 0;*/
-    /*padding: 0;*/
+/* Assicura che html e body prendano tutta l'altezza */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
+/* Layout a colonna, altezza minima 100vh */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Main prende tutto lo spazio disponibile */
+main.main-content {
+    flex: 1 0 auto;
+}
+
+/* Footer rimane in basso */
+footer {
+    flex-shrink: 0;
+}
+
+/* Styling vari */
 .map-container {
     max-width: 1200px;
     margin: 40px auto;
@@ -19,3 +39,4 @@ body {
     width: 100%;
     border-radius: 10px;
 }
+

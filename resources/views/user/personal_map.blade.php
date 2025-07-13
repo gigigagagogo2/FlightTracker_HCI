@@ -14,8 +14,19 @@
 @include('navbar')
 <main class="main-content">
     <div class="map-container">
-        <h2 class="text-center mb-4">I tuoi voli preferiti</h2>
-        <div id="map"></div>
+        <h2 class="text-center mb-4">Visualizza i tuoi voli</h2>
+
+        @if(count($flights) === 0)
+            <div class="alert alert-info text-center my-4" role="alert">
+                Non hai ancora voli preferiti.
+            </div>
+        @elseif($activeFlightsCount === 0)
+            <div class="alert alert-warning text-center my-4" role="alert">
+                Nessun volo attualmente in corso.
+            </div>
+        @else
+            <div id="map"></div>
+        @endif
     </div>
 
     <div id="flightInfoCard" class="card position-absolute bottom-0 start-50 translate-middle-x mb-4 shadow"
@@ -33,9 +44,10 @@
             </div>
         </div>
     </div>
-
-    {{--    @include('user/notify_popup')--}}
+</main>
+    <footer>
     @include('footer')
+    </footer>
 
     <script type="module">
         const flights = @json($flights);
@@ -254,6 +266,5 @@
             v: "weekly",
         });
     </script>
-</main>
 </body>
 </html>

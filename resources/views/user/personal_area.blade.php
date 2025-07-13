@@ -99,7 +99,6 @@
 </main>
 
 @include("footer")
-@include('user/notify_popup')
 <script>
     function enableEdit() {
         const inputs = document.querySelectorAll('.form-input');

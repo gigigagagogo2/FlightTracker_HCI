@@ -1,4 +1,7 @@
-@php use Carbon\Carbon; @endphp
+@php use Carbon\Carbon;
+App::setLocale('it');
+Carbon::setLocale('it');
+@endphp
     <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -12,67 +15,80 @@
 
     <!-- Custom CSS -->
     <link href="{{ asset('css/flights/show_card.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/main-content.css') }}" rel="stylesheet">
+
 
     <!-- Font Awesome 5 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
 </head>
 <body>
-
 @include("navbar")
+<main class="main-content">
+    <div class="container flight-monitor mt-5">
+        <h2 class="text-center mb-4">Monitoraggio Volo</h2>
 
-<div class="container flight-monitor mt-5">
-    <h2 class="text-center mb-4">Monitoraggio Volo</h2>
+        <div class="map-container">
+            @php
+                $diffInMinutes = Carbon::now()->diffInMinutes($flight->departure_time, false);
+            @endphp
 
-    <!-- CONTENITORE UNIFICATO con bordo bianco -->
-    <div class="map-container">
-        <div class="card shadow-sm p-4 mb-4 position-relative">
-            @auth
-                @if(! auth()->user()->is_admin)
-                    <div class="position-absolute" style="top:10px; right:10px;">
-                        <i id="starIcon" class="fa-star {{ $flight->isPreferito() ? 'fas' : 'far' }}"></i>
+            @if ($diffInMinutes > 120)
+                <div class="alert alert-info text-center" role="alert">
+                    Il monitoraggio sarà disponibile solo nelle 2 ore precedenti alla partenza del volo.
+                </div>
+            @else
+                <div class="card shadow-sm p-4 mb-4 position-relative">
+                    @auth
+                        @if(! auth()->user()->is_admin)
+                            <div class="position-absolute" style="top:10px; right:10px;">
+                                <i id="starIcon" class="fa-star {{ $flight->isPreferito() ? 'fas' : 'far' }}"></i>
+                            </div>
+                        @endif
+                    @endauth
+
+                    <div class="row align-items-center">
+                        <div class="col-md-4 text-center">
+                            <img src="/{{ $flight->airplaneModel->image_path }}"
+                                 alt="{{ $flight->airplaneModel->name }}"
+                                 class="airplane-image mb-3">
+                            <h5>{{ $flight->airplaneModel->name }}</h5>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="info-block mb-3">
+                                <strong>Partenza:</strong> {{ $flight->departureAirport->city }}
+                                – {{ Carbon::parse($flight->departure_time)->translatedFormat('j M Y, H:i') }}<br>
+                                <strong>Arrivo:</strong> {{ $flight->arrivalAirport->city }}
+                                – {{ Carbon::parse($flight->arrival_time)->translatedFormat('j M Y, H:i') }}
+                            </div>
+
+                            <div class="info-block mb-2">
+                                <strong>Coordinate attuali:</strong> <span id="current-coordinates">-- / --</span><br>
+                                <strong>Velocità attuale:</strong> <span id="current-speed">-- km/h</span>
+                            </div>
+                        </div>
                     </div>
-                @endif
-            @endauth
-
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center">
-                    <img src="/{{ $flight->airplaneModel->image_path }}" alt="{{ $flight->airplaneModel->name }}"
-                         class="airplane-image mb-3">
-                    <h5>{{ $flight->airplaneModel->name }}</h5>
                 </div>
 
-                <div class="col-md-8">
-                    <div class="info-block mb-3">
-                        <strong>Partenza:</strong> {{ $flight->departureAirport->city }}
-                        – {{ Carbon::parse($flight->departure_time)->format('d/m/Y H:i') }}<br>
-                        <strong>Arrivo:</strong> {{ $flight->arrivalAirport->city }}
-                        – {{ Carbon::parse($flight->arrival_time)->format('d/m/Y H:i') }}
-                    </div>
-
-                    <div class="info-block mb-2">
-                        <strong>Coordinate attuali:</strong> <span id="current-coordinates">-- / --</span><br>
-                        <strong>Velocità attuale:</strong> <span id="current-speed">-- km/h</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="progress my-4 position-relative" style="height: 25px;">
-            <!-- Testo centrato sopra la barra -->
-            <span id="progress-label" class="position-absolute w-100 text-center fw-bold"
-                  style="z-index: 1; line-height: 25px;">
+                <div class="progress my-4 position-relative" style="height: 25px;">
+                    <!-- Testo centrato sopra la barra -->
+                    <span id="progress-label" class="position-absolute w-100 text-center fw-bold"
+                          style="z-index: 1; line-height: 25px;">
         0%
     </span>
-            <!-- La barra vera e propria -->
-            <div id="progress-bar" class="progress-bar bg-warning text-dark" role="progressbar" style="width: 0%;">
-            </div>
+                    <!-- La barra vera e propria -->
+                    <div id="progress-bar" class="progress-bar bg-warning text-dark" role="progressbar"
+                         style="width: 0%;">
+                    </div>
+                </div>
+
+                <!-- Mappa Google -->
+                <div id="map" style="height: 500px; width: 100%; border-radius: 10px;"></div>
+
+            @endif
         </div>
-
-        <!-- Mappa Google -->
-        <div id="map" style="height: 500px; width: 100%; border-radius: 10px;"></div>
     </div>
-</div>
-
+</main>
 @include("footer")
 
 <script type="module">
@@ -181,7 +197,6 @@
     }
 
     async function aggiornaPosizione() {
-
         try {
             const data = await fetchFlightData();
             if (!data) return;

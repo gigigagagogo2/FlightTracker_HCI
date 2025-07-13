@@ -29,13 +29,6 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow-sm p-4 mb-4 position-relative">
-                @auth
-                    @if(! auth()->user()->is_admin)
-                        <div class="position-absolute" style="top:10px; right:10px;">
-                            <i id="starIcon" class="fa-star {{ $flight->isPreferito() ? 'fas' : 'far' }}"></i>
-                        </div>
-                    @endif
-                @endauth
 
                 <!-- Sezione Aereo -->
                 <div class="row align-items-center mb-4">

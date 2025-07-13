@@ -21,12 +21,15 @@ export default class RotatableOverlay extends google.maps.OverlayView {
             // Rilancia l'evento sull'overlay stesso
             google.maps.event.trigger(this, 'click', event);
         });
+
     }
 
     draw() {
-        const point = this.getProjection().fromLatLngToDivPixel(this.position);
+        const projection = this.getProjection();
+        if (!projection || !this.position || !this.div) return;
 
-        if (point && this.div) {
+        const point = projection.fromLatLngToDivPixel(this.position);
+        if (point) {
             const width = this.div.offsetWidth;
             const height = this.div.offsetHeight;
 
@@ -44,7 +47,9 @@ export default class RotatableOverlay extends google.maps.OverlayView {
 
     setPosition(position) {
         this.position = position;
-        this.draw();
+        if (this.getMap()) {
+            this.draw();
+        }
     }
 
 }

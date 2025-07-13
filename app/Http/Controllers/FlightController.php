@@ -12,11 +12,15 @@ class FlightController extends Controller
     {
         $query = $request->input('query');
 
-        $flights = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])->whereHas('departureAirport', function ($q) use ($query) {
-            $q->whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
-        })->orWhereHas('arrivalAirport', function ($q) use ($query) {
-            $q->whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
-        })->take(10)->get();
+        $flights = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])->where(function ($q) use ($query) {
+                $q->whereHas('departureAirport', function ($sub) use ($query) {
+                    $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
+                });
+            })->orWhere(function ($q) use ($query) {
+                $q->whereHas('arrivalAirport', function ($sub) use ($query) {
+                    $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
+                });
+            })->get();
 
         return response()->json($flights);
     }
@@ -32,8 +36,7 @@ class FlightController extends Controller
         $dLat = $lat2Rad - $lat1Rad;
         $dLon = $lon2Rad - $lon1Rad;
 
-        $a = sin($dLat / 2) ** 2 +
-            cos($lat1Rad) * cos($lat2Rad) * sin($dLon / 2) ** 2;
+        $a = sin($dLat / 2) ** 2 + cos($lat1Rad) * cos($lat2Rad) * sin($dLon / 2) ** 2;
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
         return $earthRadius * $c;
@@ -50,16 +53,11 @@ class FlightController extends Controller
             $durationMinutes = $departure->diffInMinutes($arrival);
             $durationHours = $durationMinutes / 60;
 
-            $distance = $this->haversineDistance(
-                $flight->departureAirport->latitude,
-                $flight->departureAirport->longitude,
-                $flight->arrivalAirport->latitude,
-                $flight->arrivalAirport->longitude
-            );
+            $distance = $this->haversineDistance($flight->departureAirport->latitude, $flight->departureAirport->longitude, $flight->arrivalAirport->latitude, $flight->arrivalAirport->longitude);
 
             $averageSpeed = $durationHours > 0 ? $distance / $durationHours : 0;
 
-            return view('flights.archived', compact('flight', 'distance', 'durationMinutes', 'averageSpeed') );
+            return view('flights.archived', compact('flight', 'distance', 'durationMinutes', 'averageSpeed'));
         }
 
         return view('flights.card', compact('flight'));

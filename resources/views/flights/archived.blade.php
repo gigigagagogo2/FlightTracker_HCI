@@ -128,39 +128,6 @@
 
 @include("footer")
 
-<script type="module">
-    let updates = -1;
-    let totalDistance = 0;
-    let totalDuration = 0;
-
-    // Calcola la distanza totale e la durata del volo
-    function calculateFlightStats() {
-        const startLat = {{ $flight->departureAirport->latitude }};
-        const startLng = {{ $flight->departureAirport->longitude }};
-        const endLat = {{ $flight->arrivalAirport->latitude }};
-        const endLng = {{ $flight->arrivalAirport->longitude }};
-
-        // Calcola la distanza usando la formula di Haversine
-        totalDistance = calculateDistance(startLat, startLng, endLat, endLng);
-
-        // Calcola la durata in minuti
-        const departure = new Date("{{ $flight->departure_time }}");
-        const arrival = new Date("{{ $flight->arrival_time }}");
-        totalDuration = (arrival - departure) / (1000 * 60); // minuti
-    }
-
-    // Formula di Haversine per calcolare la distanza
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Raggio della Terra in km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    }
-</script>
 
 </body>
 </html>

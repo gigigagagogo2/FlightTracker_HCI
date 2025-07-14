@@ -12,6 +12,15 @@
 <main class="p-5">
 <div class="container" style="max-width: 600px;">
     <h2 class="mb-4 text-center">Aggiungi un aeroporto</h2>
+    @if ($errors->any())
+        <div class="alert alert-danger mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <div class="mx-auto bg-white border rounded-4 shadow-sm p-4">
         <form id="airportForm" method="POST" action="{{ route('admin.airport.store') }}">
@@ -20,18 +29,30 @@
             <div class="mb-3">
                 <label for="country" class="form-label">Paese</label>
                 <input id="country" name="country" type="text" class="form-control" placeholder="Scrivi un paese..." autocomplete="off" required>
+
                 <div id="country-error" class="invalid-feedback" aria-live="polite"></div>
             </div>
 
             <div class="mb-3">
                 <label for="city" class="form-label">Città</label>
                 <input type="text" id="city" name="city" class="form-control" placeholder="Scrivi una città..." autocomplete="off" required>
+
                 <div id="city-error" class="invalid-feedback" aria-live="polite"></div>
             </div>
 
             <div class="mb-3">
                 <label for="name" class="form-label">Nome aeroporto</label>
-                <input type="text" name="name" id="name" class="form-control" readonly required>
+                <div class="input-group">
+                    <span class="input-group-text" id="airport-label">Aeroporto</span>
+                    <input type="text"
+                           id="name"
+                           name="name"
+                           class="form-control"
+                           placeholder="Inserisci il nome dell’aeroporto"
+                           aria-describedby="airport-label"
+                           required>
+                </div>
+
             </div>
 
             <input type="hidden" name="latitude" id="latitude">
@@ -103,13 +124,17 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        nameInput.value = "Aeroporto di " + capitalizeWords(city);
+                        nameInput.value = "";
                         latInput.value = data.latitude;
                         lonInput.value = data.longitude;
 
+                        nameInput.focus();
+                        nameInput.setSelectionRange(nameInput.value.length, nameInput.value.length);
+
                         clearError(cityInput, cityError);
                         clearError(countryInput, countryError);
-                    } else {
+                    }
+                    else {
                         resetFields();
 
                         showError(cityInput, cityError, data.message || "Città non valida");
@@ -137,15 +162,17 @@
             clearError(cityInput, cityError);
             clearError(countryInput, countryError);
 
-            if (!lat || !lon || !nameInput.value.includes(capitalizeWords(city.toLowerCase()))) {
+            // Verifica che lat/lon siano presenti e non vuoti
+            if (!lat || !lon) {
                 e.preventDefault();
-                showError(cityInput, cityError, "Hai modificato la città dopo la verifica. Ricontrolla.");
+                showError(cityInput, cityError, "Hai modificato la città o il paese dopo la verifica. Ricontrolla.");
                 return;
             }
 
             // Previeni invii multipli
             submitBtn.disabled = true;
         });
+
 
         // Attiva validazione in modo controllato
         cityInput.addEventListener('blur', () => debounce(validateLocation));
@@ -173,32 +200,35 @@
 
         const countryAutocomplete = new google.maps.places.Autocomplete(countryInput, {
             types: ['(regions)'],
-            componentRestrictions: { country: [] },  // Nessuna restrizione per avere più paesi
-            fields: ['address_components', 'geometry'],
+            fields: ['address_components'],
+        });
+
+        countryAutocomplete.addListener('place_changed', () => {
+            const place = countryAutocomplete.getPlace();
+            if (place && place.address_components) {
+                const countryComp = place.address_components.find(c => c.types.includes('country'));
+                if (countryComp) {
+                    countryInput.value = capitalizeWords(countryComp.long_name.toLowerCase());
+                }
+            }
         });
 
         const cityAutocomplete = new google.maps.places.Autocomplete(cityInput, {
             types: ['(cities)'],
-            componentRestrictions: { country: [] },
-            fields: ['address_components', 'geometry'],
-        });
-
-        // Formatta l'input in italiano e con maiuscola
-        countryAutocomplete.addListener('place_changed', () => {
-            const place = countryAutocomplete.getPlace();
-            if (place && place.address_components) {
-                countryInput.value = capitalizeWords(
-                    place.address_components[0].long_name.toLowerCase()
-                );
-            }
+            fields: ['address_components'],
         });
 
         cityAutocomplete.addListener('place_changed', () => {
             const place = cityAutocomplete.getPlace();
             if (place && place.address_components) {
-                cityInput.value = capitalizeWords(
-                    place.address_components[0].long_name.toLowerCase()
+                const cityComp = place.address_components.find(c =>
+                    c.types.includes('locality') ||
+                    c.types.includes('administrative_area_level_2') ||
+                    c.types.includes('administrative_area_level_1')
                 );
+                if (cityComp) {
+                    cityInput.value = capitalizeWords(cityComp.long_name.toLowerCase());
+                }
             }
         });
     }

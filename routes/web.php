@@ -141,6 +141,8 @@ Route::put('/admin/airports/{airport}', [AdminController::class, 'updateAirport'
 Route::post('/admin/city-lookup', [AdminController::class, 'lookupCity'])->name('admin.city.lookup');
 
 
+Route::post('/admin/city-lookup', [AdminController::class, 'lookupCity'])->name('admin.city.lookup');
+
 Route::view('/privacy', 'privacy')->name('privacy');
 
 Route::view('/terms', 'terms')->name('terms');

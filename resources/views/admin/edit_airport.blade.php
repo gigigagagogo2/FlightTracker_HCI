@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+@php use Illuminate\Support\Str; @endphp
+    <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -32,11 +33,22 @@
 
             <div class="mb-3">
                 <label for="name" class="form-label">Nome aeroporto</label>
-                <input type="text" name="name" id="name" class="form-control" value="{{ $airport->name }}" readonly required>
+                <div class="input-group">
+                    <span class="input-group-text" id="airport-label">Aeroporto</span>
+                    <input type="text"
+                           id="name"
+                           name="name"
+                           class="form-control"
+                           aria-describedby="airport-label"
+                           placeholder="Inserisci il nome"
+                           required
+                           value="{{ Str::startsWith($airport->name, 'Aeroporto ') ? trim(Str::replaceFirst('Aeroporto', '', $airport->name)) : $airport->name }}">
+                </div>
             </div>
 
-            <input type="hidden" name="latitude" id="latitude" value="{{ $airport->latitude }}">
-            <input type="hidden" name="longitude" id="longitude" value="{{ $airport->longitude }}">
+
+            <input type="hidden" name="latitude" id="latitude" value="{{ number_format($airport->latitude, 6, '.', '') }}">
+            <input type="hidden" name="longitude" id="longitude" value="{{ number_format($airport->latitude, 6, '.', '') }}">
 
             <div class="text-center mt-4">
                 <a href="{{ route('admin.airports') }}" class="btn btn-danger me-2">
@@ -122,7 +134,6 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        nameInput.value = "Aeroporto di " + capitalizeWords(city);
                         latInput.value = data.latitude;
                         lonInput.value = data.longitude;
                         clearError(cityInput, cityError);
@@ -145,26 +156,23 @@
 
         form.addEventListener('submit', (e) => {
             const city = cityInput.value.trim();
+            const expectedName = "Aeroporto di " + capitalizeWords(city.toLowerCase());
             const lat = latInput.value;
             const lon = lonInput.value;
 
             clearError(cityInput, cityError);
             clearError(countryInput, countryError);
 
-            form.addEventListener('submit', (e) => {
-                const city = cityInput.value.trim();
-                const expectedName = "Aeroporto di " + capitalizeWords(city.toLowerCase());
-                const lat = latInput.value;
-                const lon = lonInput.value;
-
-                if (!lat || !lon || nameInput.value !== expectedName) {
-                    e.preventDefault();
-                    showError(cityInput, cityError, "Hai modificato la città dopo la verifica. Ricontrolla.");
-                }
-            });
+            if (!lat || !lon) {
+                e.preventDefault();
+                showError(cityInput, cityError, "Hai modificato la città dopo la verifica. Ricontrolla.");
+                return;
+            }
 
             submitBtn.disabled = true;
         });
+
+
 
         cityInput.addEventListener('blur', validateLocation);
         countryInput.addEventListener('blur', validateLocation);

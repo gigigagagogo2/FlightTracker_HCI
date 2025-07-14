@@ -152,10 +152,38 @@ class AdminController extends Controller
         $validated['city'] = ucfirst(strtolower(trim($validated['city'])));
         $validated['country'] = ucfirst(strtolower(trim($validated['country'])));
 
-        // Ricostruisci il nome in automatico (così sei sicuro che sia coerente)
-        $validated['name'] = "Aeroporto di " . $validated['city'];
-        Airport::create($validated);
 
+        // Controllo duplicati
+        $existsByName = Airport::where('name', $validated['name'])->exists();
+        $lat = round($validated['latitude'], 6);
+        $lon = round($validated['longitude'], 6);
+
+        $existsByCoords = Airport::whereRaw('ROUND(latitude, 6) = ?', [$lat])
+            ->whereRaw('ROUND(longitude, 6) = ?', [$lon])
+            ->exists();
+
+
+        if ($existsByName || $existsByCoords) {
+            $errors = [];
+
+            if ($existsByName) {
+                $errors['name'] = 'Esiste già un aeroporto con questo nome.';
+            }
+
+            if ($existsByCoords) {
+                $errors['city'] = 'Esiste già un aeroporto alle stesse coordinate.';
+            }
+
+            return redirect()->back()->withInput()->withErrors($errors);
+        }
+
+        $prefisso = 'Aeroporto ';
+        $nome = trim($validated['name']);
+        if (!Str::startsWith($nome, $prefisso)) {
+            $validated['name'] = $prefisso . $nome;
+        }
+
+        Airport::create($validated);
         return redirect()->route('admin.airports')->with('success', 'Aeroporto aggiunto con successo.');
     }
     public function editAirport(Airport $airport)
@@ -163,23 +191,64 @@ class AdminController extends Controller
         return view('admin.edit_airport', compact('airport'));
     }
 
-    public function updateAirport(Request $request, Airport $airport)
-    {
+    public function updateAirport(Request $request, $id) {
         $validated = $request->validate([
-            'city' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-            'latitude' => 'required|numeric|between:-90,90',
+            'name'      => 'required|string|max:255',
+            'city'      => 'required|string|max:255',
+            'country'   => 'required|string|max:255',
+            'latitude'  => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
 
+        // Capitalizza città e paese
         $validated['city'] = ucfirst(strtolower(trim($validated['city'])));
         $validated['country'] = ucfirst(strtolower(trim($validated['country'])));
-        $validated['name'] = "Aeroporto di " . $validated['city'];
 
+        $nome = trim($validated['name']);
+        $prefisso = 'Aeroporto ';
+
+        if (!Str::startsWith($nome, $prefisso)) {
+            $validated['name'] = $prefisso . $nome;
+        }
+
+        // Arrotonda le coordinate
+        $lat = round($validated['latitude'], 6);
+        $lon = round($validated['longitude'], 6);
+
+        // Controllo duplicati, escludendo l’aeroporto corrente
+        $existsByName = Airport::where('name', $validated['name'])
+            ->where('id', '!=', $id)
+            ->exists();
+
+        $existsByCoords = Airport::whereRaw('ROUND(latitude, 6) = ?', [$lat])
+            ->whereRaw('ROUND(longitude, 6) = ?', [$lon])
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($existsByName || $existsByCoords) {
+            $errors = [];
+
+            if ($existsByName) {
+                $errors['name'] = 'Esiste già un aeroporto con questo nome.';
+            }
+
+            if ($existsByCoords) {
+                $errors['city'] = 'Esiste già un aeroporto alle stesse coordinate.';
+            }
+
+            return redirect()->back()->withInput()->withErrors($errors);
+        }
+
+        // Salva le coordinate arrotondate nel database
+        $validated['latitude'] = $lat;
+        $validated['longitude'] = $lon;
+
+        $airport = Airport::findOrFail($id);
         $airport->update($validated);
 
         return redirect()->route('admin.airports')->with('success', 'Aeroporto aggiornato con successo.');
     }
+
 
 
 

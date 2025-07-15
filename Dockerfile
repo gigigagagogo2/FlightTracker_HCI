@@ -4,32 +4,36 @@ FROM php:8.2-fpm-alpine
 RUN apk update && apk add --no-cache \
   libzip-dev \
   curl \
+  git \
   bash \
-  mysql-client && \
+  mysql-client \
+  oniguruma-dev \
+  libpng-dev \
+  libjpeg-turbo-dev \
+  freetype-dev \
+  zip \
+  unzip && \
   rm -rf /var/cache/apk/*
-
-# Installa Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Installa le estensioni PHP necessarie per Laravel
 RUN docker-php-ext-configure zip && \
   docker-php-ext-install zip pdo pdo_mysql
 
+# Installa Composer globalmente
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 # Imposta la directory di lavoro
 WORKDIR /var/www/html
 
-# Copia tutto tranne i file nel .dockerignore
+# Copia tutto tranne i file indicati in `.dockerignore`
 COPY . .
 
-# Installa le dipendenze di Laravel (incluso Composer)
-RUN composer install --no-dev --optimize-autoloader --prefer-dist
-
-# Esponi la porta su cui il server Laravel girera
-EXPOSE 8000
-
-# Comando per eseguire Laravel, con attesa per MySQL
+# Copia lo script di avvio
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Usa lo script come comando iniziale
+# Espone la porta su cui Laravel serve (se usi `php artisan serve`)
+EXPOSE 8000
+
+# Comando di avvio
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

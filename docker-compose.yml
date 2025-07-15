@@ -37,6 +37,8 @@ services:
             - "8000:8000"
         volumes:
             - .:/var/www/html
+            # creo un volume anonimo vendor, cosi' che quando viene montato il volume var non viene sovrascritta la cartella vendor creata dal Dockerfile
+            - /var/www/html/vendor
         networks:
             - my-network
         depends_on:
@@ -60,7 +62,8 @@ services:
         restart: unless-stopped
         volumes:
             - .:/var/www/html
-
+            # creo un volume anonimo vendor, cosi' che quando viene montato il volume var non viene sovrascritta la cartella vendor creata dal Dockerfile
+            - /var/www/html/vendor
         environment:
             CONTAINER_TYPE: "cron"
         networks:

@@ -13,7 +13,15 @@
 <main class="p-5">
 <div class="container" style="max-width: 600px;">
     <h2 class="mb-4 text-center">Modifica Aeroporto</h2>
-
+    @if ($errors->any())
+        <div class="alert alert-danger mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="mx-auto bg-white border rounded-4 shadow-sm p-4">
         <form id="airportForm" method="POST" action="{{ route('admin.airport.update', $airport->id) }}">
             @csrf

@@ -25,7 +25,7 @@
 - Blade (templating engine Laravel)
 
 ### Backend
-- Laravel 10 (PHP framework)
+- Laravel (PHP framework)
 - WebSocket Server (Node.js)
 - Laravel Scheduler per cron job
 

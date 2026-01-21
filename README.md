@@ -1,12 +1,12 @@
-# ✈️ FlightTracker – Applicazione Web per il Monitoraggio di Voli in Tempo Reale
+#  FlightTracker – Applicazione Web per il Monitoraggio di Voli in Tempo Reale
 
-## 📘 Introduzione
+##  Introduzione
 
 **FlightTracker** è una piattaforma web pensata per il monitoraggio di voli in tempo reale. L’applicazione consente agli utenti di cercare voli, visualizzarne la posizione su mappa, ricevere notifiche sull’atterraggio e accedere a un'area personale per il tracciamento dei voli preferiti. Il sistema include anche una dashboard amministrativa per la gestione completa di aeroporti, voli e utenti.
 
 ---
 
-## 🧠 Funzionalità principali
+##  Funzionalità principali
 
 - Ricerca avanzata dei voli per città, compagnia o codice
 - Visualizzazione dei voli su mappa dinamica aggiornata in tempo reale
@@ -17,7 +17,7 @@
 
 ---
 
-## 🛠️ Tecnologie utilizzate
+##  Tecnologie utilizzate
 
 ### Frontend
 - HTML5, CSS3, JavaScript
@@ -38,7 +38,7 @@
 
 ---
 
-## 🧱 Architettura WebSocket
+##  Architettura WebSocket
 
 - **websocket-server**: Server Node.js per invio notifiche
 - **laravel-cron**: job Laravel schedulato ogni minuto per notificare atterraggi
@@ -46,7 +46,7 @@
 
 ---
 
-## 🔐 Funzionalità Admin
+##  Funzionalità Admin
 
 - Accesso tramite autenticazione
 - Gestione utenti (modifica, rimozione)
@@ -56,7 +56,7 @@
 
 ---
 
-## 👁️‍🗨️ Interfaccia Utente
+##  Interfaccia Utente
 
 - Home page con card animate e barra di ricerca dinamica
 - Pagina dettagliata del volo con info su partenza, arrivo, posizione e modello
@@ -65,7 +65,7 @@
 
 ---
 
-## 💬 Notifiche in tempo reale
+##  Notifiche in tempo reale
 
 - Sistema WebSocket centralizzato
 - Integrazione con cron job per scansione voli atterrati

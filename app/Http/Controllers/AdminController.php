@@ -13,6 +13,16 @@ use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
+
+    public function index()
+    {
+        $users    = User::orderBy('created_at', 'desc')->get();
+        $flights  = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])->orderBy('departure_time')->get();
+        $airports = Airport::all();
+
+        return view('admin.admin', compact('users', 'flights', 'airports'));
+    }
+
     public function users()
     {
         $users = User::orderBy('created_at', 'desc')->get();
@@ -21,14 +31,17 @@ class AdminController extends Controller
 
     public function deleteUser(User $user)
     {
-        // Non permette di eliminare admin
         if ($user->is_admin) {
-            return redirect()->route('admin.users')->with('error', 'Non puoi eliminare un admin.');
+            return redirect()->route('admin.dashboard')
+                ->withFragment('users')
+                ->with('error', 'Non puoi eliminare un admin.');
         }
 
         $user->delete();
 
-        return redirect()->route('admin.users')->with('success', 'Utente eliminato con successo.');
+        return redirect()->route('admin.dashboard')
+            ->withFragment('users')
+            ->with('success', 'Utente eliminato con successo.');
     }
 
     public function editUser(User $user)
@@ -54,7 +67,7 @@ class AdminController extends Controller
 
         $user->save();
 
-        return redirect()->route('admin.users')->with('success', 'Utente aggiornato con successo.');
+        return redirect()->route('admin.dashboard')->with('success', 'Utente aggiornato con successo.')->withFragment('users');;
     }
 
 

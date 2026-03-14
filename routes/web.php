@@ -45,9 +45,9 @@ Route::post('/logout', function (Request $request) {
     return redirect('/')->with('success', 'Sei uscito correttamente.');
 })->name('logout');
 
-Route::get('/admin', function () {
-    return view('admin/admin');
-})->middleware(['auth', 'is_admin'])->name('admin.dashboard');
+Route::get('/admin', [AdminController::class, 'index'])
+    ->middleware(['auth', 'is_admin'])
+    ->name('admin.dashboard');
 
 Route::get('/admin/users', [AdminController::class, 'users'])
     ->middleware(['auth', 'is_admin'])

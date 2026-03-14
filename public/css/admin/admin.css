@@ -1,18 +1,195 @@
 body {
-    background-color: #f7f9fc;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+     background-color: #f7f9fc;
+     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+     min-height: 100vh;
+ }
+
+/* ── LAYOUT ── */
+.admin-layout {
+    display: flex;
+    min-height: calc(100vh - 56px); /* altezza navbar */
 }
 
-.admin-card {
-    transition: transform 0.2s ease;
+/* ── SIDEBAR SINISTRA ── */
+.admin-sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: #fff;
+    border-right: 1px solid #e3e8ef;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+}
+
+.sidebar-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    padding: 0 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.nav-item-admin {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 0.95rem;
+    border: 2px solid transparent;
+    text-decoration: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.nav-item-admin:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.nav-item-admin.active {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+}
+
+.nav-item-admin.active .nav-icon {
+    filter: none;
+}
+
+/* colori icone per ciascuna voce */
+.nav-item-admin[data-section="users"] .nav-icon       { color: #3b82f6; }
+.nav-item-admin[data-section="flights"] .nav-icon     { color: #10b981; }
+.nav-item-admin[data-section="airports"] .nav-icon    { color: #f59e0b; }
+
+.nav-item-admin[data-section="users"].active       { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+.nav-item-admin[data-section="flights"].active     { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+.nav-item-admin[data-section="airports"].active    { background: #fffbeb; border-color: #fde68a; color: #b45309; }
+
+.nav-icon { font-size: 1.2rem; width: 1.4rem; text-align: center; }
+
+/* ── MAIN PANEL ── */
+.admin-main {
+    flex: 1;
+    padding: 2.5rem 2rem;
+    overflow-y: auto;
+}
+
+/* ── PANNELLO BENVENUTO (nessuna selezione) ── */
+.welcome-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    color: #94a3b8;
+    gap: 1rem;
+    text-align: center;
+}
+
+.welcome-panel i { font-size: 3.5rem; opacity: 0.3; }
+.welcome-panel h4 { font-weight: 600; color: #64748b; }
+.welcome-panel p  { font-size: 0.9rem; }
+
+/* ── SEZIONI TABELLE ── */
+.content-section { display: none; }
+.content-section.active { display: block; }
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* placeholder tabella */
+.table-placeholder {
+    background: #fff;
     border-radius: 1rem;
-
+    border: 1px solid #e3e8ef;
+    overflow: hidden;
 }
 
-.admin-card:hover {
-    transform: translateY(-5px);
+.table-placeholder table { margin: 0; }
+.table-placeholder thead th {
+    background: #f8fafc;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    border-bottom: 1px solid #e3e8ef;
 }
-/*override del nostro footer*/
-.site-footer{
-    margin-top: 17rem !important;
+
+/* badge stato */
+.badge-status {
+    font-size: 0.75rem;
+    padding: 0.3em 0.7em;
+    border-radius: 999px;
+}
+
+/* Navbar demo */
+.navbar-brand { font-weight: 700; letter-spacing: -0.02em; }
+
+/* ── UNIFORMITÀ TABELLE ── */
+.table-placeholder thead th,
+.table-placeholder tbody td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.75rem 1rem;
+}
+
+.table-placeholder tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-placeholder tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table-placeholder tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.table-placeholder table {
+    border: none !important;
+}
+
+.table-placeholder tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* ── BUTTON GROUPS AZIONI ── */
+.action-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.action-separator {
+    width: 1px;
+    height: 1.4rem;
+    background-color: #e3e8ef;
+    margin: 0 0.35rem;
 }

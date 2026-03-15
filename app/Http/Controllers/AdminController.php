@@ -19,8 +19,9 @@ class AdminController extends Controller
         $users    = User::orderBy('created_at', 'desc')->get();
         $flights  = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])->orderBy('departure_time')->get();
         $airports = Airport::all();
+        $airplaneModels = AirplaneModel::orderBy('name')->get();
 
-        return view('admin.admin', compact('users', 'flights', 'airports'));
+        return view('admin.admin', compact('users', 'flights', 'airports', 'airplaneModels'));
     }
 
     public function users()
@@ -87,27 +88,48 @@ class AdminController extends Controller
 
     public function storeFlight(Request $request)
     {
+
         // Validazione dei dati in input
-        $validated = $request->validate([
+        $validator = \Validator::make($request->all(), [
             'departure_airport_id'   => 'required|exists:airports,id',
             'arrival_airport_id'     => 'required|exists:airports,id|different:departure_airport_id',
             'airplane_model_id'      => 'required|exists:airplane_models,id',
             'departure_time'         => 'required|date',
             'arrival_time'           => 'required|date|after_or_equal:departure_time',
+        ], [
+            'arrival_airport_id.different'  => 'L\'aeroporto di arrivo deve essere diverso da quello di partenza.',
+            'departure_airport_id.required' => 'Seleziona un aeroporto di partenza.',
+            'arrival_airport_id.required'   => 'Seleziona un aeroporto di arrivo.',
+            'airplane_model_id.required'    => 'Seleziona un modello di aereo.',
+            'departure_time.required'       => 'Inserisci l\'orario di partenza.',
+            'arrival_time.required'         => 'Inserisci l\'orario di arrivo.',
+            'arrival_time.after_or_equal'   => 'L\'orario di arrivo deve essere successivo a quello di partenza.',
         ]);
 
-        // Creazione del nuovo volo
-        Flight::create($validated);
+        if ($validator->fails()) {
+            return redirect()->route('admin.dashboard')
+                ->withFragment('flights')
+                ->withErrors($validator, 'createFlight')
+                ->withInput()
+                ->with('_form', 'create_flight');
+        }
 
+        // Creazione del nuovo volo
+        Flight::create($validator->validated());
         // Redirect con messaggio di successo
-        return redirect()->route('admin.flights')->with('success', 'Volo aggiunto con successo.');
+        return redirect()->route('admin.dashboard')
+            ->withFragment('flights')
+            ->with('success', 'Volo aggiunto con successo.');
     }
+
 
     public function deleteFlight(Flight $flight)
     {
         $flight->delete();
 
-        return redirect()->route('admin.flights')->with('success', 'Volo eliminato con successo.');
+        return redirect()->route('admin.dashboard')
+            ->withFragment('flights')
+            ->with('success', 'Volo eliminato con successo.');
     }
 
     public function editFlight(Flight $flight)
@@ -120,17 +142,34 @@ class AdminController extends Controller
 
     public function updateFlight(Request $request, Flight $flight)
     {
-        $validated = $request->validate([
-            'airplane_model_id'      => 'required|exists:airplane_models,id',
-            'departure_airport_id'   => 'required|exists:airports,id',
-            'arrival_airport_id'     => 'required|exists:airports,id|different:departure_airport_id',
-            'departure_time'         => 'required|date',
-            'arrival_time'           => 'required|date|after_or_equal:departure_time',
+        $validator = \Validator::make($request->all(), [
+            'airplane_model_id'    => 'required|exists:airplane_models,id',
+            'departure_airport_id' => 'required|exists:airports,id',
+            'arrival_airport_id'   => 'required|exists:airports,id|different:departure_airport_id',
+            'departure_time'       => 'required|date',
+            'arrival_time'         => 'required|date|after_or_equal:departure_time',
+        ], [
+            'arrival_airport_id.different' => 'L\'aeroporto di arrivo deve essere diverso da quello di partenza.',
+            'airplane_model_id.required'   => 'Seleziona un modello di aereo.',
+            'departure_airport_id.required'=> 'Seleziona un aeroporto di partenza.',
+            'arrival_airport_id.required'  => 'Seleziona un aeroporto di arrivo.',
+            'departure_time.required'      => 'Inserisci l\'orario di partenza.',
+            'arrival_time.required'        => 'Inserisci l\'orario di arrivo.',
+            'arrival_time.after_or_equal'  => 'L\'orario di arrivo deve essere successivo a quello di partenza.',
         ]);
 
-        $flight->update($validated);
+        if ($validator->fails()) {
+            return redirect()->route('admin.dashboard')
+                ->withFragment('flights')
+                ->withErrors($validator, 'editFlight')
+                ->withInput();
+        }
 
-        return redirect()->route('admin.flights')->with('success', 'Volo aggiornato con successo.');
+        $flight->update($validator->validated());
+
+        return redirect()->route('admin.dashboard')
+            ->withFragment('flights')
+            ->with('success', 'Volo aggiornato con successo.');
     }
 
     public function airports()
@@ -143,8 +182,9 @@ class AdminController extends Controller
     {
         $airport->delete();
 
-        return redirect()->route('admin.airports')->with('success', 'Aeroporto eliminato con successo.');
-    }
+        return redirect()->route('admin.dashboard')
+            ->withFragment('airports')
+            ->with('success', 'Aeroporto eliminato con successo.');    }
 
     public function createAirport() {
         return view('admin.create_airport');
@@ -197,7 +237,9 @@ class AdminController extends Controller
         }
 
         Airport::create($validated);
-        return redirect()->route('admin.airports')->with('success', 'Aeroporto aggiunto con successo.');
+        return redirect()->route('admin.dashboard')
+            ->withFragment('airports')
+            ->with('success', 'Aeroporto aggiunto con successo.');
     }
     public function editAirport(Airport $airport)
     {
@@ -259,8 +301,9 @@ class AdminController extends Controller
         $airport = Airport::findOrFail($id);
         $airport->update($validated);
 
-        return redirect()->route('admin.airports')->with('success', 'Aeroporto aggiornato con successo.');
-    }
+        return redirect()->route('admin.dashboard')
+            ->withFragment('airports')
+            ->with('success', 'Aeroporto aggiornato con successo.');    }
 
 
 

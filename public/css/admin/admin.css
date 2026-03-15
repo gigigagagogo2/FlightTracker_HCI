@@ -193,3 +193,79 @@ body {
     background-color: #e3e8ef;
     margin: 0 0.35rem;
 }
+
+.flatpickr-calendar {
+    border-radius: 0.75rem !important;
+    border: none !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18) !important;
+    background: #ffffff !important;
+}
+
+.flatpickr-months {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+    padding: 0.25rem 0;
+}
+
+.flatpickr-months .flatpickr-month,
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+    color: white !important;
+    fill: white !important;
+}
+
+/* Mese e anno stesso stile — bianchi e grassetto */
+.flatpickr-current-month select,
+.flatpickr-current-month input.cur-year {
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+}
+
+.flatpickr-weekdays {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e3e8ef !important;
+}
+
+.flatpickr-weekday {
+    color: #64748b !important;
+    font-weight: 600 !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+    background: #94a3b8 !important;
+    border-color: #94a3b8 !important;
+    color: white !important;
+}
+
+/* Rimuovi cerchio del giorno corrente */
+.flatpickr-day.today {
+    border-color: transparent !important;
+    color: inherit !important;
+    font-weight: inherit !important;
+}
+
+.flatpickr-day.today:hover {
+    background: #f1f5f9 !important;
+    border-color: #f1f5f9 !important;
+}
+
+.flatpickr-day:hover {
+    background: #f1f5f9 !important;
+    border-color: #f1f5f9 !important;
+}
+
+/* Orario — nero normale, non grassetto */
+.flatpickr-time {
+    background: #ffffff !important;
+    border-top: 1px solid #e3e8ef !important;
+    border-radius: 0 0 0.75rem 0.75rem !important;
+}
+
+.flatpickr-time input,
+.flatpickr-time .flatpickr-time-separator {
+    font-weight: 500 !important;
+    color: #1e293b !important;
+    font-size: 0.95rem !important;
+}

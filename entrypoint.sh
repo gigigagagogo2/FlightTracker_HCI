@@ -26,6 +26,9 @@ if ! grep -q "APP_KEY=base64:" .env; then
   php artisan key:generate
 fi
 
+composer require laravel-lang/common --no-interaction
+php artisan lang:add it --no-interaction
+
 # Controlla se il database è già migrato (es. verifica se la tabella 'migrations' esiste)
 echo "Controllo stato del database..."
 if ! php artisan migrate:status > /dev/null 2>&1; then

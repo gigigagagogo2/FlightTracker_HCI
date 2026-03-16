@@ -397,17 +397,28 @@
 
         public function usersData(Request $request)
         {
+            $sortable = ['id', 'nickname', 'email'];
+            $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
+            $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
+
             $users = User::where('is_admin', false)
-                ->orderBy('created_at', 'desc')
+                ->orderBy($sort, $dir)
                 ->paginate(20);
             return response()->json($users);
         }
 
         public function flightsData(Request $request)
         {
+            $sortable = ['flights.id', 'departure_time', 'arrival_time', 'departure_airport_id', 'arrival_airport_id', 'airplane_models.name'];
+            $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'departure_time';
+            $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
+
             $flights = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])
-                ->orderBy('departure_time')
+                ->join('airplane_models', 'flights.airplane_model_id', '=', 'airplane_models.id')
+                ->select('flights.*')
+                ->orderBy($sort, $dir)
                 ->paginate(20);
+
             return response()->json([
                 'data' => $flights->map(fn($f) => [
                     'id'                   => $f->id,
@@ -428,7 +439,11 @@
 
         public function airportsData(Request $request)
         {
-            $airports = Airport::orderBy('name')->paginate(20);
+            $sortable = ['id', 'name', 'city', 'country'];
+            $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'name';
+            $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
+
+            $airports = Airport::orderBy($sort, $dir)->paginate(20);
             return response()->json($airports);
         }
 

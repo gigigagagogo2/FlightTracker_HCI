@@ -91,9 +91,15 @@
                 <table class="table table-hover align-middle mb-0 text-center">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nickname</th>
-                        <th>Email</th>
+                        <th data-sort="id" onclick="sortSection('users', 'id')" style="cursor:pointer;">
+                            ID <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="nickname" onclick="sortSection('users', 'nickname')" style="cursor:pointer;">
+                            Nickname <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="email" onclick="sortSection('users', 'email')" style="cursor:pointer;">
+                            Email <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
                         <th>Ruolo</th>
                         <th>Azioni</th>
                     </tr>
@@ -118,12 +124,24 @@
                 <table class="table table-hover align-middle mb-0 text-center">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Modello Aereo</th>
-                        <th>Aeroporto Partenza</th>
-                        <th>Aeroporto Arrivo</th>
-                        <th>Partenza</th>
-                        <th>Arrivo</th>
+                        <th data-sort="flights.id" onclick="sortSection('flights', 'flights.id')" style="cursor:pointer;">
+                            ID <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="airplane_models.name" onclick="sortSection('flights', 'airplane_models.name')" style="cursor:pointer;">
+                            Modello Aereo <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="departure_airport_id" onclick="sortSection('flights', 'departure_airport_id')" style="cursor:pointer;">
+                            Aeroporto Partenza <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="arrival_airport_id" onclick="sortSection('flights', 'arrival_airport_id')" style="cursor:pointer;">
+                            Aeroporto Arrivo <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="departure_time" onclick="sortSection('flights', 'departure_time')" style="cursor:pointer;">
+                            Partenza <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="arrival_time" onclick="sortSection('flights', 'arrival_time')" style="cursor:pointer;">
+                            Arrivo <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
                         <th>Azioni</th>
                     </tr>
                     </thead>
@@ -147,10 +165,18 @@
                 <table class="table table-hover align-middle mb-0 text-center">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nome aeroporto</th>
-                        <th>Città</th>
-                        <th>Paese</th>
+                        <th data-sort="id" onclick="sortSection('airports', 'id')" style="cursor:pointer;">
+                            ID <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="name" onclick="sortSection('airports', 'name')" style="cursor:pointer;">
+                            Nome aeroporto <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="city" onclick="sortSection('airports', 'city')" style="cursor:pointer;">
+                            Città <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
+                        <th data-sort="country" onclick="sortSection('airports', 'country')" style="cursor:pointer;">
+                            Paese <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                        </th>
                         <th>Latitudine</th>
                         <th>Longitudine</th>
                         <th>Azioni</th>
@@ -831,6 +857,16 @@
         const sections = document.querySelectorAll('.content-section');
         const welcome  = document.getElementById('welcome');
 
+        // Stato paginazione per ogni sezione
+        const pagination = { users: 1, flights: 1, airports: 1 };
+
+        // Stato ordinamento per ogni sezione
+        const sortState = {
+            users:    { sort: 'id', dir: 'asc' },
+            flights:  { sort: 'departure_time', dir: 'asc' },
+            airports: { sort: 'name', dir: 'asc' },
+        };
+
         // Ripristina la sezione attiva dopo redirect o refresh
         const hash = window.location.hash.replace('#', '');
         const savedSection = sessionStorage.getItem('adminSection');
@@ -879,8 +915,7 @@
         toast.show();
     });
 
-        // Stato paginazione per ogni sezione
-        const pagination = { users: 1, flights: 1, airports: 1 };
+
 
         function loadSectionData(section, page = 1) {
             const endpoints = {
@@ -896,21 +931,19 @@
         <div class="spinner-border spinner-border-sm me-2"></div>Caricamento...
     </td></tr>`;
 
-            fetch(`${endpoints[section]}?page=${page}`)
+            const { sort, dir } = sortState[section];
+            fetch(`${endpoints[section]}?page=${page}&sort=${sort}&dir=${dir}`)
                 .then(res => res.json())
                 .then(response => {
-                    const data = response.data ?? response.data;
                     const items = Array.isArray(response) ? response : (response.data || []);
                     const currentPage = response.current_page ?? 1;
                     const lastPage = response.last_page ?? 1;
                     const total = response.total ?? items.length;
 
                     tbody.innerHTML = renderRows(section, items);
-                    tbody.dataset.loaded = 'true';
                     pagination[section] = currentPage;
-
-                    // Aggiorna paginazione
                     updatePagination(section, currentPage, lastPage, total);
+                    updateSortIcons(section);
 
                     tbody.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
                         new bootstrap.Tooltip(el);
@@ -920,6 +953,33 @@
                     tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4">Errore nel caricamento dei dati.</td></tr>`;
                 });
         }
+
+        function sortSection(section, column) {
+            if (sortState[section].sort === column) {
+                sortState[section].dir = sortState[section].dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState[section].sort = column;
+                sortState[section].dir = 'asc';
+            }
+            pagination[section] = 1;
+            loadSectionData(section, 1);
+        }
+
+        function updateSortIcons(section) {
+            const { sort, dir } = sortState[section];
+            document.querySelectorAll(`#section-${section} th[data-sort]`).forEach(th => {
+                const icon = th.querySelector('.sort-icon');
+                if (!icon) return;
+                if (th.dataset.sort === sort) {
+                    icon.className = `sort-icon bi bi-arrow-${dir === 'asc' ? 'up' : 'down'} ms-1`;
+                    icon.style.opacity = '1';
+                } else {
+                    icon.className = 'sort-icon bi bi-arrow-down-up ms-1';
+                    icon.style.opacity = '0.3';
+                }
+            });
+        }
+
 
         function updatePagination(section, currentPage, lastPage, total) {
             const container = document.getElementById(`pagination-${section}`);

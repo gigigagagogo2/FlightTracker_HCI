@@ -23,7 +23,7 @@ class FlightSeeder extends Seeder
             return;
         }
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 85; $i++) {
             // Prendi aeroporti diversi
             $departure = $airports->random();
             do {

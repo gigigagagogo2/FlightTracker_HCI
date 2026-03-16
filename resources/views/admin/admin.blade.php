@@ -98,39 +98,11 @@
                         <th>Azioni</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    @foreach ($users as $user)
-                        @if (!$user->is_admin)
-                            <tr>
-                                <td>{{ $user->id }}</td>
-                                <td>{{ $user->nickname }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>Utente</td>
-                                <td>
-                                    <div class="action-group">
-                                        <button type="button"
-                                                class="btn btn-sm btn-warning"
-                                                data-bs-toggle="tooltip" title="Modifica utente"
-                                                onclick="openEditUserModal({{ $user->id }}, '{{ $user->nickname }}', '{{ $user->email }}')">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-
-                                        <span class="action-separator"></span>
-
-                                        <button type="button"
-                                                class="btn btn-sm btn-danger"
-                                                data-bs-toggle="tooltip" title="Elimina utente"
-                                                onclick="openDeleteUserModal({{ $user->id }}, '{{ $user->nickname }}')">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endif
-                    @endforeach
-                    </tbody>
+                    <tbody id="tbody-users"></tbody>
                 </table>
             </div>
+            <div id="pagination-users"></div>
+
         </div>
 
         <!-- SEZIONE VOLI -->
@@ -155,52 +127,11 @@
                         <th>Azioni</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    @foreach ($flights as $flight)
-                        <tr>
-                            <td>{{ $flight->id }}</td>
-                            <td>{{ $flight->airplaneModel->name ?? '—' }}</td>
-                            <td>{{ $flight->departureAirport->name ?? '—' }}</td>
-                            <td>{{ $flight->arrivalAirport->name ?? '—' }}</td>
-                            <td>{{ $flight->departure_time }}</td>
-                            <td>{{ $flight->arrival_time ?? '–' }}</td>
-                            <td>
-                                <div class="action-group">
-                                    <button type="button"
-                                            class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" title="Modifica volo"
-                                            onclick="openEditFlightModal(
-                                                {{ $flight->id }},
-                                                {{ $flight->airplane_model_id }},
-                                                {{ $flight->departure_airport_id }},
-                                                {{ $flight->arrival_airport_id }},
-                                                '{{ \Carbon\Carbon::parse($flight->departure_time)->format('Y-m-d H:i') }}',
-                                                '{{ \Carbon\Carbon::parse($flight->arrival_time)->format('Y-m-d H:i') }}'
-                                            )">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-
-                                    <span class="action-separator"></span>
-
-                                    <button type="button"
-                                            class="btn btn-sm btn-danger"
-                                            data-bs-toggle="tooltip" title="Elimina volo"
-                                            onclick="openDeleteFlightModal(
-                                                {{ $flight->id }},
-                                                '{{ $flight->departureAirport->name ?? '' }}',
-                                                '{{ \Carbon\Carbon::parse($flight->departure_time)->format('d/m/Y H:i') }}',
-                                                '{{ $flight->arrivalAirport->name ?? '' }}',
-                                                '{{ \Carbon\Carbon::parse($flight->arrival_time)->format('d/m/Y H:i') }}'
-                                            )">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
+                    <tbody id="tbody-flights"></tbody>
                 </table>
             </div>
+            <div id="pagination-flights"></div>
+
         </div>
 
         <!-- SEZIONE AEROPORTI -->
@@ -225,46 +156,10 @@
                         <th>Azioni</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    @foreach ($airports as $airport)
-                        <tr>
-                            <td>{{ $airport->id }}</td>
-                            <td>{{ $airport->name ?? '—' }}</td>
-                            <td>{{ $airport->city ?? '—' }}</td>
-                            <td>{{ $airport->country ?? '—' }}</td>
-                            <td>{{ $airport->latitude ?? '–' }}</td>
-                            <td>{{ $airport->longitude ?? '–' }}</td>
-                            <td>
-                                <div class="action-group">
-                                    <button type="button"
-                                            class="btn btn-sm btn-warning"
-                                            data-bs-toggle="tooltip" title="Modifica aeroporto"
-                                            onclick="openEditAirportModal(
-                                                {{ $airport->id }},
-                                                '{{ $airport->country }}',
-                                                '{{ $airport->city }}',
-                                                '{{ Str::startsWith($airport->name, 'Aeroporto ') ? trim(Str::replaceFirst('Aeroporto', '', $airport->name)) : $airport->name }}',
-                                                '{{ number_format($airport->latitude, 6, '.', '') }}',
-                                                '{{ number_format($airport->longitude, 6, '.', '') }}'
-                                            )">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-
-                                    <span class="action-separator"></span>
-
-                                    <button type="button"
-                                            class="btn btn-sm btn-danger"
-                                            data-bs-toggle="tooltip" title="Elimina aeroporto"
-                                            onclick="openDeleteAirportModal({{ $airport->id }}, '{{ $airport->name }}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
+                    <tbody id="tbody-airports"></tbody>
                 </table>
             </div>
+            <div id="pagination-airports"></div>
         </div>
 
     </main>
@@ -634,10 +529,11 @@
                                        placeholder="Seleziona data e ora"
                                        style="border-radius: 0 0.6rem 0.6rem 0;" required readonly>
                             </div>
-                            @error('arrival_time', 'editFlight')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
+
                         </div>
+                        @error('arrival_time', 'editFlight')
+                        <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 pt-2">
@@ -931,26 +827,27 @@
 </div>
 
 <script>
-    const navItems = document.querySelectorAll('.nav-item-admin');
-    const sections = document.querySelectorAll('.content-section');
-    const welcome  = document.getElementById('welcome');
+        const navItems = document.querySelectorAll('.nav-item-admin');
+        const sections = document.querySelectorAll('.content-section');
+        const welcome  = document.getElementById('welcome');
 
-    // Ripristina la sezione attiva dopo redirect o refresh
-    const hash = window.location.hash.replace('#', '');
-    const savedSection = sessionStorage.getItem('adminSection');
-    const activeSection = hash || savedSection;
+        // Ripristina la sezione attiva dopo redirect o refresh
+        const hash = window.location.hash.replace('#', '');
+        const savedSection = sessionStorage.getItem('adminSection');
+        const activeSection = hash || savedSection;
 
-    if (activeSection && document.getElementById('section-' + activeSection)) {
+        if (activeSection && document.getElementById('section-' + activeSection)) {
         document.querySelectorAll('.nav-item-admin').forEach(b => b.classList.remove('active'));
         document.querySelector(`[data-section="${activeSection}"]`).classList.add('active');
         welcome.style.display = 'none';
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
         document.getElementById('section-' + activeSection).classList.add('active');
         history.replaceState(null, '', window.location.pathname);
+        loadSectionData(activeSection);
     }
 
-    // Navigazione sidebar
-    navItems.forEach(btn => {
+        // Navigazione sidebar
+        navItems.forEach(btn => {
         btn.addEventListener('click', () => {
             const target = btn.dataset.section;
             navItems.forEach(b => b.classList.remove('active'));
@@ -959,10 +856,11 @@
             sections.forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + target).classList.add('active');
             sessionStorage.setItem('adminSection', target);
+            loadSectionData(target);
         });
     });
 
-    function goToWelcome() {
+        function goToWelcome() {
         navItems.forEach(b => b.classList.remove('active'));
         sections.forEach(s => s.classList.remove('active'));
         welcome.style.display = '';
@@ -970,19 +868,200 @@
         history.replaceState(null, '', window.location.pathname);
     }
 
-    // Attiva tooltip Bootstrap
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        // Attiva tooltip Bootstrap
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
         new bootstrap.Tooltip(el);
     });
 
-    // Auto-dismiss toast dopo 3 secondi
-    document.querySelectorAll('.toast').forEach(toastEl => {
+        // Auto-dismiss toast dopo 3 secondi
+        document.querySelectorAll('.toast').forEach(toastEl => {
         const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
         toast.show();
     });
 
-    // ── UTENTI ──
-    function openEditUserModal(id, nickname, email) {
+        // Stato paginazione per ogni sezione
+        const pagination = { users: 1, flights: 1, airports: 1 };
+
+        function loadSectionData(section, page = 1) {
+            const endpoints = {
+                users:    '/admin/users/data',
+                flights:  '/admin/flights/data',
+                airports: '/admin/airports/data',
+            };
+
+            const tbody = document.getElementById(`tbody-${section}`);
+            if (!tbody) return;
+
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted py-4">
+        <div class="spinner-border spinner-border-sm me-2"></div>Caricamento...
+    </td></tr>`;
+
+            fetch(`${endpoints[section]}?page=${page}`)
+                .then(res => res.json())
+                .then(response => {
+                    const data = response.data ?? response.data;
+                    const items = Array.isArray(response) ? response : (response.data || []);
+                    const currentPage = response.current_page ?? 1;
+                    const lastPage = response.last_page ?? 1;
+                    const total = response.total ?? items.length;
+
+                    tbody.innerHTML = renderRows(section, items);
+                    tbody.dataset.loaded = 'true';
+                    pagination[section] = currentPage;
+
+                    // Aggiorna paginazione
+                    updatePagination(section, currentPage, lastPage, total);
+
+                    tbody.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                        new bootstrap.Tooltip(el);
+                    });
+                })
+                .catch(() => {
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4">Errore nel caricamento dei dati.</td></tr>`;
+                });
+        }
+
+        function updatePagination(section, currentPage, lastPage, total) {
+            const container = document.getElementById(`pagination-${section}`);
+            if (!container) return;
+
+            // Colore attivo per sezione
+            const colors = {
+                users:    '#3b82f6',
+                flights:  '#10b981',
+                airports: '#f59e0b',
+            };
+            const activeColor = colors[section] ?? '#64748b';
+
+            // Genera i numeri di pagina con ellissi
+            let pages = [];
+            if (lastPage <= 7) {
+                for (let i = 1; i <= lastPage; i++) pages.push(i);
+            } else {
+                pages.push(1);
+                if (currentPage > 3) pages.push('...');
+                for (let i = Math.max(2, currentPage - 1); i <= Math.min(lastPage - 1, currentPage + 1); i++) {
+                    pages.push(i);
+                }
+                if (currentPage < lastPage - 2) pages.push('...');
+                pages.push(lastPage);
+            }
+
+            const pageButtons = pages.map(p => {
+                if (p === '...') return `<span class="px-2 text-muted" style="line-height: 2rem;">…</span>`;
+                const isActive = p === currentPage;
+                return `<button class="btn btn-sm"
+            style="border-radius: 0.5rem; min-width: 2rem;
+                   background: ${isActive ? activeColor : '#f1f5f9'};
+                   color: ${isActive ? 'white' : '#475569'};
+                   border: ${isActive ? `2px solid ${activeColor}` : 'none'};"
+            ${isActive ? 'disabled' : `onclick="loadSectionData('${section}', ${p})"`}>
+            ${p}
+        </button>`;
+            }).join('');
+
+            container.innerHTML = `
+        <div class="d-flex align-items-center justify-content-center gap-1 px-3 py-2">
+            <button class="btn btn-sm"
+                style="border-radius: 0.5rem; background: #f1f5f9; color: #475569; border: none;"
+                ${currentPage <= 1 ? 'disabled' : ''}
+                onclick="loadSectionData('${section}', ${currentPage - 1})">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            ${pageButtons}
+            <button class="btn btn-sm"
+                style="border-radius: 0.5rem; background: #f1f5f9; color: #475569; border: none;"
+                ${currentPage >= lastPage ? 'disabled' : ''}
+                onclick="loadSectionData('${section}', ${currentPage + 1})">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    `;
+        }
+
+        function reloadSection(section) {
+            const tbody = document.getElementById(`tbody-${section}`);
+            if (tbody) delete tbody.dataset.loaded;
+            loadSectionData(section, pagination[section] ?? 1);
+        }
+
+        function renderRows(section, data) {
+        if (section === 'users') {
+        return data.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.nickname}</td>
+                    <td>${u.email}</td>
+                    <td>Utente</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Modifica utente"
+                                onclick="openEditUserModal(${u.id}, '${u.nickname}', '${u.email}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <span class="action-separator"></span>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Elimina utente"
+                                onclick="openDeleteUserModal(${u.id}, '${u.nickname}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+    }
+
+        if (section === 'flights') {
+        return data.map(f => `
+                <tr>
+                    <td>${f.id}</td>
+                    <td>${f.airplane_model}</td>
+                    <td>${f.departure_airport}</td>
+                    <td>${f.arrival_airport}</td>
+                    <td>${f.departure_time}</td>
+                    <td>${f.arrival_time}</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Modifica volo"
+                                onclick="openEditFlightModal(${f.id}, ${f.airplane_model_id}, ${f.departure_airport_id}, ${f.arrival_airport_id}, '${f.departure_time}', '${f.arrival_time}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <span class="action-separator"></span>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Elimina volo"
+                                onclick="openDeleteFlightModal(${f.id}, '${f.departure_airport}', '${f.departure_time}', '${f.arrival_airport}', '${f.arrival_time}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+    }
+
+        if (section === 'airports') {
+        return data.map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td>${a.name ?? '—'}</td>
+                    <td>${a.city ?? '—'}</td>
+                    <td>${a.country ?? '—'}</td>
+                    <td>${a.latitude ?? '–'}</td>
+                    <td>${a.longitude ?? '–'}</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Modifica aeroporto"
+                                onclick="openEditAirportModal(${a.id}, '${a.country}', '${a.city}', '${a.name}', '${a.latitude}', '${a.longitude}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <span class="action-separator"></span>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Elimina aeroporto"
+                                onclick="openDeleteAirportModal(${a.id}, '${a.name}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+    }
+    }
+
+        // ── UTENTI ──
+        function openEditUserModal(id, nickname, email) {
         document.getElementById('modal_nickname').value = nickname;
         document.getElementById('modal_nickname').placeholder = nickname;
         document.getElementById('modal_email').value = email;
@@ -994,25 +1073,25 @@
         new bootstrap.Modal(document.getElementById('editUserModal')).show();
     }
 
-    function openDeleteUserModal(id, nickname) {
+        function openDeleteUserModal(id, nickname) {
         document.getElementById('delete_user_name').textContent = nickname;
         document.getElementById('deleteUserForm').action = `/admin/users/${id}`;
         new bootstrap.Modal(document.getElementById('deleteUserModal')).show();
     }
 
-    // ── VOLI ──
-    function openCreateFlightModal() {
+        // ── VOLI ──
+        function openCreateFlightModal() {
         new bootstrap.Modal(document.getElementById('createFlightModal')).show();
     }
 
-    @if ($errors->hasBag('createFlight'))
-    document.addEventListener('DOMContentLoaded', function() {
+        @if ($errors->hasBag('createFlight'))
+        document.addEventListener('DOMContentLoaded', function() {
         new bootstrap.Modal(document.getElementById('createFlightModal')).show();
     });
-    @endif
+        @endif
 
-    @if (!$errors->hasBag('createFlight'))
-    document.addEventListener('DOMContentLoaded', function() {
+        @if (!$errors->hasBag('createFlight'))
+        document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('#createFlightForm select').forEach(select => {
             select.selectedIndex = 0;
         });
@@ -1021,41 +1100,41 @@
         if (dep) dep.value = '';
         if (arr) arr.value = '';
     });
-    @endif
+        @endif
 
-    document.getElementById('createFlightModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('createFlightModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('createFlightForm').reset();
         document.getElementById('departure_time_picker')._flatpickr.clear();
         document.getElementById('arrival_time_picker')._flatpickr.clear();
         document.querySelectorAll('#createFlightForm select').forEach(select => {
-            select.selectedIndex = 0;
-        });
+        select.selectedIndex = 0;
+    });
         document.querySelectorAll('#createFlightModal .text-danger').forEach(el => el.textContent = '');
     });
 
-    flatpickr("#departure_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "Y-m-d H:i",
+        flatpickr("#departure_time_picker", {
+        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
         time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
         @if(old('departure_time')) defaultDate: "{{ old('departure_time') }}", @endif
     });
 
-    flatpickr("#arrival_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "Y-m-d H:i",
+        flatpickr("#arrival_time_picker", {
+        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
         time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
         @if(old('arrival_time')) defaultDate: "{{ old('arrival_time') }}", @endif
     });
 
-    const editDeparturePicker = flatpickr("#edit_departure_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "Y-m-d H:i",
+        const editDeparturePicker = flatpickr("#edit_departure_time_picker", {
+        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
         time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
     });
 
-    const editArrivalPicker = flatpickr("#edit_arrival_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "Y-m-d H:i",
+        const editArrivalPicker = flatpickr("#edit_arrival_time_picker", {
+        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
         time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
     });
 
-    function openEditFlightModal(id, airplaneModelId, departureAirportId, arrivalAirportId, departureTime, arrivalTime) {
+        function openEditFlightModal(id, airplaneModelId, departureAirportId, arrivalAirportId, departureTime, arrivalTime) {
         document.getElementById('editFlightForm').action = `/admin/flights/${id}`;
         document.getElementById('edit_airplane_model_id').value = airplaneModelId;
         document.getElementById('edit_departure_airport_id').value = departureAirportId;
@@ -1066,20 +1145,20 @@
         new bootstrap.Modal(document.getElementById('editFlightModal')).show();
     }
 
-    @if ($errors->hasBag('editFlight'))
-    document.addEventListener('DOMContentLoaded', function() {
+        @if ($errors->hasBag('editFlight'))
+        document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('editFlightForm').action = `/admin/flights/{{ old('flight_id') }}`;
         editDeparturePicker.setDate("{{ old('departure_time') }}");
         editArrivalPicker.setDate("{{ old('arrival_time') }}");
         new bootstrap.Modal(document.getElementById('editFlightModal')).show();
     });
-    @endif
+        @endif
 
-    document.getElementById('editFlightModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('editFlightModal').addEventListener('hidden.bs.modal', function () {
         document.querySelectorAll('#editFlightModal .text-danger').forEach(el => el.textContent = '');
     });
 
-    function openDeleteFlightModal(id, departure, departureTime, arrival, arrivalTime) {
+        function openDeleteFlightModal(id, departure, departureTime, arrival, arrivalTime) {
         document.getElementById('delete_flight_departure').textContent = departure;
         document.getElementById('delete_flight_departure_time').textContent = departureTime;
         document.getElementById('delete_flight_arrival').textContent = arrival;
@@ -1088,12 +1167,12 @@
         new bootstrap.Modal(document.getElementById('deleteFlightModal')).show();
     }
 
-    // ── AEROPORTI ──
-    function openCreateAirportModal() {
+        // ── AEROPORTI ──
+        function openCreateAirportModal() {
         new bootstrap.Modal(document.getElementById('createAirportModal')).show();
     }
 
-    document.getElementById('createAirportModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('createAirportModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('createAirportForm').reset();
         document.getElementById('city-error').textContent = '';
         document.getElementById('country-error').textContent = '';
@@ -1103,7 +1182,7 @@
         document.getElementById('country').classList.remove('is-invalid');
     });
 
-    (function() {
+        (function() {
         const cityInput = document.getElementById('city');
         const countryInput = document.getElementById('country');
         const nameInput = document.getElementById('airport_name');
@@ -1120,39 +1199,39 @@
         function clearError(input, errorEl) { input.classList.remove("is-invalid"); errorEl.textContent = ""; }
 
         function validateLocation() {
-            const city = cityInput.value.trim();
-            const country = countryInput.value.trim();
-            if (!city || !country) return;
-            fetch("{{ route('admin.city.lookup') }}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value },
-                body: JSON.stringify({ city, country })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        latInput.value = data.latitude; lonInput.value = data.longitude;
-                        nameInput.value = ""; nameInput.focus();
-                        clearError(cityInput, cityError); clearError(countryInput, countryError);
-                    } else {
-                        resetFields();
-                        showError(cityInput, cityError, data.message || "Città non valida");
-                        if (data.invalid_country) showError(countryInput, countryError, "Paese non valido o non riconosciuto");
-                        else clearError(countryInput, countryError);
-                    }
-                })
-                .catch(() => { resetFields(); showError(cityInput, cityError, "Errore durante la verifica della città."); });
-        }
+        const city = cityInput.value.trim();
+        const country = countryInput.value.trim();
+        if (!city || !country) return;
+        fetch("{{ route('admin.city.lookup') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value },
+        body: JSON.stringify({ city, country })
+    })
+        .then(res => res.json())
+        .then(data => {
+        if (data.success) {
+        latInput.value = data.latitude; lonInput.value = data.longitude;
+        nameInput.value = ""; nameInput.focus();
+        clearError(cityInput, cityError); clearError(countryInput, countryError);
+    } else {
+        resetFields();
+        showError(cityInput, cityError, data.message || "Città non valida");
+        if (data.invalid_country) showError(countryInput, countryError, "Paese non valido o non riconosciuto");
+        else clearError(countryInput, countryError);
+    }
+    })
+        .catch(() => { resetFields(); showError(cityInput, cityError, "Errore durante la verifica della città."); });
+    }
 
         document.getElementById('createAirportForm').addEventListener('submit', (e) => {
-            clearError(cityInput, cityError); clearError(countryInput, countryError);
-            if (!latInput.value || !lonInput.value) {
-                e.preventDefault();
-                showError(cityInput, cityError, "Hai modificato la città o il paese dopo la verifica. Ricontrolla.");
-                return;
-            }
-            submitBtn.disabled = true;
-        });
+        clearError(cityInput, cityError); clearError(countryInput, countryError);
+        if (!latInput.value || !lonInput.value) {
+        e.preventDefault();
+        showError(cityInput, cityError, "Hai modificato la città o il paese dopo la verifica. Ricontrolla.");
+        return;
+    }
+        submitBtn.disabled = true;
+    });
 
         cityInput.addEventListener('blur', () => debounce(validateLocation));
         countryInput.addEventListener('blur', () => debounce(validateLocation));
@@ -1160,7 +1239,7 @@
         countryInput.addEventListener('input', () => { resetFields(); clearError(countryInput, countryError); });
     })();
 
-    function openEditAirportModal(id, country, city, name, latitude, longitude) {
+        function openEditAirportModal(id, country, city, name, latitude, longitude) {
         document.getElementById('edit_country').value = country;
         document.getElementById('edit_city').value = city;
         document.getElementById('edit_airport_name').value = name;
@@ -1174,14 +1253,14 @@
         new bootstrap.Modal(document.getElementById('editAirportModal')).show();
     }
 
-    document.getElementById('editAirportModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('editAirportModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('edit_country_error').textContent = '';
         document.getElementById('edit_city_error').textContent = '';
         document.getElementById('edit_city').classList.remove('is-invalid');
         document.getElementById('edit_country').classList.remove('is-invalid');
     });
 
-    (function() {
+        (function() {
         const cityInput = document.getElementById('edit_city');
         const countryInput = document.getElementById('edit_country');
         const latInput = document.getElementById('edit_latitude');
@@ -1197,38 +1276,38 @@
         function clearError(input, errorEl) { input.classList.remove("is-invalid"); errorEl.textContent = ""; }
 
         function validateLocation() {
-            const city = cityInput.value.trim();
-            const country = countryInput.value.trim();
-            if (!city || !country) return;
-            fetch("{{ route('admin.city.lookup') }}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value },
-                body: JSON.stringify({ city, country })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        latInput.value = data.latitude; lonInput.value = data.longitude;
-                        clearError(cityInput, cityError); clearError(countryInput, countryError);
-                    } else {
-                        resetFields();
-                        showError(cityInput, cityError, data.message || "Città non valida");
-                        if (data.invalid_country) showError(countryInput, countryError, "Paese non valido o non riconosciuto");
-                        else clearError(countryInput, countryError);
-                    }
-                })
-                .catch(() => { resetFields(); showError(cityInput, cityError, "Errore durante la verifica della città."); });
-        }
+        const city = cityInput.value.trim();
+        const country = countryInput.value.trim();
+        if (!city || !country) return;
+        fetch("{{ route('admin.city.lookup') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value },
+        body: JSON.stringify({ city, country })
+    })
+        .then(res => res.json())
+        .then(data => {
+        if (data.success) {
+        latInput.value = data.latitude; lonInput.value = data.longitude;
+        clearError(cityInput, cityError); clearError(countryInput, countryError);
+    } else {
+        resetFields();
+        showError(cityInput, cityError, data.message || "Città non valida");
+        if (data.invalid_country) showError(countryInput, countryError, "Paese non valido o non riconosciuto");
+        else clearError(countryInput, countryError);
+    }
+    })
+        .catch(() => { resetFields(); showError(cityInput, cityError, "Errore durante la verifica della città."); });
+    }
 
         document.getElementById('editAirportForm').addEventListener('submit', (e) => {
-            clearError(cityInput, cityError); clearError(countryInput, countryError);
-            if (!latInput.value || !lonInput.value) {
-                e.preventDefault();
-                showError(cityInput, cityError, "Hai modificato la città o il paese dopo la verifica. Ricontrolla.");
-                return;
-            }
-            submitBtn.disabled = true;
-        });
+        clearError(cityInput, cityError); clearError(countryInput, countryError);
+        if (!latInput.value || !lonInput.value) {
+        e.preventDefault();
+        showError(cityInput, cityError, "Hai modificato la città o il paese dopo la verifica. Ricontrolla.");
+        return;
+    }
+        submitBtn.disabled = true;
+    });
 
         cityInput.addEventListener('blur', () => debounce(validateLocation));
         countryInput.addEventListener('blur', () => debounce(validateLocation));
@@ -1236,11 +1315,12 @@
         countryInput.addEventListener('input', () => { resetFields(); clearError(countryInput, countryError); });
     })();
 
-    function openDeleteAirportModal(id, name) {
+        function openDeleteAirportModal(id, name) {
         document.getElementById('delete_airport_name').textContent = name;
         document.getElementById('deleteAirportForm').action = `/admin/airports/${id}`;
         new bootstrap.Modal(document.getElementById('deleteAirportModal')).show();
     }
+
 </script>
 <script>
     function capitalizeWords(str) {

@@ -51,22 +51,38 @@
 
         public function updateUser(Request $request, User $user)
         {
-            $validated = $request->validate([
+            $validator = \Validator::make($request->all(), [
                 'nickname' => 'required|string|max:255|unique:users,nickname,' . $user->id,
-                'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-                'password' => 'nullable|string',
+                'email' => 'required|email:rfc,strict|max:255|unique:users,email,' . $user->id,
+                'password' => 'nullable|string|min:8',
+            ], [
+                'nickname.required' => 'Il nickname è obbligatorio.',
+                'nickname.unique'   => 'Questo nickname è già in uso.',
+                'email.required'    => 'L\'email è obbligatoria.',
+                'email.email'       => 'Inserisci un\'email valida (es. nome@dominio.it).',
+                'email.unique'      => 'Questa email è già in uso.',
+                'password.min'      => 'La password deve essere di almeno 8 caratteri.',
             ]);
 
-            $user->nickname = $validated['nickname'];
-            $user->email = $validated['email'];
+            if ($validator->fails()) {
+                return redirect()->route('admin.dashboard')
+                    ->withFragment('users')
+                    ->withErrors($validator, 'editUser')
+                    ->withInput();
+            }
 
-            if (!empty($validated['password'])) {
-                $user->password = Hash::make($validated['password']);
+            $user->nickname = $validator->validated()['nickname'];
+            $user->email    = $validator->validated()['email'];
+
+            if (!empty($validator->validated()['password'])) {
+                $user->password = Hash::make($validator->validated()['password']);
             }
 
             $user->save();
 
-            return redirect()->route('admin.dashboard')->with('success', 'Utente aggiornato con successo.')->withFragment('users');;
+            return redirect()->route('admin.dashboard')
+                ->withFragment('users')
+                ->with('success', 'Utente aggiornato con successo.');
         }
 
 
@@ -400,8 +416,13 @@
             $sortable = ['id', 'nickname', 'email'];
             $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
             $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
+            $search = $request->get('search', '');
 
             $users = User::where('is_admin', false)
+                ->when($search, fn($q) => $q->where(fn($q) =>
+                $q->where('nickname', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                ))
                 ->orderBy($sort, $dir)
                 ->paginate(20);
             return response()->json($users);
@@ -412,10 +433,20 @@
             $sortable = ['flights.id', 'departure_time', 'arrival_time', 'departure_airport_id', 'arrival_airport_id', 'airplane_models.name'];
             $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'departure_time';
             $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
+            $search = $request->get('search', '');
 
             $flights = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])
                 ->join('airplane_models', 'flights.airplane_model_id', '=', 'airplane_models.id')
+                ->join('airports as dep', 'flights.departure_airport_id', '=', 'dep.id')
+                ->join('airports as arr', 'flights.arrival_airport_id', '=', 'arr.id')
                 ->select('flights.*')
+                ->when($search, fn($q) => $q->where(fn($q) =>
+                $q->where('airplane_models.name', 'like', "%{$search}%")
+                    ->orWhere('dep.name', 'like', "%{$search}%")
+                    ->orWhere('arr.name', 'like', "%{$search}%")
+                    ->orWhereRaw("DATE_FORMAT(flights.departure_time, '%d/%m/%Y %H:%i') like ?", ["%{$search}%"])
+                    ->orWhereRaw("DATE_FORMAT(flights.arrival_time, '%d/%m/%Y %H:%i') like ?", ["%{$search}%"])
+                ))
                 ->orderBy($sort, $dir)
                 ->paginate(20);
 
@@ -442,8 +473,15 @@
             $sortable = ['id', 'name', 'city', 'country'];
             $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'name';
             $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
+            $search = $request->get('search', '');
 
-            $airports = Airport::orderBy($sort, $dir)->paginate(20);
+            $airports = Airport::when($search, fn($q) => $q->where(fn($q) =>
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('city', 'like', "%{$search}%")
+                ->orWhere('country', 'like', "%{$search}%")
+            ))
+                ->orderBy($sort, $dir)
+                ->paginate(20);
             return response()->json($airports);
         }
 

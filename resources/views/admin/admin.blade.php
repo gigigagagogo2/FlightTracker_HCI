@@ -86,6 +86,15 @@
         <div class="content-section" id="section-users">
             <div class="section-header">
                 <h2><i class="bi bi-people-fill text-primary"></i> Utenti registrati</h2>
+                <div class="input-group" style="width: 280px;">
+                    <span class="input-group-text bg-light border-end-0" style="border-radius: 0.6rem 0 0 0.6rem;">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" id="search-users" class="form-control border-start-0"
+                           placeholder="Cerca per nickname o email..."
+                           style="border-radius: 0 0.6rem 0.6rem 0;"
+                           oninput="debounceSearch('users', this.value)">
+                </div>
             </div>
             <div class="table-placeholder">
                 <table class="table table-hover align-middle mb-0 text-center">
@@ -115,10 +124,21 @@
         <div class="content-section" id="section-flights">
             <div class="section-header">
                 <h2><i class="bi bi-airplane-engines text-success"></i> Voli registrati</h2>
-                <button type="button" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1"
-                        onclick="openCreateFlightModal()">
-                    <i class="bi bi-plus-circle"></i> Aggiungi volo
-                </button>
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="input-group" style="width: 280px;">
+            <span class="input-group-text bg-light border-end-0" style="border-radius: 0.6rem 0 0 0.6rem;">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+                        <input type="text" id="search-flights" class="form-control border-start-0"
+                               placeholder="Cerca per aereo, aeroporto, data..."
+                               style="border-radius: 0 0.6rem 0.6rem 0;"
+                               oninput="debounceSearch('flights', this.value)">
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1"
+                            onclick="openCreateFlightModal()">
+                        <i class="bi bi-plus-circle"></i> Aggiungi volo
+                    </button>
+                </div>
             </div>
             <div class="table-placeholder">
                 <table class="table table-hover align-middle mb-0 text-center">
@@ -156,10 +176,21 @@
         <div class="content-section" id="section-airports">
             <div class="section-header">
                 <h2><i class="fas fa-building text-warning"></i> Aeroporti registrati</h2>
-                <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center gap-1 text-white"
-                        onclick="openCreateAirportModal()">
-                    <i class="bi bi-plus-circle"></i> Aggiungi aeroporto
-                </button>
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="input-group" style="width: 280px;">
+            <span class="input-group-text bg-light border-end-0" style="border-radius: 0.6rem 0 0 0.6rem;">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+                        <input type="text" id="search-airports" class="form-control border-start-0"
+                               placeholder="Cerca per nome, città, paese..."
+                               style="border-radius: 0 0.6rem 0.6rem 0;"
+                               oninput="debounceSearch('airports', this.value)">
+                    </div>
+                    <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center gap-1 text-white"
+                            onclick="openCreateAirportModal()">
+                        <i class="bi bi-plus-circle"></i> Aggiungi aeroporto
+                    </button>
+                </div>
             </div>
             <div class="table-placeholder">
                 <table class="table table-hover align-middle mb-0 text-center">
@@ -211,10 +242,12 @@
             </div>
 
             <div class="modal-body" style="padding: 1.75rem;">
-                <form id="editUserForm" method="POST">
+                <form id="editUserForm" method="POST" action="">
                     @csrf
                     @method('PUT')
-
+                    <input type="hidden" id="edit_user_id" name="user_id">
+                    <input type="hidden" id="edit_user_original_nickname" name="original_nickname">
+                    <input type="hidden" id="edit_user_original_email" name="original_email">
                     <div class="mb-3">
                         <label for="modal_nickname" class="form-label fw-semibold text-secondary small text-uppercase" style="letter-spacing: 0.05em;">Nickname</label>
                         <div class="input-group">
@@ -223,10 +256,15 @@
                             </span>
                             <input type="text" class="form-control border-start-0 ps-1" id="modal_nickname" name="nickname"
                                    placeholder="Es. mario_rossi"
-                                   style="border-radius: 0 0.6rem 0.6rem 0;" required>
+                                   style="border-radius: 0 0.6rem 0.6rem 0;"
+                                   autocomplete="new-password"
+                                   required>
                         </div>
-                        <div class="text-danger small mt-1" id="modal_nickname_error"></div>
-                    </div>
+                        <div class="text-danger small mt-1" id="modal_nickname_error">
+                            @if($errors->hasBag('editUser'))
+                                {{ $errors->getBag('editUser')->first('nickname') }}
+                            @endif
+                        </div>                    </div>
 
                     <div style="height: 1px; background: #f1f5f9; margin: 0.75rem 0 1rem 0;"></div>
 
@@ -236,12 +274,16 @@
                             <span class="input-group-text bg-light border-end-0" style="border-radius: 0.6rem 0 0 0.6rem;">
                                 <i class="bi bi-envelope text-muted"></i>
                             </span>
-                            <input type="email" class="form-control border-start-0 ps-1" id="modal_email" name="email"
+                            <input type="text" class="form-control border-start-0 ps-1" id="modal_email" name="email"
                                    placeholder="Es. mario@esempio.it"
-                                   style="border-radius: 0 0.6rem 0.6rem 0;" required>
+                                   style="border-radius: 0 0.6rem 0.6rem 0;"
+                                   autocomplete="new-password">
                         </div>
-                        <div class="text-danger small mt-1" id="modal_email_error"></div>
-                    </div>
+                        <div class="text-danger small mt-1" id="modal_email_error">
+                            @if($errors->hasBag('editUser'))
+                                {{ $errors->getBag('editUser')->first('email') }}
+                            @endif
+                        </div>                    </div>
 
                     <div style="height: 1px; background: #f1f5f9; margin: 0.75rem 0 1rem 0;"></div>
 
@@ -255,6 +297,11 @@
                             <input type="password" class="form-control border-start-0 ps-1" id="modal_password" name="password"
                                    placeholder="Lascia vuoto per non cambiarla"
                                    style="border-radius: 0 0.6rem 0.6rem 0;">
+                        </div>
+                        <div class="text-danger small mt-1">
+                            @if($errors->hasBag('editUser'))
+                                {{ $errors->getBag('editUser')->first('password') }}
+                            @endif
                         </div>
                     </div>
 
@@ -852,6 +899,8 @@
     </div>
 </div>
 
+@include('footer')
+
 <script>
         const navItems = document.querySelectorAll('.nav-item-admin');
         const sections = document.querySelectorAll('.content-section');
@@ -872,6 +921,19 @@
         const savedSection = sessionStorage.getItem('adminSection');
         const activeSection = hash || savedSection;
 
+        // Stato ricerca per ogni sezione
+        const searchState = { users: '', flights: '', airports: '' };
+        const searchTimers = { users: null, flights: null, airports: null };
+
+        function debounceSearch(section, value) {
+            clearTimeout(searchTimers[section]);
+            searchTimers[section] = setTimeout(() => {
+                searchState[section] = value.trim();
+                pagination[section] = 1;
+                loadSectionData(section, 1);
+            }, 400);
+        }
+
         if (activeSection && document.getElementById('section-' + activeSection)) {
         document.querySelectorAll('.nav-item-admin').forEach(b => b.classList.remove('active'));
         document.querySelector(`[data-section="${activeSection}"]`).classList.add('active');
@@ -884,17 +946,23 @@
 
         // Navigazione sidebar
         navItems.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const target = btn.dataset.section;
-            navItems.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            welcome.style.display = 'none';
-            sections.forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + target).classList.add('active');
-            sessionStorage.setItem('adminSection', target);
-            loadSectionData(target);
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.section;
+                navItems.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                welcome.style.display = 'none';
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById('section-' + target).classList.add('active');
+                sessionStorage.setItem('adminSection', target);
+
+                // Resetta la ricerca quando cambi sezione
+                const searchInput = document.getElementById(`search-${target}`);
+                if (searchInput) searchInput.value = '';
+                searchState[target] = '';
+
+                loadSectionData(target);
+            });
         });
-    });
 
         function goToWelcome() {
         navItems.forEach(b => b.classList.remove('active'));
@@ -932,7 +1000,8 @@
     </td></tr>`;
 
             const { sort, dir } = sortState[section];
-            fetch(`${endpoints[section]}?page=${page}&sort=${sort}&dir=${dir}`)
+            const search = searchState[section] ?? '';
+            fetch(`${endpoints[section]}?page=${page}&sort=${sort}&dir=${dir}&search=${encodeURIComponent(search)}`)
                 .then(res => res.json())
                 .then(response => {
                     const items = Array.isArray(response) ? response : (response.data || []);
@@ -1021,7 +1090,12 @@
             }).join('');
 
             container.innerHTML = `
-        <div class="d-flex align-items-center justify-content-center gap-1 px-3 py-2">
+    <div class="d-flex align-items-center justify-content-between px-3 py-2"
+         style="border-top: 1px solid #e3e8ef;">
+        <span class="text-muted small">
+            Totale: <strong>${total}</strong> record
+        </span>
+        <div class="d-flex align-items-center gap-1">
             <button class="btn btn-sm"
                 style="border-radius: 0.5rem; background: #f1f5f9; color: #475569; border: none;"
                 ${currentPage <= 1 ? 'disabled' : ''}
@@ -1036,7 +1110,8 @@
                 <i class="bi bi-chevron-right"></i>
             </button>
         </div>
-    `;
+    </div>
+`;
         }
 
         function reloadSection(section) {
@@ -1120,19 +1195,47 @@
     }
     }
 
-        // ── UTENTI ──
+    // ── UTENTI ──
         function openEditUserModal(id, nickname, email) {
-        document.getElementById('modal_nickname').value = nickname;
-        document.getElementById('modal_nickname').placeholder = nickname;
-        document.getElementById('modal_email').value = email;
-        document.getElementById('modal_email').placeholder = email;
-        document.getElementById('modal_password').value = '';
-        document.getElementById('editUserForm').action = `/admin/users/${id}`;
-        document.getElementById('modal_nickname_error').textContent = '';
-        document.getElementById('modal_email_error').textContent = '';
-        new bootstrap.Modal(document.getElementById('editUserModal')).show();
-    }
+            document.getElementById('modal_nickname').value = nickname;
+            document.getElementById('modal_email').value = email;
+            document.getElementById('modal_password').value = '';
+            document.getElementById('edit_user_id').value = id;
+            document.getElementById('edit_user_original_nickname').value = nickname;
+            document.getElementById('edit_user_original_email').value = email;
+            document.getElementById('editUserForm').action = `/admin/users/${id}`;
+            document.getElementById('modal_nickname_error').textContent = '';
+            document.getElementById('modal_email_error').textContent = '';
+            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        }
 
+        document.getElementById('modal_nickname').addEventListener('input', function() {
+            document.getElementById('modal_nickname_error').textContent = '';
+        });
+
+        document.getElementById('modal_email').addEventListener('input', function() {
+            document.getElementById('modal_email_error').textContent = '';
+        });
+
+        @if ($errors->hasBag('editUser'))
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('editUserForm').action = `/admin/users/{{ old('user_id') }}`;
+            document.getElementById('modal_nickname').value = "{{ old('nickname') }}";
+            document.getElementById('modal_email').value = "{{ old('email') }}";
+            document.getElementById('modal_nickname').placeholder = "{{ old('original_nickname') }}";
+            document.getElementById('modal_email').placeholder = "{{ old('original_email') }}";
+            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        });
+        @endif
+
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            const action = this.action;
+            if (!action || action.endsWith('/admin/users/') || action === window.location.origin + '/admin/users') {
+                e.preventDefault();
+                console.warn('Action non valida:', action);
+                return;
+            }
+        });
         function openDeleteUserModal(id, nickname) {
         document.getElementById('delete_user_name').textContent = nickname;
         document.getElementById('deleteUserForm').action = `/admin/users/${id}`;
@@ -1146,8 +1249,17 @@
 
         @if ($errors->hasBag('createFlight'))
         document.addEventListener('DOMContentLoaded', function() {
-        new bootstrap.Modal(document.getElementById('createFlightModal')).show();
-    });
+            @if(old('airplane_model_id'))
+            document.querySelector('#createFlightForm select[name="airplane_model_id"]').value = "{{ old('airplane_model_id') }}";
+            @endif
+            @if(old('departure_airport_id'))
+            document.querySelector('#createFlightForm select[name="departure_airport_id"]').value = "{{ old('departure_airport_id') }}";
+            @endif
+            @if(old('arrival_airport_id'))
+            document.querySelector('#createFlightForm select[name="arrival_airport_id"]').value = "{{ old('arrival_airport_id') }}";
+            @endif
+            new bootstrap.Modal(document.getElementById('createFlightModal')).show();
+        });
         @endif
 
         @if (!$errors->hasBag('createFlight'))
@@ -1173,26 +1285,40 @@
     });
 
         flatpickr("#departure_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
-        time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
-        @if(old('departure_time')) defaultDate: "{{ old('departure_time') }}", @endif
-    });
+            locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
+            time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
+            @if(old('departure_time')) defaultDate: "{{ old('departure_time') }}", @endif
+            onChange: function() {
+                document.querySelectorAll('#createFlightModal .text-danger').forEach(el => el.textContent = '');
+            }
+        });
 
         flatpickr("#arrival_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
-        time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
-        @if(old('arrival_time')) defaultDate: "{{ old('arrival_time') }}", @endif
-    });
+            locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
+            time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
+            @if(old('arrival_time')) defaultDate: "{{ old('arrival_time') }}", @endif
+            onChange: function() {
+                document.querySelectorAll('#createFlightModal .text-danger').forEach(el => el.textContent = '');
+            }
+        });
 
         const editDeparturePicker = flatpickr("#edit_departure_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
-        time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
-    });
+            locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
+            time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
+            onChange: function() {
+                document.querySelectorAll('#editFlightModal .text-danger').forEach(el => el.textContent = '');
+            }
+        });
 
         const editArrivalPicker = flatpickr("#edit_arrival_time_picker", {
-        locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
-        time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
-    });
+            locale: "it", enableTime: true, dateFormat: "d/m/Y H:i",
+            time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
+            onChange: function() {
+                document.querySelectorAll('#editFlightModal .text-danger').forEach(el => el.textContent = '');
+            }
+        });
+
+
 
         function openEditFlightModal(id, airplaneModelId, departureAirportId, arrivalAirportId, departureTime, arrivalTime) {
         document.getElementById('editFlightForm').action = `/admin/flights/${id}`;
@@ -1207,11 +1333,20 @@
 
         @if ($errors->hasBag('editFlight'))
         document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('editFlightForm').action = `/admin/flights/{{ old('flight_id') }}`;
-        editDeparturePicker.setDate("{{ old('departure_time') }}");
-        editArrivalPicker.setDate("{{ old('arrival_time') }}");
-        new bootstrap.Modal(document.getElementById('editFlightModal')).show();
-    });
+            document.getElementById('editFlightForm').action = `/admin/flights/{{ old('flight_id') }}`;
+            @if(old('airplane_model_id'))
+            document.getElementById('edit_airplane_model_id').value = "{{ old('airplane_model_id') }}";
+            @endif
+            @if(old('departure_airport_id'))
+            document.getElementById('edit_departure_airport_id').value = "{{ old('departure_airport_id') }}";
+            @endif
+            @if(old('arrival_airport_id'))
+            document.getElementById('edit_arrival_airport_id').value = "{{ old('arrival_airport_id') }}";
+            @endif
+            editDeparturePicker.setDate("{{ old('departure_time') }}");
+            editArrivalPicker.setDate("{{ old('arrival_time') }}");
+            new bootstrap.Modal(document.getElementById('editFlightModal')).show();
+        });
         @endif
 
         document.getElementById('editFlightModal').addEventListener('hidden.bs.modal', function () {
@@ -1226,6 +1361,21 @@
         document.getElementById('deleteFlightForm').action = `/admin/flights/${id}`;
         new bootstrap.Modal(document.getElementById('deleteFlightModal')).show();
     }
+
+        document.querySelectorAll('#createFlightForm select').forEach(select => {
+            select.addEventListener('change', function() {
+                const errorDiv = this.closest('.mb-3, .mb-4')?.querySelector('.text-danger');
+                if (errorDiv) errorDiv.textContent = '';
+            });
+        });
+
+        document.querySelectorAll('#editFlightForm select').forEach(select => {
+            select.addEventListener('change', function() {
+                const errorDiv = this.closest('.mb-3, .mb-4')?.querySelector('.text-danger');
+                if (errorDiv) errorDiv.textContent = '';
+            });
+        });
+
 
         // ── AEROPORTI ──
         function openCreateAirportModal() {

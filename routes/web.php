@@ -53,6 +53,10 @@ Route::get('/admin/users', [AdminController::class, 'users'])
     ->middleware(['auth', 'is_admin'])
     ->name('admin.users');
 
+Route::get('/admin/users/data', [AdminController::class, 'usersData'])->middleware(['auth', 'is_admin'])->name('admin.users.data');
+Route::get('/admin/flights/data', [AdminController::class, 'flightsData'])->middleware(['auth', 'is_admin'])->name('admin.flights.data');
+Route::get('/admin/airports/data', [AdminController::class, 'airportsData'])->middleware(['auth', 'is_admin'])->name('admin.airports.data');
+
 Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])
     ->middleware(['auth', 'is_admin'])
     ->name('admin.users.delete');
@@ -149,6 +153,4 @@ Route::view('/terms', 'terms')->name('terms');
 
 Route::view('/about', 'about')->name('about');
 
-Route::get('/admin/users/data', [AdminController::class, 'usersData'])->middleware(['auth', 'is_admin'])->name('admin.users.data');
-Route::get('/admin/flights/data', [AdminController::class, 'flightsData'])->middleware(['auth', 'is_admin'])->name('admin.flights.data');
-Route::get('/admin/airports/data', [AdminController::class, 'airportsData'])->middleware(['auth', 'is_admin'])->name('admin.airports.data');
+

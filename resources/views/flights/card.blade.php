@@ -9,92 +9,137 @@ Carbon::setLocale('it');
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Monitoraggio Volo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="{{ asset('css/flights/show_card.css') }}" rel="stylesheet">
     <link href="{{ asset('css/main-content.css') }}" rel="stylesheet">
-
-
-    <!-- Font Awesome 5 -->
+    <link href="{{ asset('css/flights/show_card.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
 </head>
-<body>
+<body class="page-flight-monitor">
 @include("navbar")
-<main class="main-content">
-    <div class="container flight-monitor mt-5">
-        <h2 class="text-center mb-4">Monitoraggio Volo</h2>
 
-        <div class="map-container">
-            @php
-                $diffInMinutes = Carbon::now()->diffInMinutes($flight->departure_time, false);
-            @endphp
+@php
+    $diffInMinutes = Carbon::now()->diffInMinutes($flight->departure_time, false);
+@endphp
 
-            @if ($diffInMinutes > 120)
-                <div class="alert alert-info text-center" role="alert">
-                    Il monitoraggio sarà disponibile solo nelle 2 ore precedenti alla partenza del volo.
-                </div>
-            @else
-                <div class="card shadow-sm p-4 mb-4 position-relative">
-                    @auth
-                        @if(! auth()->user()->is_admin)
-                            <div class="position-absolute" style="top:10px; right:10px;">
-                                <i id="starIcon" class="fa-star {{ $flight->isPreferito() ? 'fas' : 'far' }}"></i>
-                            </div>
-                        @endif
-                    @endauth
+<div class="flight-layout">
 
-                    <div class="row align-items-center">
-                        <div class="col-md-4 text-center">
-                            <img src="/{{ $flight->airplaneModel->image_path }}"
-                                 alt="{{ $flight->airplaneModel->name }}"
-                                 class="airplane-image mb-3">
-                            <h5>{{ $flight->airplaneModel->name }}</h5>
-                        </div>
-
-                        <div class="col-md-8">
-                            <div class="info-block mb-3">
-                                <strong>Partenza:</strong> {{ $flight->departureAirport->city }}
-                                – {{ Carbon::parse($flight->departure_time)->translatedFormat('j M Y, H:i') }}<br>
-                                <strong>Arrivo:</strong> {{ $flight->arrivalAirport->city }}
-                                – {{ Carbon::parse($flight->arrival_time)->translatedFormat('j M Y, H:i') }}
-                            </div>
-
-                            <div class="info-block mb-2">
-                                <strong>Coordinate attuali:</strong> <span id="current-coordinates">-- / --</span><br>
-                                <strong>Velocità attuale:</strong> <span id="current-speed">-- km/h</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="progress my-4 position-relative" style="height: 25px;">
-                    <!-- Testo centrato sopra la barra -->
-                    <span id="progress-label" class="position-absolute w-100 text-center fw-bold"
-                          style="z-index: 1; line-height: 25px;">
-        0%
-    </span>
-                    <!-- La barra vera e propria -->
-                    <div id="progress-bar" class="progress-bar bg-warning text-dark" role="progressbar"
-                         style="width: 0%;">
-                    </div>
-                </div>
-
-                <!-- Mappa Google -->
-                <div id="map" style="height: 500px; width: 100%; border-radius: 10px;"></div>
-
-            @endif
+    <!-- ── PANNELLO SINISTRO ── -->
+    <aside class="flight-panel">
+        <div class="panel-header">
+            <div class="flight-badge">
+                @if($diffInMinutes <= 0 && $diffInMinutes > -($flight->departure_time->diffInMinutes($flight->arrival_time)))
+                    <div class="pulse-dot"></div> IN VOLO
+                @elseif($diffInMinutes > 0)
+                    <div class="pulse-dot pulse-dot--cyan"></div> IN PARTENZA
+                @else
+                    ATTERRATO
+                @endif
+            </div>
+            <h1>Monitoraggio <span>Volo</span></h1>
         </div>
+
+        <!-- Aereo -->
+        <div class="airplane-card">
+            @auth
+                @if(! auth()->user()->is_admin)
+                    <button class="star-btn">
+                        <i id="starIcon" class="fa-star {{ $flight->isPreferito() ? 'fas' : 'far' }}"></i>
+                    </button>
+                @endif
+            @endauth
+
+            <div class="airplane-img-wrap">
+                <img src="/{{ $flight->airplaneModel->image_path }}" alt="{{ $flight->airplaneModel->name }}">
+            </div>
+            <div class="airplane-info">
+                <h3>{{ $flight->airplaneModel->name }}</h3>
+                <p>AEROMOBILE</p>
+            </div>
+        </div>
+
+        <!-- Rotta -->
+        <div class="route-section">
+            <p class="section-label">Rotta</p>
+            <div class="route-row">
+                <div class="route-airport">
+                    <span class="city">{{ $flight->departureAirport->city }}</span>
+                    <span class="time">{{ Carbon::parse($flight->departure_time)->translatedFormat('j M, H:i') }}</span>
+                </div>
+                <div class="route-divider">
+                    <div class="dot"></div>
+                    <div class="line"></div>
+                    <i class="fas fa-plane"></i>
+                    <div class="line"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="route-airport text-end">
+                    <span class="city">{{ $flight->arrivalAirport->city }}</span>
+                    <span class="time">{{ Carbon::parse($flight->arrival_time)->translatedFormat('j M, H:i') }}</span>
+                </div>
+            </div>
+        </div>
+
+        @if($diffInMinutes > 120)
+            <!-- In attesa -->
+            <div class="waiting-panel">
+                <div class="waiting-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Monitoraggio non disponibile</h3>
+                <p>Il monitoraggio sarà attivo nelle 2 ore precedenti alla partenza del volo.</p>
+            </div>
+
+        @else
+            <!-- Progresso -->
+            <div class="progress-section">
+                <p class="section-label">Avanzamento volo</p>
+                <div class="progress-header">
+                    <span class="progress-city">{{ $flight->departureAirport->city }}</span>
+                    <span id="progress-pct" class="progress-pct">0%</span>
+                    <span class="progress-city">{{ $flight->arrivalAirport->city }}</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progress-bar" class="progress-fill" style="width:0%;"></div>
+                </div>
+            </div>
+
+            <!-- Dati live -->
+            <div class="live-section">
+                <p class="section-label">Dati in tempo reale</p>
+                <div class="live-grid">
+                    <div class="live-card cyan-accent">
+                        <p class="card-label">Coordinate</p>
+                        <p class="card-value cyan" id="current-coordinates">-- / --</p>
+                        <i class="fas fa-map-marker-alt card-icon"></i>
+                    </div>
+                    <div class="live-card amber-accent">
+                        <p class="card-label">Velocità</p>
+                        <p class="card-value amber" id="current-speed">-- km/h</p>
+                        <i class="fas fa-tachometer-alt card-icon"></i>
+                    </div>
+                </div>
+            </div>
+        @endif
+    </aside>
+
+    <!-- ── MAPPA ── -->
+    <div class="map-pane">
+        @if($diffInMinutes <= 120)
+            <div id="map"></div>
+        @else
+            <div class="map-unavailable">
+                <i class="fas fa-map"></i>
+                <p>MAPPA NON DISPONIBILE</p>
+            </div>
+        @endif
     </div>
-</main>
+
+</div>
+
 @include("footer")
 
 <script type="module">
-
     let map, overlay, route;
-    const currentFlightId = {{ $flight->id }};
 
     async function initMap() {
         await google.maps.importLibrary('maps');
@@ -103,43 +148,57 @@ Carbon::setLocale('it');
         const RotatableOverlay = module.default;
 
         map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 4,
+            zoom: 5,
             center: {lat: 48.0, lng: 10.0},
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             streetViewControl: false,
             fullscreenControl: false,
             mapTypeControl: false,
-            scaleControl: true,
+            scaleControl: false,
             zoomControl: true,
             gestureHandling: "greedy",
             minZoom: 2,
             styles: [
-                {featureType: "poi", stylers: [{visibility: "off"}]},
-                {featureType: "transit", stylers: [{visibility: "off"}]}
+                { elementType: "geometry", stylers: [{ color: "#1a2540" }] },
+                { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
+                { elementType: "labels.text.stroke", stylers: [{ color: "#0a0f1e" }] },
+                { featureType: "water", elementType: "geometry", stylers: [{ color: "#0d1b2a" }] },
+                { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#475569" }] },
+                { featureType: "road", elementType: "geometry", stylers: [{ color: "#253354" }] },
+                { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#1a2540" }] },
+                { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2d4068" }] },
+                { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#2d4068" }] },
+                { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
+                { featureType: "poi", stylers: [{ visibility: "off" }] },
+                { featureType: "transit", stylers: [{ visibility: "off" }] },
             ]
         });
 
-        // Coordinate di partenza/arrivo
         const startPoint = new google.maps.LatLng(
             {{ $flight->departureAirport->latitude }},
             {{ $flight->departureAirport->longitude }}
         );
-
         const endPoint = new google.maps.LatLng(
             {{ $flight->arrivalAirport->latitude }},
             {{ $flight->arrivalAirport->longitude }}
         );
 
-        // Heading
+        new google.maps.Marker({
+            position: startPoint, map,
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#f59e0b', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 },
+        });
+        new google.maps.Marker({
+            position: endPoint, map,
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#22d3ee', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 },
+        });
+
         const heading = spherical.computeHeading(startPoint, endPoint);
         const iconHeading = -45 + heading;
 
-        // Primo fetch per inizializzare posizione
         const data = await fetchFlightData();
         if (!data || data.progress === 1) return;
 
         const iniziale = new google.maps.LatLng(data.lat, data.lng);
-
         overlay = new RotatableOverlay(iniziale, '/images/plane-map-icon.svg', iconHeading);
         overlay.setMap(map);
 
@@ -149,25 +208,16 @@ Carbon::setLocale('it');
             strokeOpacity: 0,
             strokeWeight: 2,
             zIndex: 1,
-            icons: [{
-                icon: {path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4},
-                offset: '0',
-                repeat: '20px'
-            }],
-            map: map
+            icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#f59e0b', scale: 4 }, offset: '0', repeat: '20px' }],
+            map
         });
 
         map.panTo(iniziale);
 
-        // Animazione linea tratteggio
         let offset = 0;
         setInterval(() => {
             offset = (offset + 0.5) % 20;
-            route.set('icons', [{
-                icon: {path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#000', scale: 4},
-                offset: `${offset}px`,
-                repeat: '20px'
-            }]);
+            route.set('icons', [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#f59e0b', scale: 4 }, offset: `${offset}px`, repeat: '20px' }]);
         }, 100);
 
         await aggiornaPosizione();
@@ -182,16 +232,13 @@ Carbon::setLocale('it');
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 },
-                body: JSON.stringify({ids: [{{ $flight->id }}]}),
+                body: JSON.stringify({ ids: [{{ $flight->id }}] }),
             });
-
-            if (!res.ok) throw new Error(`Errore HTTP ${res.status}`);
-
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const allData = await res.json();
             return allData[{{ $flight->id }}] || null;
-
         } catch (err) {
-            console.error("Errore nel fetch dei dati volo:", err);
+            console.error("Errore fetch:", err);
             return null;
         }
     }
@@ -201,62 +248,45 @@ Carbon::setLocale('it');
             const data = await fetchFlightData();
             if (!data) return;
 
-            // Rimuovi overlay e rotta se il volo è concluso
             if (data.progress === 1) {
                 if (overlay) overlay.setMap(null);
                 if (route) route.setMap(null);
-                overlay = null;
-                route = null;
+                overlay = null; route = null;
                 return;
             }
 
-            const nuovaPosizione = new google.maps.LatLng(data.lat, data.lng);
-            overlay.setPosition(nuovaPosizione);
+            const pos = new google.maps.LatLng(data.lat, data.lng);
+            overlay.setPosition(pos);
 
-            document.getElementById("current-coordinates").innerText =
-                `${nuovaPosizione.lat().toFixed(2)} / ${nuovaPosizione.lng().toFixed(2)}`;
+            document.getElementById("current-coordinates").innerText = `${pos.lat().toFixed(2)}° / ${pos.lng().toFixed(2)}°`;
+            document.getElementById("current-speed").innerText = `${Math.round(data.speed)} km/h`;
 
-            document.getElementById("current-speed").innerText =
-                `${Math.round(data.speed)} km/h`;
-
-            const pb = document.getElementById("progress-bar");
-            const label = document.getElementById("progress-label");
             const percent = Math.round(data.progress * 100);
-
-            pb.style.width = `${percent}%`;
-            label.innerText = `${percent}%`;
-
-
+            document.getElementById("progress-bar").style.width = `${percent}%`;
+            document.getElementById("progress-pct").innerText = `${percent}%`;
         } catch (err) {
-            console.error("Errore aggiornamento posizione:", err);
+            console.error("Errore aggiornamento:", err);
         }
     }
 
     document.addEventListener("DOMContentLoaded", function () {
         const starIcon = document.getElementById("starIcon");
         if (starIcon) {
-            starIcon.addEventListener("click", togglePreferito);
+            starIcon.closest('button').addEventListener("click", togglePreferito);
         }
     });
 
     async function togglePreferito() {
         const starIcon = document.getElementById("starIcon");
         if (!starIcon) return;
-
         const isFavorito = starIcon.classList.contains("fas");
         const url = `{{ url('/flights/preferiti') }}/{{ $flight->id }}`;
-
         try {
             const response = await fetch(url, {
                 method: isFavorito ? "DELETE" : "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                }
+                headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" }
             });
-
             if (!response.ok) throw new Error();
-
             starIcon.classList.toggle("fas");
             starIcon.classList.toggle("far");
         } catch {
@@ -290,6 +320,5 @@ Carbon::setLocale('it');
         v: "weekly",
     });
 </script>
-
 </body>
 </html>

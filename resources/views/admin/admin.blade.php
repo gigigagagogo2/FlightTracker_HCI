@@ -1090,12 +1090,11 @@
             }).join('');
 
             container.innerHTML = `
-    <div class="d-flex align-items-center justify-content-between px-3 py-2"
-         style="border-top: 1px solid #e3e8ef;">
+    <div class="d-flex align-items-center px-3 py-3" style="position: relative;">
         <span class="text-muted small">
             Totale: <strong>${total}</strong> record
         </span>
-        <div class="d-flex align-items-center gap-1">
+        <div class="d-flex align-items-center gap-1" style="position: absolute; left: 50%; transform: translateX(-50%);">
             <button class="btn btn-sm"
                 style="border-radius: 0.5rem; background: #f1f5f9; color: #475569; border: none;"
                 ${currentPage <= 1 ? 'disabled' : ''}

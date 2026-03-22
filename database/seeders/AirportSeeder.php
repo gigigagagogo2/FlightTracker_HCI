@@ -16,6 +16,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Italia',
                 'latitude' => 45.630604,
                 'longitude' => 8.728111,
+                'image_path' => 'images/city/milano_malpensa.jpg',
             ],
             [
                 'name' => 'Aeroporto di Roma Fiumicino',
@@ -23,6 +24,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Italia',
                 'latitude' => 41.800278,
                 'longitude' => 12.238889,
+                'image_path' => 'images/city/roma_fiumicino.jpg',
             ],
             [
                 'name' => 'Aeroporto di Venezia Marco Polo',
@@ -30,6 +32,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Italia',
                 'latitude' => 45.505278,
                 'longitude' => 12.351944,
+                'image_path' => 'images/city/venezia_marco_polo.jpg',
             ],
             [
                 'name' => 'Aeroporto Internazionale di Tirana',
@@ -37,6 +40,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Albania',
                 'latitude' => 41.414700,
                 'longitude' => 19.720600,
+                'image_path' => 'images/city/albania_tirana.jpg',
             ],
             [
                 'name' => 'Aeroporto Charles de Gaulle',
@@ -44,6 +48,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Francia',
                 'latitude' => 49.009690,
                 'longitude' => 2.547925,
+                'image_path' => 'images/city/parigi_charles.jpg',
             ],
             [
                 'name' => 'Aeroporto di Francoforte',
@@ -51,6 +56,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Germania',
                 'latitude' => 50.033333,
                 'longitude' => 8.570556,
+                'image_path' => 'images/city/germania_francoforte.jpg',
             ],
             [
                 'name' => 'Aeroporto di Zurigo',
@@ -58,6 +64,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Svizzera',
                 'latitude' => 47.464722,
                 'longitude' => 8.549167,
+                'image_path' => 'images/city/svizzera_zurigo.jpg',
             ],
             [
                 'name' => 'Aeroporto di Vienna',
@@ -65,6 +72,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Austria',
                 'latitude' => 48.110278,
                 'longitude' => 16.569722,
+                'image_path' => 'images/city/austria_vienna.jpg',
             ],
             [
                 'name' => 'Aeroporto di Amsterdam Schiphol',
@@ -72,6 +80,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Paesi Bassi',
                 'latitude' => 52.308613,
                 'longitude' => 4.763889,
+                'image_path' => 'images/city/paesi_bassi_amsterdam.jpg',
             ],
             [
                 'name' => 'Aeroporto di Madrid-Barajas',
@@ -79,6 +88,7 @@ class AirportSeeder extends Seeder
                 'country' => 'Spagna',
                 'latitude' => 40.472222,
                 'longitude' => -3.560833,
+                'image_path' => 'images/city/spagna_madrid.jpg',
             ],
         ];
 

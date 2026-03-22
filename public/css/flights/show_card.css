@@ -1,61 +1,639 @@
-.flight-monitor {
-    max-width: 900px;
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+:root {
+    --navy: #0a0f1e;
+    --navy-mid: #111827;
+    --navy-light: #1a2540;
+    --amber: #f59e0b;
+    --amber-glow: rgba(245,158,11,0.15);
+    --amber-soft: #fbbf24;
+    --cyan: #22d3ee;
+    --cyan-glow: rgba(34,211,238,0.12);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
+    --border: rgba(255,255,255,0.07);
+    --glass: rgba(255,255,255,0.04);
 }
 
-.airplane-image {
-    width: 100%;
-    max-width: 220px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--navy);
+    color: var(--text-primary);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
 }
 
-.info-block {
-    font-size: 1.1rem;
-    line-height: 1.6;
+/* ── LAYOUT PRINCIPALE ── */
+.flight-layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    align-items: stretch;
 }
 
-.card {
-    border: 1px solid #ddd;
+/* Rimuove il margin-top del footer che crea lo spazio bianco */
+body.page-flight-monitor .site-footer {
+    margin-top: 0;
+}
+
+/* ── PANNELLO SINISTRO ── */
+.flight-panel {
+    background: var(--navy-mid);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative;
+    min-height: calc(100vh - 60px);
+}
+
+.flight-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amber), var(--cyan));
+}
+
+.panel-header {
+    padding: 2rem 1.75rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-header .flight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--amber-glow);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: var(--amber);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.3rem 0.75rem;
+    border-radius: 2rem;
+    margin-bottom: 1rem;
+}
+
+.pulse-dot {
+    width: 6px; height: 6px;
+    background: var(--amber);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.panel-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.panel-header h1 span {
+    color: var(--amber);
+}
+
+/* ── AIRPLANE CARD ── */
+.airplane-card {
+    margin: 1.5rem 1.75rem;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.airplane-card::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, var(--amber-glow) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.airplane-img-wrap {
+    flex-shrink: 0;
+    width: 90px; height: 70px;
+    background: rgba(255,255,255,0.05);
     border-radius: 10px;
-    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-#current-coordinates,
-#current-speed {
-    color: #0d6efd;
-    font-weight: 600;
+.airplane-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.airplane-info h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.2rem;
+}
+
+.airplane-info p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+}
+
+/* ── STAR ICON ── */
+.star-btn {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    z-index: 2;
 }
 
 #starIcon {
-    transition: transform 0.3s ease, color 0.3s ease;
-    font-size: 1.2rem;        /* Stella più piccola */
-    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    transition: color 0.2s, transform 0.2s;
 }
 
-/* outline (non preferito): solo contorno di stella giallo */
-#starIcon.far.fa-star {
-    color: gold;
-    background-color: transparent;
-    border: none;
+#starIcon.fas { color: var(--amber); }
+#starIcon:hover { transform: scale(1.2); }
+
+/* ── ROUTE INFO ── */
+.route-section {
+    padding: 0 1.75rem;
+    margin-bottom: 1.5rem;
 }
 
-
-/* solid (preferito): stella piena gialla, senza bordo */
-#starIcon.fas.fa-star {
-    color: gold;
-    background-color: transparent;
-    border: none;
+.section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
 }
 
-#starIcon:hover {
-    transform: scale(1.1);
+.route-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
 }
-.map-container {
-    background-color: #fff;
-    padding: 24px;
+
+.route-airport {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.route-airport .city {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.route-airport .time {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.1rem;
+}
+
+.route-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    flex-shrink: 0;
+}
+
+.route-divider .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1px solid var(--text-muted);
+}
+
+.route-divider .line {
+    width: 1px;
+    height: 20px;
+    background: var(--text-muted);
+    opacity: 0.4;
+}
+
+.route-divider i {
+    color: var(--amber);
+    font-size: 0.85rem;
+    transform: rotate(90deg);
+}
+
+/* ── PROGRESS ── */
+.progress-section {
+    padding: 0 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.progress-track {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber), var(--amber-soft));
+    border-radius: 99px;
+    transition: width 1s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    to { left: 200%; }
+}
+
+/* ── LIVE DATA ── */
+.live-section {
+    padding: 0 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.live-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.live-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    margin-top: 40px;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
 }
 
+.live-card.cyan-accent {
+    border-color: rgba(34,211,238,0.2);
+}
 
+.live-card.cyan-accent::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--cyan);
+}
+
+.live-card.amber-accent {
+    border-color: rgba(245,158,11,0.2);
+}
+
+.live-card.amber-accent::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--amber);
+}
+
+.live-card .card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+}
+
+.live-card .card-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.live-card .card-value.cyan { color: var(--cyan); }
+.live-card .card-value.amber { color: var(--amber); }
+
+.live-card .card-icon {
+    position: absolute;
+    bottom: 0.75rem; right: 0.75rem;
+    font-size: 1.5rem;
+    opacity: 0.06;
+}
+
+/* ── WAITING PANEL ── */
+.waiting-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.75rem;
+    text-align: center;
+}
+
+.waiting-icon {
+    width: 64px; height: 64px;
+    background: var(--amber-glow);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--amber);
+    margin-bottom: 1.25rem;
+}
+
+.waiting-panel h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.waiting-panel p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ── MAPPA ── */
+.map-pane {
+    position: relative;
+    background: #0d1117;
+    min-height: calc(100vh - 70px);
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    min-height: calc(100vh - 70px);
+}
+
+/* ── PROGRESS HELPER CLASSES ── */
+.progress-city {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.progress-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--amber);
+}
+
+/* ── PULSE DOT CYAN VARIANT ── */
+.pulse-dot--cyan {
+    background: var(--cyan) !important;
+}
+
+/* ── MAP UNAVAILABLE ── */
+.map-unavailable {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    opacity: 0.15;
+}
+
+.map-unavailable i {
+    font-size: 4rem;
+}
+
+.map-unavailable p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 900px) {
+
+    /* Layout occupa tutto il viewport meno la navbar */
+    .flight-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 260px;
+        height: calc(100vh - 70px);
+        min-height: unset;
+    }
+
+    /* Mappa in cima, prende 1fr */
+    .map-pane {
+        order: -1;
+        min-height: 0;
+        height: 100%;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+        min-height: unset;
+    }
+
+    /* Pannello info sotto, altezza fissa 260px */
+    .flight-panel {
+        order: 1;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        overflow-y: auto;
+        height: 260px;
+        min-height: unset;
+    }
+
+    /* Gradient bar in cima alla mappa */
+    .flight-panel::before {
+        display: none;
+    }
+
+    .map-pane::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--amber), var(--cyan));
+        z-index: 10;
+    }
+
+    /* Header: badge + titolo su una riga */
+    .panel-header {
+        padding: 0.6rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .panel-header .flight-badge {
+        margin-bottom: 0;
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 0.6rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    .panel-header h1 {
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    /* Airplane card compatta */
+    .airplane-card {
+        margin: 0.6rem 1rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 10px;
+    }
+
+    .airplane-img-wrap {
+        width: 46px;
+        height: 36px;
+        border-radius: 6px;
+    }
+
+    .airplane-info h3 {
+        font-size: 0.8rem;
+        margin-bottom: 0.05rem;
+    }
+
+    .airplane-info p {
+        font-size: 0.6rem;
+    }
+
+    /* Rotta compatta */
+    .route-section {
+        padding: 0 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .section-label {
+        font-size: 0.55rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .route-airport .city {
+        font-size: 0.85rem;
+    }
+
+    .route-airport .time {
+        font-size: 0.6rem;
+    }
+
+    .route-divider .line {
+        height: 10px;
+    }
+
+    .route-divider i {
+        font-size: 0.75rem;
+    }
+
+    /* Progress compatta */
+    .progress-section {
+        padding: 0 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .progress-header {
+        margin-bottom: 0.3rem;
+    }
+
+    .progress-track {
+        height: 4px;
+    }
+
+    .progress-city {
+        font-size: 0.6rem;
+    }
+
+    .progress-pct {
+        font-size: 0.65rem;
+    }
+
+    /* Live cards compatte */
+    .live-section {
+        padding: 0 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .live-grid {
+        gap: 0.4rem;
+    }
+
+    .live-card {
+        padding: 0.4rem 0.6rem;
+        border-radius: 8px;
+    }
+
+    .live-card .card-label {
+        font-size: 0.5rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .live-card .card-value {
+        font-size: 0.75rem;
+    }
+
+    .live-card .card-icon {
+        display: none;
+    }
+
+    /* Waiting panel compatto */
+    .waiting-panel {
+        padding: 0.75rem 1rem;
+    }
+
+    .waiting-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .waiting-panel h3 {
+        font-size: 0.8rem;
+    }
+
+    .waiting-panel p {
+        font-size: 0.7rem;
+    }
+}

@@ -1,23 +1,22 @@
-/* Footer */
 .site-footer {
-    flex: 0 0 80px;
     width: 100%;
-    background-color: #f8f9fa;
+    background-color: #060b14;
     padding: 2rem 1rem;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid rgba(255,255,255,0.07);
     text-align: center;
     font-size: 0.95rem;
-    color: #555;
-    margin-top: 10rem;
+    color: #475569;
+    margin-top: 0;
 }
 
 .site-footer a {
-    color: #0d6efd;
+    color: #94a3b8;
     text-decoration: none;
 }
 
 .site-footer a:hover {
-    text-decoration: underline;
+    color: #f59e0b;
+    text-decoration: none;
 }
 
 .footer-content p {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Flight;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -11,7 +12,6 @@ class HomeController extends Controller
     {
         $now = Carbon::now();
 
-        // Voli popolari scelti a caso
         $popolari = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])
             ->where('departure_time', '<=', $now)
             ->where('arrival_time', '>=', $now)
@@ -19,17 +19,26 @@ class HomeController extends Controller
             ->limit(9)
             ->get();
 
-        // Voli vicino a te (id aeroporto 1 o 3)
-        $vicino = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])
-            ->where('departure_time', '<=', $now)
-            ->where('arrival_time', '>=', $now)
-            ->inRandomOrder()
-            ->limit(6)
-            ->get();
-
         return view('home', [
             'popolari' => $popolari,
-            'vicino' => $vicino,
         ]);
+    }
+
+    public function vicino(Request $request)
+    {
+        $paese = $request->input('paese');
+        $now = Carbon::now();
+
+        $flights = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])
+            ->where('departure_time', '<=', $now)
+            ->where('arrival_time', '>=', $now)
+            ->where(function($q) use ($paese) {
+                $q->whereHas('departureAirport', fn($s) => $s->where('country', $paese))
+                    ->orWhereHas('arrivalAirport', fn($s) => $s->where('country', $paese));
+            })
+            ->limit(9)
+            ->get();
+
+        return response()->json($flights);
     }
 }

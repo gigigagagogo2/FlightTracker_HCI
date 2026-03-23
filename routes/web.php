@@ -73,6 +73,8 @@ Route::get('/admin/flights', [AdminController::class, 'flights'])
     ->middleware(['auth', 'is_admin'])
     ->name('admin.flights');
 
+Route::get('/flights/vicino', [HomeController::class, 'vicino'])->name('flights.vicino');
+
 Route::get('/admin/flights/create', [AdminController::class, 'createFlight'])
     ->middleware(['auth', 'is_admin'])
     ->name('admin.flights.create');

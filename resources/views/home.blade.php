@@ -41,7 +41,6 @@
             </h1>
             <p class="hero-subtitle" id="hero-subtitle">Monitoraggio live, coordinate, velocità e rotta. Sempre aggiornato.</p>
 
-            <!-- Search -->
             <form action="#" method="GET" class="search-form" id="search-form">
                 <div class="search-container">
                     <i class="bi bi-search search-icon-inner"></i>
@@ -51,7 +50,6 @@
                 </div>
             </form>
 
-            <!-- Filtri -->
             <div class="filter-bar" id="filter-bar">
                 <button class="filter-pill" id="btn-in-arrivo">
                     <i class="bi bi-airplane-engines-fill"></i> In arrivo
@@ -73,7 +71,7 @@
     <!-- ── STATS BAR ── -->
     <div class="stats-bar" id="stats-bar">
         <div class="stat-item">
-            <span class="stat-value stat-value--amber">{{ $popolari->count() + $vicino->count() }}</span>
+            <span class="stat-value stat-value--amber" id="stat-voli-attivi">{{ $popolari->count() }}</span>
             <span class="stat-label">Voli attivi</span>
         </div>
         <div class="stat-divider"></div>
@@ -99,8 +97,11 @@
                     <h2 class="section-title">Voli popolari</h2>
                 </div>
             </div>
-            <div class="carousel-wrapper">
-                <button class="carousel-btn carousel-btn--prev" id="carousel-prev">
+            <p id="popolari-no-results" class="no-results" style="display:none;">
+                Nessun volo popolare disponibile al momento.
+            </p>
+            <div class="carousel-wrapper" id="carousel-wrapper-popolari">
+                <button class="carousel-btn" id="carousel-prev">
                     <i class="bi bi-chevron-left"></i>
                 </button>
                 <div class="flights-grid" id="grid-popolari">
@@ -123,7 +124,7 @@
                             <div class="flight-card-body">
                                 <div class="flight-card-route">
                                     {{ $flight->departureAirport->name }}
-                                    <i class="bi bi-arrow-right"></i>
+                                    <i class="bi bi-arrow-right flex-shrink-0"></i>
                                     {{ $flight->arrivalAirport->name }}
                                 </div>
                                 <div class="flight-card-meta">
@@ -133,60 +134,39 @@
                         </a>
                     @endforeach
                 </div>
-                <button class="carousel-btn carousel-btn--next" id="carousel-next">
+                <button class="carousel-btn" id="carousel-next">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </div>
         </section>
 
-        <!-- Voli Vicino a Te -->
-        <section class="flights-section">
+        <!-- Voli Vicino a Te — popolati dinamicamente via JS -->
+        <section class="flights-section" id="section-vicino">
             <div class="section-header">
                 <div>
                     <p class="section-eyebrow">Basato sulla tua posizione</p>
                     <h2 class="section-title">Voli vicino a te</h2>
                 </div>
             </div>
+
+            <!-- Stato di caricamento -->
+            <div id="vicino-loading" class="vicino-loading">
+                <span class="pulse-dot" style="background:var(--cyan);"></span>
+                <span>Rilevamento posizione...</span>
+            </div>
+
+            <!-- Messaggio nessun volo -->
             <p id="vicino-no-results" class="no-results" style="display:none;">
                 Nessun volo disponibile nel tuo paese al momento.
             </p>
-            <div class="carousel-wrapper">
-                <button class="carousel-btn carousel-btn--prev" id="carousel-vicino-prev">
+
+            <!-- Carousel (nascosto finché non arrivano i dati) -->
+            <div class="carousel-wrapper" id="carousel-wrapper-vicino" style="display:none;">
+                <button class="carousel-btn" id="carousel-vicino-prev">
                     <i class="bi bi-chevron-left"></i>
                 </button>
-                <div class="flights-grid" id="grid-vicino">
-                    @foreach($vicino as $flight)
-                        <a href="/flights/{{ $flight->id }}" class="flight-card-new"
-                           data-dep-country="{{ $flight->departureAirport->country }}"
-                           data-arr-country="{{ $flight->arrivalAirport->country }}">
-                            <div class="flight-card-map">
-                                <div class="flight-card-photos">
-                                    <div class="photo-left"
-                                         style="background-image: url('/{{ $flight->departureAirport->image_path ?? 'images/airport-placeholder.jpg' }}')">
-                                    </div>
-                                    <div class="photo-right"
-                                         style="background-image: url('/{{ $flight->arrivalAirport->image_path ?? 'images/airport-placeholder.jpg' }}')">
-                                    </div>
-                                    <div class="photo-diagonal"></div>
-                                </div>
-                                <div class="flight-card-badge flight-card-badge--live">
-                                    <span class="badge-dot"></span> In volo
-                                </div>
-                            </div>
-                            <div class="flight-card-body">
-                                <div class="flight-card-route">
-                                    {{ $flight->departureAirport->name }}
-                                    <i class="bi bi-arrow-right"></i>
-                                    {{ $flight->arrivalAirport->name }}
-                                </div>
-                                <div class="flight-card-meta">
-                                    <span class="flight-card-model">{{ $flight->airplaneModel->name }}</span>
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-                <button class="carousel-btn carousel-btn--next" id="carousel-vicino-next">
+                <div class="flights-grid" id="grid-vicino"></div>
+                <button class="carousel-btn" id="carousel-vicino-next">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </div>
@@ -202,92 +182,52 @@
 @include('footer')
 
 <script>
-    // ── IP GEOLOCATION ──
-    let vinoCards = []; // riferimento globale
-
-    // ── IP GEOLOCATION ──
-    (async () => {
-        try {
-            const res = await fetch('https://ipapi.co/json/');
-
-            const data = await res.json();
-
-            const codice = data.country_code || '';
-
-            // Converti il codice ISO in nome italiano tramite API nativa del browser
-            let paese = '';
-            if (codice) {
-                try {
-                    const displayNames = new Intl.DisplayNames(['it'], { type: 'region' });
-                    paese = displayNames.of(codice) || data.country_name || '';
-                } catch(e) {
-                    paese = data.country_name || '';
-                }
-            }
-
-            const flag = codice
-                ? [...codice.toUpperCase()].map(c =>
-                    String.fromCodePoint(0x1F1E6 - 65 + c.charCodeAt(0))
-                ).join('')
-                : '';
-
-            document.getElementById('paese-flag').textContent = flag;
-            document.getElementById('paese-label').textContent = paese || 'Paese';
-            document.getElementById('btn-paese').dataset.country = paese;
-
-            filterVicinoPaese(paese);
-
-            filtri.inPaese = volo => {
-                const c1 = (volo.departure_airport?.country || '').toLowerCase();
-                const c2 = (volo.arrival_airport?.country || '').toLowerCase();
-                const target = paese.toLowerCase();
-                return c1.includes(target) || c2.includes(target);
-            };
-        } catch(e) {
-            document.getElementById('paese-label').textContent = 'Paese';
-        }
-    })();
-
-    function filterVicinoPaese(paese) {
-        const grid = document.getElementById('grid-vicino');
-        const noResults = document.getElementById('vicino-no-results');
-        const carouselWrapper = document.querySelector('#grid-vicino').closest('.carousel-wrapper');
-        const allCards = Array.from(grid.querySelectorAll('.flight-card-new'));
-
-        if (!paese) return;
-
-        const target = paese.toLowerCase();
-        const filtered = allCards.filter(card => {
-            const dep = (card.dataset.depCountry || '').toLowerCase();
-            const arr = (card.dataset.arrCountry || '').toLowerCase();
-            return dep.includes(target) || arr.includes(target);
-        });
-
-        allCards.forEach(c => c.style.display = 'none');
-
-        if (filtered.length === 0) {
-            carouselWrapper.style.display = 'none';
-            noResults.style.display = 'block';
-        } else {
-            carouselWrapper.style.display = 'flex';
-            noResults.style.display = 'none';
-
-            // Se meno di 3 card centra la griglia
-            if (filtered.length < 3) {
-                grid.style.gridTemplateColumns = `repeat(${filtered.length}, minmax(0, 280px))`;
-                grid.style.justifyContent = 'center';
-            } else {
-                grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-                grid.style.justifyContent = '';
-            }
-
-            initCarouselCards(filtered, 'carousel-vicino-prev', 'carousel-vicino-next');
-        }
+    // ── HELPERS ──
+    function getFlag(countryCode) {
+        if (!countryCode || countryCode.length !== 2) return '';
+        return [...countryCode.toUpperCase()]
+            .map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65))
+            .join('');
     }
 
-    function initCarouselCards(cards, prevId, nextId) {
+    function buildFlightCard(flight) {
+        const depImg = flight.departure_airport.image_path
+            ? '/' + flight.departure_airport.image_path
+            : '/images/airport-placeholder.jpg';
+        const arrImg = flight.arrival_airport.image_path
+            ? '/' + flight.arrival_airport.image_path
+            : '/images/airport-placeholder.jpg';
+
+        return `
+        <a href="/flights/${flight.id}" class="flight-card-new">
+            <div class="flight-card-map">
+                <div class="flight-card-photos">
+                    <div class="photo-left" style="background-image: url('${depImg}')"></div>
+                    <div class="photo-right" style="background-image: url('${arrImg}')"></div>
+                    <div class="photo-diagonal"></div>
+                </div>
+                <div class="flight-card-badge flight-card-badge--live">
+                    <span class="badge-dot"></span> In volo
+                </div>
+            </div>
+            <div class="flight-card-body">
+                <div class="flight-card-route">
+                    ${flight.departure_airport.name}
+                    <i class="bi bi-arrow-right flex-shrink-0"></i>
+                    ${flight.arrival_airport.name}
+                </div>
+                <div class="flight-card-meta">
+                    <span class="flight-card-model">${flight.airplane_model.name}</span>
+                </div>
+            </div>
+        </a>`;
+    }
+
+    // ── CAROUSEL ──
+    function initCarouselCards(cards, prevId, nextId, gridId) {
         const btnPrev = document.getElementById(prevId);
         const btnNext = document.getElementById(nextId);
+        const grid = gridId ? document.getElementById(gridId) : null;
         if (!btnPrev || !btnNext || cards.length === 0) return;
 
         const perPage = 3;
@@ -295,29 +235,127 @@
         const totalPages = Math.ceil(cards.length / perPage);
 
         function renderPage(page) {
-            cards.forEach((card, i) => {
-                card.style.display = (i >= page * perPage && i < (page + 1) * perPage)
-                    ? 'block' : 'none';
-            });
-            btnPrev.disabled = page === 0;
-            btnNext.disabled = page >= totalPages - 1;
+            const visible = cards.slice(page * perPage, (page + 1) * perPage);
+            cards.forEach(c => c.style.display = 'none');
+            visible.forEach(c => c.style.display = 'block');
+
+            if (grid) {
+                if (visible.length < 3) {
+                    grid.style.gridTemplateColumns = `repeat(${visible.length}, minmax(0, 280px))`;
+                    grid.style.justifyContent = 'center';
+                } else {
+                    grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                    grid.style.justifyContent = '';
+                }
+            }
+
+            document.getElementById(prevId).disabled = page === 0;
+            document.getElementById(nextId).disabled = page >= totalPages - 1;
         }
 
-        btnPrev.addEventListener('click', () => { if (currentPage > 0) renderPage(--currentPage); });
-        btnNext.addEventListener('click', () => { if (currentPage < totalPages - 1) renderPage(++currentPage); });
+        const newPrev = btnPrev.cloneNode(true);
+        const newNext = btnNext.cloneNode(true);
+        btnPrev.parentNode.replaceChild(newPrev, btnPrev);
+        btnNext.parentNode.replaceChild(newNext, btnNext);
+
+        newPrev.addEventListener('click', () => { if (currentPage > 0) { currentPage--; renderPage(currentPage); } });
+        newNext.addEventListener('click', () => { if (currentPage < totalPages - 1) { currentPage++; renderPage(currentPage); } });
 
         renderPage(0);
     }
 
-    function initCarousel(gridId, prevId, nextId) {
+    function initCarousel(gridId, prevId, nextId, noResultsId, wrapperId) {
         const grid = document.getElementById(gridId);
+        const noResults = noResultsId ? document.getElementById(noResultsId) : null;
+        const wrapper = wrapperId ? document.getElementById(wrapperId) : null;
         if (!grid) return;
+
         const cards = Array.from(grid.querySelectorAll('.flight-card-new'));
-        initCarouselCards(cards, prevId, nextId);
+
+        if (cards.length === 0) {
+            if (wrapper) wrapper.style.display = 'none';
+            if (noResults) noResults.style.display = 'block';
+            return;
+        }
+
+        initCarouselCards(cards, prevId, nextId, gridId);
     }
 
-    initCarousel('grid-popolari', 'carousel-prev', 'carousel-next');
-    // grid-vicino viene inizializzato dopo il filtro paese
+    initCarousel('grid-popolari', 'carousel-prev', 'carousel-next', 'popolari-no-results', 'carousel-wrapper-popolari');
+
+    // ── FILTRI ──
+    const filtri = {
+        inArrivoProssimi: v => v.arrival_time && Date.now() <= new Date(v.arrival_time).getTime() && new Date(v.arrival_time).getTime() <= Date.now() + 2*3600000,
+        inPartenzaProssimi: v => v.departure_time && Date.now() <= new Date(v.departure_time).getTime() && new Date(v.departure_time).getTime() <= Date.now() + 2*3600000,
+        atterrati: v => v.status === "red",
+        inPaese: () => false,
+    };
+
+    // ── IP GEOLOCATION + CARICAMENTO VOLI VICINO ──
+    (async () => {
+        const loading = document.getElementById('vicino-loading');
+        const noResults = document.getElementById('vicino-no-results');
+        const wrapper = document.getElementById('carousel-wrapper-vicino');
+        const grid = document.getElementById('grid-vicino');
+        
+        try {
+            const res = await fetch('https://ipapi.co/json/?token={{ env('IPAPI_API') }}');
+            const data = await res.json();
+            const codice = data.country_code || '';
+
+            if (!codice) {
+                loading.style.display = 'none';
+                document.getElementById('paese-flag').textContent = '⚠️';
+                document.getElementById('paese-label').textContent = 'Posizione non rilevata';
+                document.getElementById('btn-paese').title = 'Non è stato possibile rilevare il paese di connessione';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            let paese = '';
+            try {
+                paese = new Intl.DisplayNames(['it'], { type: 'region' }).of(codice) || data.country_name || '';
+            } catch(e) {
+                paese = data.country_name || '';
+            }
+
+            document.getElementById('paese-flag').textContent = getFlag(codice);
+            document.getElementById('paese-label').textContent = paese || 'Paese';
+            document.getElementById('btn-paese').dataset.country = paese;
+
+            filtri.inPaese = volo => {
+                const c1 = (volo.departure_airport?.country || '').toLowerCase();
+                const c2 = (volo.arrival_airport?.country || '').toLowerCase();
+                return c1.includes(paese.toLowerCase()) || c2.includes(paese.toLowerCase());
+            };
+
+            // Carica voli vicino a te tramite endpoint dedicato
+            const vinoRes = await fetch(`/flights/vicino?paese=${encodeURIComponent(paese)}`);
+            const flights = await vinoRes.json();
+
+            loading.style.display = 'none';
+
+            if (!flights || flights.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+
+            // Popola la griglia con le card
+            grid.innerHTML = flights.map(f => buildFlightCard(f)).join('');
+
+            wrapper.style.display = 'flex';
+
+            const cards = Array.from(grid.querySelectorAll('.flight-card-new'));
+            initCarouselCards(cards, 'carousel-vicino-prev', 'carousel-vicino-next', 'grid-vicino');
+
+        } catch(e) {
+            loading.style.display = 'none';
+            document.getElementById('paese-flag').textContent = '⚠️';
+            document.getElementById('paese-label').textContent = 'Posizione non rilevata';
+            document.getElementById('btn-paese').title = 'Non è stato possibile rilevare il paese di connessione';
+            noResults.style.display = 'block';
+        }
+    })();
 
     // ── SEARCH LOGIC ──
     const input = document.getElementById("search-input");
@@ -329,10 +367,10 @@
     const heroBadge = document.querySelector(".hero-badge");
 
     const words = ["aeroporto", "città", "volo"];
-    let index = 0;
+    let wordIndex = 0;
     setInterval(() => {
-        index = (index + 1) % words.length;
-        input.setAttribute("placeholder", "Cerca " + words[index] + "...");
+        wordIndex = (wordIndex + 1) % words.length;
+        input.setAttribute("placeholder", "Cerca " + words[wordIndex] + "...");
     }, 3000);
 
     function disableSearch() {
@@ -350,6 +388,13 @@
         document.querySelectorAll(".filter-pill").forEach(b => b.classList.remove("selected"));
     }
 
+    const statusConfig = {
+        green:  { label: 'In volo',     borderColor: 'rgba(34,211,238,0.3)',  color: '#22d3ee', dotAnim: 'pulse-anim' },
+        yellow: { label: 'In partenza', borderColor: 'rgba(245,158,11,0.3)',  color: '#f59e0b', dotAnim: 'pulse-anim' },
+        red:    { label: 'Atterrato',   borderColor: 'rgba(239,68,68,0.3)',   color: '#ef4444', dotAnim: '' },
+        gray:   { label: 'Sconosciuto', borderColor: 'rgba(71,85,105,0.3)',   color: '#475569', dotAnim: '' },
+    };
+
     function showResults(data) {
         document.getElementById("search-section").classList.add("search-active");
         heroTitleText.style.display = "none";
@@ -361,14 +406,12 @@
 
         let filteredData = [...data];
         const activeBtn = document.querySelector(".filter-pill.selected");
-        const id = activeBtn?.id;
-
         const filtro = {
             "btn-in-arrivo": filtri.inArrivoProssimi,
             "btn-in-partenza": filtri.inPartenzaProssimi,
             "btn-atterrati": filtri.atterrati,
             "btn-paese": filtri.inPaese
-        }[id];
+        }[activeBtn?.id];
 
         if (filtro) {
             filteredData = filteredData.filter(filtro);
@@ -385,27 +428,31 @@
 
         filteredData.forEach(flight => {
             const statusClass = ['green','yellow','red'].includes(flight.status) ? flight.status : 'gray';
+            const cfg = statusConfig[statusClass];
             const card = document.createElement("div");
             card.className = "flight-card";
             card.addEventListener("click", () => window.location.href = `/flights/${flight.id}`);
             card.innerHTML = `
-                <div class="flight-card-content">
-                    <span class="status-dot ${statusClass}"></span>
-                    <img src="${flight.airplane_model.image_path}" alt="Aereo" class="airplane-image">
-                    <div class="flight-info">
-                        <h5 class="flight-route">
-                            ${flight.departure_airport.name}
-                            <span class="route-arrow"><i class="bi bi-airplane-fill"></i></span>
-                            ${flight.arrival_airport.name}
-                        </h5>
-                        <p class="flight-times">
-                            ${new Date(flight.departure_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
-                            <span class="arrow">→</span>
-                            ${new Date(flight.arrival_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
-                        </p>
-                        <p class="aircraft-info"><strong>${flight.airplane_model.name}</strong></p>
-                    </div>
-                </div>`;
+            <div class="flight-card-content">
+                <div class="result-status-badge" style="border-color:${cfg.borderColor}; color:${cfg.color};">
+                    <span class="result-status-dot" style="background:${cfg.color};"></span>
+                    ${cfg.label}
+                </div>
+                <img src="${flight.airplane_model.image_path}" alt="Aereo" class="airplane-image">
+                <div class="flight-info">
+                    <h5 class="flight-route">
+                        ${flight.departure_airport.name}
+                        <span class="route-arrow"><i class="bi bi-airplane-fill"></i></span>
+                        ${flight.arrival_airport.name}
+                    </h5>
+                    <p class="flight-times">
+                        ${new Date(flight.departure_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+                        <span class="arrow">→</span>
+                        ${new Date(flight.arrival_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+                    </p>
+                    <p class="aircraft-info"><strong>${flight.airplane_model.name}</strong></p>
+                </div>
+            </div>`;
             resultContainer.appendChild(card);
         });
     }
@@ -435,44 +482,6 @@
                 .then(data => showResults(data));
         });
     });
-
-    const filtri = {
-        inArrivoProssimi: v => v.departure_time <= Date.now && v.arrival_time && Date.now() <= new Date(v.arrival_time).getTime() && new Date(v.arrival_time).getTime() <= Date.now() + 2*3600000,
-        inPartenzaProssimi: v => v.departure_time && Date.now() <= new Date(v.departure_time).getTime() && new Date(v.departure_time).getTime() <= Date.now() + 2*3600000,
-        atterrati: v => v.status === "red",
-        inPaese: () => false,
-    };
-
-    // ── CAROUSEL VOLI POPOLARI ──
-    function initCarousel(gridId, prevId, nextId) {
-        const grid = document.getElementById(gridId);
-        const btnPrev = document.getElementById(prevId);
-        const btnNext = document.getElementById(nextId);
-        if (!grid || !btnPrev || !btnNext) return;
-
-        const cards = Array.from(grid.querySelectorAll('.flight-card-new'));
-        const perPage = 3;
-        let currentPage = 0;
-        const totalPages = Math.ceil(cards.length / perPage);
-
-        function renderPage(page) {
-            cards.forEach((card, i) => {
-                card.style.display = (i >= page * perPage && i < (page + 1) * perPage)
-                    ? 'block' : 'none';
-            });
-            btnPrev.disabled = page === 0;
-            btnNext.disabled = page >= totalPages - 1;
-        }
-
-        btnPrev.addEventListener('click', () => { if (currentPage > 0) renderPage(--currentPage); });
-        btnNext.addEventListener('click', () => { if (currentPage < totalPages - 1) renderPage(++currentPage); });
-
-        renderPage(0);
-    }
-
-    initCarousel('grid-popolari', 'carousel-prev', 'carousel-next');
-    initCarousel('grid-vicino', 'carousel-vicino-prev', 'carousel-vicino-next');
-
 </script>
 </body>
 </html>

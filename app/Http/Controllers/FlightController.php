@@ -12,15 +12,21 @@ class FlightController extends Controller
     {
         $query = $request->input('query');
 
-        $flights = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])->where(function ($q) use ($query) {
+        $flights = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])
+            ->where(function ($q) use ($query) {
                 $q->whereHas('departureAirport', function ($sub) use ($query) {
-                    $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
+                    $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])
+                        ->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
                 });
-            })->orWhere(function ($q) use ($query) {
+            })
+            ->orWhere(function ($q) use ($query) {
                 $q->whereHas('arrivalAirport', function ($sub) use ($query) {
-                    $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
+                    $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])
+                        ->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
                 });
-            })->get();
+            })
+            ->limit(20)
+            ->get();
 
         return response()->json($flights);
     }

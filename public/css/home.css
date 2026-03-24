@@ -494,6 +494,7 @@ a { text-decoration: none; color: inherit; }
     padding: 16px 20px;
     gap: 16px;
     position: relative;
+    padding-right: 100px; /* spazio per il badge */
 }
 
 /* ── STATUS DOT con datatip ── */
@@ -612,7 +613,6 @@ a { text-decoration: none; color: inherit; }
     letter-spacing: 0.05em;
 }
 
-/* ── RESULT STATUS BADGE ── */
 .result-status-badge {
     position: absolute;
     top: 12px; right: 12px;
@@ -626,6 +626,7 @@ a { text-decoration: none; color: inherit; }
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
     letter-spacing: 0.05em;
+    white-space: nowrap;
 }
 
 .result-status-dot {

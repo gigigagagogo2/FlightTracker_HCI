@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+/* ── VARIABILI GLOBALI ── */
+:root {
+    --navy: #0a0f1e;
+    --navy-mid: #111827;
+    --navy-light: #1a2540;
+    --amber: #f59e0b;
+    --amber-glow: rgba(245,158,11,0.15);
+    --amber-soft: #fbbf24;
+    --cyan: #22d3ee;
+    --cyan-glow: rgba(34,211,238,0.12);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
+    --glass: rgba(255,255,255,0.04);
+    --error: #ef4444;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { background: var(--navy); }
+
+body {
+    background: var(--navy);
+    color: var(--text-primary);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ── LAYOUT BASE ── */
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content { flex: 1; }
+
+/* ── PULSE DOT (usato ovunque) ── */
+.pulse-dot {
+    width: 6px; height: 6px;
+    background: var(--amber);
+    border-radius: 50%;
+    animation: pulse-anim 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.pulse-dot--cyan { background: var(--cyan); }
+.pulse-dot--sm { width: 5px; height: 5px; }
+
+@keyframes pulse-anim {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── GRADIENT BAR (usato in card, auth, show) ── */
+.gradient-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amber), var(--cyan));
+}
+
+/* ── BADGE PILL (usato in home hero, auth, show) ── */
+.pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--amber-glow);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 99px;
+    padding: 4px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+

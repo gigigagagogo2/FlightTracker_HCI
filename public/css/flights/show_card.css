@@ -1,29 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
-
-:root {
-    --navy: #0a0f1e;
-    --navy-mid: #111827;
-    --navy-light: #1a2540;
-    --amber: #f59e0b;
-    --amber-glow: rgba(245,158,11,0.15);
-    --amber-soft: #fbbf24;
-    --cyan: #22d3ee;
-    --cyan-glow: rgba(34,211,238,0.12);
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #475569;
-    --border: rgba(255,255,255,0.07);
-    --glass: rgba(255,255,255,0.04);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-    background: var(--navy);
-    color: var(--text-primary);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-}
+@import url('../base.css');
 
 /* ── LAYOUT PRINCIPALE ── */
 .flight-layout {
@@ -32,7 +7,6 @@ body {
     align-items: stretch;
 }
 
-/* Rimuove il margin-top del footer che crea lo spazio bianco */
 body.page-flight-monitor .site-footer {
     margin-top: 0;
 }
@@ -76,18 +50,6 @@ body.page-flight-monitor .site-footer {
     margin-bottom: 1rem;
 }
 
-.pulse-dot {
-    width: 6px; height: 6px;
-    background: var(--amber);
-    border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-}
-
 .panel-header h1 {
     font-size: 1.5rem;
     font-weight: 800;
@@ -96,9 +58,7 @@ body.page-flight-monitor .site-footer {
     line-height: 1.2;
 }
 
-.panel-header h1 span {
-    color: var(--amber);
-}
+.panel-header h1 span { color: var(--amber); }
 
 /* ── AIRPLANE CARD ── */
 .airplane-card {
@@ -135,8 +95,7 @@ body.page-flight-monitor .site-footer {
 }
 
 .airplane-img-wrap img {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     object-fit: contain;
 }
 
@@ -226,8 +185,8 @@ body.page-flight-monitor .site-footer {
 .route-divider .dot {
     width: 6px; height: 6px;
     border-radius: 50%;
-    background: var(--border);
-    border: 1px solid var(--text-muted);
+    background: var(--amber);
+    border: 1px solid var(--amber);
 }
 
 .route-divider .line {
@@ -261,7 +220,6 @@ body.page-flight-monitor .site-footer {
     background: rgba(255,255,255,0.08);
     border-radius: 99px;
     overflow: hidden;
-    position: relative;
 }
 
 .progress-fill {
@@ -282,8 +240,19 @@ body.page-flight-monitor .site-footer {
     animation: shimmer 2s infinite;
 }
 
-@keyframes shimmer {
-    to { left: 200%; }
+@keyframes shimmer { to { left: 200%; } }
+
+.progress-city {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.progress-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--amber);
 }
 
 /* ── LIVE DATA ── */
@@ -307,27 +276,17 @@ body.page-flight-monitor .site-footer {
     overflow: hidden;
 }
 
-.live-card.cyan-accent {
-    border-color: rgba(34,211,238,0.2);
-}
-
+.live-card.cyan-accent { border-color: rgba(34,211,238,0.2); }
 .live-card.cyan-accent::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
     background: var(--cyan);
 }
 
-.live-card.amber-accent {
-    border-color: rgba(245,158,11,0.2);
-}
-
+.live-card.amber-accent { border-color: rgba(245,158,11,0.2); }
 .live-card.amber-accent::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
     background: var(--amber);
 }
 
@@ -382,17 +341,8 @@ body.page-flight-monitor .site-footer {
     margin-bottom: 1.25rem;
 }
 
-.waiting-panel h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-.waiting-panel p {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
+.waiting-panel h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.waiting-panel p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
 
 /* ── MAPPA ── */
 .map-pane {
@@ -407,29 +357,10 @@ body.page-flight-monitor .site-footer {
     min-height: calc(100vh - 70px);
 }
 
-/* ── PROGRESS HELPER CLASSES ── */
-.progress-city {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
+.pulse-dot--cyan { background: var(--cyan); }
 
-.progress-pct {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--amber);
-}
-
-/* ── PULSE DOT CYAN VARIANT ── */
-.pulse-dot--cyan {
-    background: var(--cyan) !important;
-}
-
-/* ── MAP UNAVAILABLE ── */
 .map-unavailable {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -438,10 +369,7 @@ body.page-flight-monitor .site-footer {
     opacity: 0.15;
 }
 
-.map-unavailable i {
-    font-size: 4rem;
-}
-
+.map-unavailable i { font-size: 4rem; }
 .map-unavailable p {
     font-family: 'DM Mono', monospace;
     font-size: 0.8rem;
@@ -450,8 +378,6 @@ body.page-flight-monitor .site-footer {
 
 /* ── MOBILE ── */
 @media (max-width: 900px) {
-
-    /* Layout occupa tutto il viewport meno la navbar */
     .flight-layout {
         grid-template-columns: 1fr;
         grid-template-rows: 1fr 260px;
@@ -459,20 +385,9 @@ body.page-flight-monitor .site-footer {
         min-height: unset;
     }
 
-    /* Mappa in cima, prende 1fr */
-    .map-pane {
-        order: -1;
-        min-height: 0;
-        height: 100%;
-    }
+    .map-pane { order: -1; min-height: 0; height: 100%; }
+    #map { width: 100%; height: 100%; min-height: unset; }
 
-    #map {
-        width: 100%;
-        height: 100%;
-        min-height: unset;
-    }
-
-    /* Pannello info sotto, altezza fissa 260px */
     .flight-panel {
         order: 1;
         border-right: none;
@@ -482,10 +397,7 @@ body.page-flight-monitor .site-footer {
         min-height: unset;
     }
 
-    /* Gradient bar in cima alla mappa */
-    .flight-panel::before {
-        display: none;
-    }
+    .flight-panel::before { display: none; }
 
     .map-pane::after {
         content: '';
@@ -496,7 +408,6 @@ body.page-flight-monitor .site-footer {
         z-index: 10;
     }
 
-    /* Header: badge + titolo su una riga */
     .panel-header {
         padding: 0.6rem 1rem;
         display: flex;
@@ -513,127 +424,35 @@ body.page-flight-monitor .site-footer {
         padding: 0.2rem 0.6rem;
     }
 
-    .panel-header h1 {
-        font-size: 0.95rem;
-        margin: 0;
-    }
+    .panel-header h1 { font-size: 0.95rem; margin: 0; }
 
-    /* Airplane card compatta */
-    .airplane-card {
-        margin: 0.6rem 1rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 10px;
-    }
+    .airplane-card { margin: 0.6rem 1rem; padding: 0.5rem 0.75rem; border-radius: 10px; }
+    .airplane-img-wrap { width: 46px; height: 36px; border-radius: 6px; }
+    .airplane-info h3 { font-size: 0.8rem; margin-bottom: 0.05rem; }
+    .airplane-info p { font-size: 0.6rem; }
 
-    .airplane-img-wrap {
-        width: 46px;
-        height: 36px;
-        border-radius: 6px;
-    }
+    .route-section { padding: 0 1rem; margin-bottom: 0.6rem; }
+    .section-label { font-size: 0.55rem; margin-bottom: 0.3rem; }
+    .route-airport .city { font-size: 0.85rem; }
+    .route-airport .time { font-size: 0.6rem; }
+    .route-divider .line { height: 10px; }
+    .route-divider i { font-size: 0.75rem; }
 
-    .airplane-info h3 {
-        font-size: 0.8rem;
-        margin-bottom: 0.05rem;
-    }
+    .progress-section { padding: 0 1rem; margin-bottom: 0.6rem; }
+    .progress-header { margin-bottom: 0.3rem; }
+    .progress-track { height: 4px; }
+    .progress-city { font-size: 0.6rem; }
+    .progress-pct { font-size: 0.65rem; }
 
-    .airplane-info p {
-        font-size: 0.6rem;
-    }
+    .live-section { padding: 0 1rem; margin-bottom: 0.6rem; }
+    .live-grid { gap: 0.4rem; }
+    .live-card { padding: 0.4rem 0.6rem; border-radius: 8px; }
+    .live-card .card-label { font-size: 0.5rem; margin-bottom: 0.15rem; }
+    .live-card .card-value { font-size: 0.75rem; }
+    .live-card .card-icon { display: none; }
 
-    /* Rotta compatta */
-    .route-section {
-        padding: 0 1rem;
-        margin-bottom: 0.6rem;
-    }
-
-    .section-label {
-        font-size: 0.55rem;
-        margin-bottom: 0.3rem;
-    }
-
-    .route-airport .city {
-        font-size: 0.85rem;
-    }
-
-    .route-airport .time {
-        font-size: 0.6rem;
-    }
-
-    .route-divider .line {
-        height: 10px;
-    }
-
-    .route-divider i {
-        font-size: 0.75rem;
-    }
-
-    /* Progress compatta */
-    .progress-section {
-        padding: 0 1rem;
-        margin-bottom: 0.6rem;
-    }
-
-    .progress-header {
-        margin-bottom: 0.3rem;
-    }
-
-    .progress-track {
-        height: 4px;
-    }
-
-    .progress-city {
-        font-size: 0.6rem;
-    }
-
-    .progress-pct {
-        font-size: 0.65rem;
-    }
-
-    /* Live cards compatte */
-    .live-section {
-        padding: 0 1rem;
-        margin-bottom: 0.6rem;
-    }
-
-    .live-grid {
-        gap: 0.4rem;
-    }
-
-    .live-card {
-        padding: 0.4rem 0.6rem;
-        border-radius: 8px;
-    }
-
-    .live-card .card-label {
-        font-size: 0.5rem;
-        margin-bottom: 0.15rem;
-    }
-
-    .live-card .card-value {
-        font-size: 0.75rem;
-    }
-
-    .live-card .card-icon {
-        display: none;
-    }
-
-    /* Waiting panel compatto */
-    .waiting-panel {
-        padding: 0.75rem 1rem;
-    }
-
-    .waiting-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .waiting-panel h3 {
-        font-size: 0.8rem;
-    }
-
-    .waiting-panel p {
-        font-size: 0.7rem;
-    }
+    .waiting-panel { padding: 0.75rem 1rem; }
+    .waiting-icon { width: 36px; height: 36px; font-size: 1rem; margin-bottom: 0.5rem; }
+    .waiting-panel h3 { font-size: 0.8rem; }
+    .waiting-panel p { font-size: 0.7rem; }
 }

@@ -10,7 +10,7 @@ Carbon::setLocale('it');
     <title>Monitoraggio Volo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ asset('css/main-content.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/base.css') }}" rel="stylesheet">
     <link href="{{ asset('css/flights/show_card.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
 </head>
@@ -189,7 +189,7 @@ Carbon::setLocale('it');
         });
         new google.maps.Marker({
             position: endPoint, map,
-            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#22d3ee', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 },
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#f59e0b', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 },
         });
 
         const heading = spherical.computeHeading(startPoint, endPoint);

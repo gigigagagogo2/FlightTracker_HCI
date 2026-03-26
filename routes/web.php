@@ -155,4 +155,7 @@ Route::view('/terms', 'terms')->name('terms');
 
 Route::view('/about', 'about')->name('about');
 
+Route::get('/forgot-password', function () {
+    return view('forgot-password');
+})->name('password.request');
 

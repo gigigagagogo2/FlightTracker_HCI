@@ -21,8 +21,6 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-
-
         $remember = $request->has('remember');
 
         // Tentativo di login

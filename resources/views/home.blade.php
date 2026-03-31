@@ -45,7 +45,7 @@
                 <div class="search-container">
                     <i class="bi bi-search search-icon-inner"></i>
                     <input type="text" class="search-input" id="search-input"
-                           placeholder="Cerca aeroporto, città o volo..."
+                           placeholder="Cerca aeroporto o città..."
                            name="query" autocomplete="off">
                 </div>
             </form>
@@ -297,7 +297,7 @@
         const noResults = document.getElementById('vicino-no-results');
         const wrapper = document.getElementById('carousel-wrapper-vicino');
         const grid = document.getElementById('grid-vicino');
-        
+
         try {
             const res = await fetch('https://ipapi.co/json/?token={{ env('IPAPI_API') }}');
             const data = await res.json();
@@ -366,7 +366,7 @@
     const heroSubtitle = document.getElementById("hero-subtitle");
     const heroBadge = document.querySelector(".hero-badge");
 
-    const words = ["aeroporto", "città", "volo"];
+    const words = ["aeroporto", "città"];
     let wordIndex = 0;
     setInterval(() => {
         wordIndex = (wordIndex + 1) % words.length;

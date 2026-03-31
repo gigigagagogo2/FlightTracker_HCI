@@ -291,13 +291,31 @@
                     <div class="mb-4">
                         <label for="modal_password" class="form-label fw-semibold text-secondary small text-uppercase" style="letter-spacing: 0.05em;">Nuova Password</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0" style="border-radius: 0.6rem 0 0 0.6rem;">
-                                <i class="bi bi-lock text-muted"></i>
-                            </span>
+        <span class="input-group-text bg-light border-end-0" style="border-radius: 0.6rem 0 0 0.6rem;">
+            <i class="bi bi-lock text-muted"></i>
+        </span>
                             <input type="password" class="form-control border-start-0 ps-1" id="modal_password" name="password"
                                    placeholder="Lascia vuoto per non cambiarla"
                                    style="border-radius: 0 0.6rem 0.6rem 0;">
                         </div>
+
+                        <!-- Strength bar -->
+                        <div id="admin-strength-wrap" style="display:none; margin-top:8px;">
+                            <div style="height:4px; background:#e2e8f0; border-radius:99px; overflow:hidden;">
+                                <div id="admin-strength-bar" style="height:100%; width:0%; border-radius:99px; transition:width 0.3s,background 0.3s;"></div>
+                            </div>
+                            <span id="admin-strength-label" style="font-size:0.65rem; color:#94a3b8; margin-top:3px; display:block;"></span>
+                        </div>
+
+                        <!-- Regole -->
+                        <ul id="admin-password-rules" style="display:none; list-style:none; margin:8px 0 0; padding:0; flex-direction:column; gap:4px;">
+                            <li class="admin-rule" id="admin-rule-length"    style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#334155;"><span class="admin-rule-icon" style="width:12px;height:12px;border-radius:50%;border:1.5px solid #64748b;flex-shrink:0;"></span> Almeno 8 caratteri</li>
+                            <li class="admin-rule" id="admin-rule-uppercase" style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#334155;"><span class="admin-rule-icon" style="width:12px;height:12px;border-radius:50%;border:1.5px solid #64748b;flex-shrink:0;"></span> Almeno una maiuscola</li>
+                            <li class="admin-rule" id="admin-rule-lowercase" style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#334155;"><span class="admin-rule-icon" style="width:12px;height:12px;border-radius:50%;border:1.5px solid #64748b;flex-shrink:0;"></span> Almeno una minuscola</li>
+                            <li class="admin-rule" id="admin-rule-number"   style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#334155;"><span class="admin-rule-icon" style="width:12px;height:12px;border-radius:50%;border:1.5px solid #64748b;flex-shrink:0;"></span> Almeno un numero</li>
+                            <li class="admin-rule" id="admin-rule-special"  style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#334155;"><span class="admin-rule-icon" style="width:12px;height:12px;border-radius:50%;border:1.5px solid #64748b;flex-shrink:0;"></span> Almeno un carattere speciale</li>
+                        </ul>
+
                         <div class="text-danger small mt-1">
                             @if($errors->hasBag('editUser'))
                                 {{ $errors->getBag('editUser')->first('password') }}
@@ -1207,6 +1225,7 @@
             document.getElementById('modal_nickname_error').textContent = '';
             document.getElementById('modal_email_error').textContent = '';
             new bootstrap.Modal(document.getElementById('editUserModal')).show();
+            checkEditUserForm();
         }
 
         document.getElementById('modal_nickname').addEventListener('input', function() {
@@ -1215,6 +1234,73 @@
 
         document.getElementById('modal_email').addEventListener('input', function() {
             document.getElementById('modal_email_error').textContent = '';
+        });
+
+        // ── PASSWORD STRENGTH ADMIN ──
+        const adminPwInput = document.getElementById('modal_password');
+        const adminStrengthBar = document.getElementById('admin-strength-bar');
+        const adminStrengthLabel = document.getElementById('admin-strength-label');
+
+        const adminRules = {
+            length:    { el: document.getElementById('admin-rule-length'),    test: v => v.length >= 8 },
+            uppercase: { el: document.getElementById('admin-rule-uppercase'), test: v => /[A-Z]/.test(v) },
+            lowercase: { el: document.getElementById('admin-rule-lowercase'), test: v => /[a-z]/.test(v) },
+            number:    { el: document.getElementById('admin-rule-number'),    test: v => /[0-9]/.test(v) },
+            special:   { el: document.getElementById('admin-rule-special'),   test: v => /[^A-Za-z0-9]/.test(v) },
+        };
+
+        const adminLevels = [
+            { label: 'Molto debole', color: '#ef4444', width: '20%' },
+            { label: 'Debole',       color: '#f97316', width: '40%' },
+            { label: 'Discreta',     color: '#f59e0b', width: '60%' },
+            { label: 'Forte',        color: '#22d3ee', width: '80%' },
+            { label: 'Ottima',       color: '#10b981', width: '100%' },
+        ];
+
+        adminPwInput.addEventListener('input', () => {
+            const val = adminPwInput.value;
+            const rulesEl = document.getElementById('admin-password-rules');
+            const wrapEl  = document.getElementById('admin-strength-wrap');
+
+            rulesEl.style.display = val.length > 0 ? 'flex' : 'none';
+            wrapEl.style.display  = val.length > 0 ? 'flex' : 'none';
+
+            let passed = 0;
+            Object.values(adminRules).forEach(rule => {
+                const ok = rule.test(val);
+                const icon = rule.el.querySelector('.admin-rule-icon');
+                rule.el.style.color = ok ? '#10b981' : '#334155';
+                icon.style.background    = ok ? '#10b981' : '';
+                icon.style.borderColor = ok ? '#10b981' : '#64748b';
+                if (ok) passed++;
+            });
+
+            if (val.length === 0) {
+                adminStrengthBar.style.width = '0%';
+                adminStrengthLabel.textContent = '';
+                return;
+            }
+
+            const level = adminLevels[Math.min(passed - 1, 4)];
+            adminStrengthBar.style.width      = level.width;
+            adminStrengthBar.style.background = level.color;
+            adminStrengthLabel.textContent    = level.label;
+            adminStrengthLabel.style.color    = level.color;
+        });
+
+        // Reset strength quando si chiude il modal
+        document.getElementById('editUserModal').addEventListener('hidden.bs.modal', function () {
+            adminPwInput.value = '';
+            adminStrengthBar.style.width = '0%';
+            adminStrengthLabel.textContent = '';
+            document.getElementById('admin-password-rules').style.display = 'none';
+            document.getElementById('admin-strength-wrap').style.display  = 'none';
+            Object.values(adminRules).forEach(rule => {
+                rule.el.style.color = '#334155'; // era #94a3b8
+                const icon = rule.el.querySelector('.admin-rule-icon');
+                icon.style.background  = '';
+                icon.style.borderColor = '#64748b'; // era #94a3b8
+            });
         });
 
         @if ($errors->hasBag('editUser'))
@@ -1244,8 +1330,9 @@
 
         // ── VOLI ──
         function openCreateFlightModal() {
-        new bootstrap.Modal(document.getElementById('createFlightModal')).show();
-    }
+            new bootstrap.Modal(document.getElementById('createFlightModal')).show();
+            checkCreateFlightForm();
+        }
 
         @if ($errors->hasBag('createFlight'))
         document.addEventListener('DOMContentLoaded', function() {
@@ -1282,6 +1369,7 @@
         select.selectedIndex = 0;
     });
         document.querySelectorAll('#createFlightModal .text-danger').forEach(el => el.textContent = '');
+            checkCreateFlightForm();
     });
 
         flatpickr("#departure_time_picker", {
@@ -1290,6 +1378,7 @@
             @if(old('departure_time')) defaultDate: "{{ old('departure_time') }}", @endif
             onChange: function() {
                 document.querySelectorAll('#createFlightModal .text-danger').forEach(el => el.textContent = '');
+                checkCreateFlightForm();
             }
         });
 
@@ -1299,6 +1388,7 @@
             @if(old('arrival_time')) defaultDate: "{{ old('arrival_time') }}", @endif
             onChange: function() {
                 document.querySelectorAll('#createFlightModal .text-danger').forEach(el => el.textContent = '');
+                checkCreateFlightForm();
             }
         });
 
@@ -1307,6 +1397,7 @@
             time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
             onChange: function() {
                 document.querySelectorAll('#editFlightModal .text-danger').forEach(el => el.textContent = '');
+                checkEditFlightForm(); // ← deve essere Edit, non Create
             }
         });
 
@@ -1315,21 +1406,23 @@
             time_24hr: true, minuteIncrement: 1, monthSelectorType: "static",
             onChange: function() {
                 document.querySelectorAll('#editFlightModal .text-danger').forEach(el => el.textContent = '');
+                checkEditFlightForm(); // ← deve essere Edit, non Create
             }
         });
 
 
 
         function openEditFlightModal(id, airplaneModelId, departureAirportId, arrivalAirportId, departureTime, arrivalTime) {
-        document.getElementById('editFlightForm').action = `/admin/flights/${id}`;
-        document.getElementById('edit_airplane_model_id').value = airplaneModelId;
-        document.getElementById('edit_departure_airport_id').value = departureAirportId;
-        document.getElementById('edit_arrival_airport_id').value = arrivalAirportId;
-        document.getElementById('edit_flight_id').value = id;
-        editDeparturePicker.setDate(departureTime);
-        editArrivalPicker.setDate(arrivalTime);
-        new bootstrap.Modal(document.getElementById('editFlightModal')).show();
-    }
+            document.getElementById('editFlightForm').action = `/admin/flights/${id}`;
+            document.getElementById('edit_airplane_model_id').value = airplaneModelId;
+            document.getElementById('edit_departure_airport_id').value = departureAirportId;
+            document.getElementById('edit_arrival_airport_id').value = arrivalAirportId;
+            document.getElementById('edit_flight_id').value = id;
+            editDeparturePicker.setDate(departureTime);
+            editArrivalPicker.setDate(arrivalTime);
+            new bootstrap.Modal(document.getElementById('editFlightModal')).show();
+            checkEditFlightForm();
+        }
 
         @if ($errors->hasBag('editFlight'))
         document.addEventListener('DOMContentLoaded', function() {
@@ -1379,17 +1472,19 @@
 
         // ── AEROPORTI ──
         function openCreateAirportModal() {
-        new bootstrap.Modal(document.getElementById('createAirportModal')).show();
-    }
+            new bootstrap.Modal(document.getElementById('createAirportModal')).show();
+            checkCreateFlightForm();
+        }
 
         document.getElementById('createAirportModal').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('createAirportForm').reset();
-        document.getElementById('city-error').textContent = '';
-        document.getElementById('country-error').textContent = '';
-        document.getElementById('latitude').value = '';
-        document.getElementById('longitude').value = '';
-        document.getElementById('city').classList.remove('is-invalid');
-        document.getElementById('country').classList.remove('is-invalid');
+            document.getElementById('createAirportForm').reset();
+            document.getElementById('city-error').textContent = '';
+            document.getElementById('country-error').textContent = '';
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+            document.getElementById('city').classList.remove('is-invalid');
+            document.getElementById('country').classList.remove('is-invalid');
+            checkCreateAirportForm();
     });
 
         (function() {
@@ -1450,18 +1545,20 @@
     })();
 
         function openEditAirportModal(id, country, city, name, latitude, longitude) {
-        document.getElementById('edit_country').value = country;
-        document.getElementById('edit_city').value = city;
-        document.getElementById('edit_airport_name').value = name;
-        document.getElementById('edit_latitude').value = latitude;
-        document.getElementById('edit_longitude').value = longitude;
-        document.getElementById('editAirportForm').action = `/admin/airports/${id}`;
-        document.getElementById('edit_country_error').textContent = '';
-        document.getElementById('edit_city_error').textContent = '';
-        document.getElementById('edit_city').classList.remove('is-invalid');
-        document.getElementById('edit_country').classList.remove('is-invalid');
-        new bootstrap.Modal(document.getElementById('editAirportModal')).show();
-    }
+            document.getElementById('edit_country').value = country;
+            document.getElementById('edit_city').value = city;
+            document.getElementById('edit_airport_name').value = name;
+            document.getElementById('edit_latitude').value = latitude;
+            document.getElementById('edit_longitude').value = longitude;
+            document.getElementById('editAirportForm').action = `/admin/airports/${id}`;
+            document.getElementById('edit_country_error').textContent = '';
+            document.getElementById('edit_city_error').textContent = '';
+            document.getElementById('edit_city').classList.remove('is-invalid');
+            document.getElementById('edit_country').classList.remove('is-invalid');
+            new bootstrap.Modal(document.getElementById('editAirportModal')).show();
+
+            checkEditAirportForm();
+        }
 
         document.getElementById('editAirportModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('edit_country_error').textContent = '';
@@ -1567,6 +1664,74 @@
             }
         });
     }
+
+    // ── EDIT UTENTE ── (password opzionale)
+    function checkEditUserForm() {
+        const nickname = document.getElementById('modal_nickname').value.trim();
+        const email = document.getElementById('modal_email').value.trim();
+        const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        const btn = document.querySelector('#editUserForm button[type="submit"]');
+        btn.disabled = !(nickname && emailRegex.test(email));
+    }
+
+    ['modal_nickname', 'modal_email', 'modal_password'].forEach(id => {
+        document.getElementById(id).addEventListener('input', checkEditUserForm);
+    });
+
+    // Reset bottone quando si apre il modal
+    document.getElementById('editUserModal').addEventListener('show.bs.modal', checkEditUserForm);
+
+    // ── CREATE FLIGHT ──
+    function checkCreateFlightForm() {
+        const airplane = document.querySelector('#createFlightForm select[name="airplane_model_id"]').value;
+        const dep = document.querySelector('#createFlightForm select[name="departure_airport_id"]').value;
+        const arr = document.querySelector('#createFlightForm select[name="arrival_airport_id"]').value;
+        const depTime = document.getElementById('departure_time_picker').value;
+        const arrTime = document.getElementById('arrival_time_picker').value;
+        const btn = document.querySelector('#createFlightForm button[type="submit"]');
+        btn.disabled = !(airplane && dep && arr && depTime && arrTime);
+    }
+
+    document.querySelectorAll('#createFlightForm select').forEach(s => s.addEventListener('change', checkCreateFlightForm));
+    // Flatpickr non triggera 'input' — usa onChange già definito, aggiungi lì checkCreateFlightForm()
+
+    // ── EDIT FLIGHT ──
+    function checkEditFlightForm() {
+        const airplane = document.getElementById('edit_airplane_model_id').value;
+        const dep = document.getElementById('edit_departure_airport_id').value;
+        const arr = document.getElementById('edit_arrival_airport_id').value;
+        const depTime = document.getElementById('edit_departure_time_picker').value;
+        const arrTime = document.getElementById('edit_arrival_time_picker').value;
+        const btn = document.querySelector('#editFlightForm button[type="submit"]');
+        btn.disabled = !(airplane && dep && arr && depTime && arrTime);
+    }
+
+    document.querySelectorAll('#editFlightForm select').forEach(s => s.addEventListener('change', checkEditFlightForm));
+
+    // ── CREATE AIRPORT ──
+    function checkCreateAirportForm() {
+        const lat = document.getElementById('latitude').value;
+        const lon = document.getElementById('longitude').value;
+        const name = document.getElementById('airport_name').value.trim();
+        const btn = document.getElementById('createAirportSubmit');
+        btn.disabled = !(lat && lon && name);
+    }
+
+    document.getElementById('airport_name').addEventListener('input', checkCreateAirportForm);
+    document.getElementById('latitude').addEventListener('change', checkCreateAirportForm);
+
+    // ── EDIT AIRPORT ──
+    function checkEditAirportForm() {
+        const lat = document.getElementById('edit_latitude').value;
+        const lon = document.getElementById('edit_longitude').value;
+        const name = document.getElementById('edit_airport_name').value.trim();
+        const btn = document.getElementById('editAirportSubmit');
+        btn.disabled = !(lat && lon && name);
+    }
+
+    document.getElementById('edit_airport_name').addEventListener('input', checkEditAirportForm);
+    document.getElementById('edit_latitude').addEventListener('change', checkEditAirportForm);
+
 </script>
 
 <script>

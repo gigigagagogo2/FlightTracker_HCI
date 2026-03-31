@@ -269,3 +269,9 @@ body {
     color: #1e293b !important;
     font-size: 0.95rem !important;
 }
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: all !important;
+}

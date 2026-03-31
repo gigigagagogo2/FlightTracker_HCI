@@ -9,7 +9,7 @@
     use Illuminate\Support\Facades\Hash;
     use Illuminate\Support\Facades\Http;
     use Illuminate\Support\Str;
-
+    use Illuminate\Validation\Rules\Password;
 
     class AdminController extends Controller
     {
@@ -54,15 +54,18 @@
             $validator = \Validator::make($request->all(), [
                 'nickname' => 'required|string|max:255|unique:users,nickname,' . $user->id,
                 'email' => 'required|email:rfc,strict|max:255|unique:users,email,' . $user->id,
-                'password' => 'nullable|string|min:8',
-            ], [
-                'nickname.required' => 'Il nickname è obbligatorio.',
-                'nickname.unique'   => 'Questo nickname è già in uso.',
-                'email.required'    => 'L\'email è obbligatoria.',
-                'email.email'       => 'Inserisci un\'email valida (es. nome@dominio.it).',
-                'email.unique'      => 'Questa email è già in uso.',
-                'password.min'      => 'La password deve essere di almeno 8 caratteri.',
-            ]);
+                'password' => ['nullable', Password::min(8)->mixedCase()->numbers()->symbols()],
+                ], [
+                    'nickname.required' => 'Il nickname è obbligatorio.',
+                    'nickname.unique'   => 'Questo nickname è già in uso.',
+                    'email.required'    => 'L\'email è obbligatoria.',
+                    'email.email'       => 'Inserisci un\'email valida (es. nome@dominio.it).',
+                    'email.unique'      => 'Questa email è già in uso.',
+                    'password.min'        => 'La password deve essere di almeno 8 caratteri.',
+                    'password.mixed_case' => 'La password deve contenere maiuscole e minuscole.',
+                    'password.numbers'    => 'La password deve contenere almeno un numero.',
+                    'password.symbols'    => 'La password deve contenere almeno un carattere speciale.',
+                ]);
 
             if ($validator->fails()) {
                 return redirect()->route('admin.dashboard')

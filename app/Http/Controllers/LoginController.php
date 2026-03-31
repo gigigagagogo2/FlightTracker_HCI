@@ -17,7 +17,7 @@ class LoginController extends Controller
     {
         // Validazione dei campi ('email' e 'password' corrispondono agli elementi html con quel name)
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email:rfc,strict'],
             'password' => ['required'],
         ]);
 
@@ -33,7 +33,7 @@ class LoginController extends Controller
 
         // Login fallito
         return back()->withErrors([
-            'email' => 'Credenziali non valide.',
+            'email' => 'Email o password errati. Riprova.',
         ])->onlyInput('email');
     }
 }

@@ -14,7 +14,6 @@ services:
             - "3306:3306"
         networks:
             - my-network
-
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         container_name: phpmyadmin
@@ -26,7 +25,6 @@ services:
             MYSQL_ROOT_PASSWORD: rootpassword
         networks:
             - my-network
-
     laravel:
         build:
             context: .
@@ -37,13 +35,14 @@ services:
             - "8000:8000"
         volumes:
             - .:/var/www/html
-            # creo un volume anonimo vendor, cosi' che quando viene montato il volume var non viene sovrascritta la cartella vendor creata dal Dockerfile
             - /var/www/html/vendor
         networks:
             - my-network
         depends_on:
             - db
-
+        dns:
+            - 8.8.8.8
+            - 8.8.4.4
     websocket-server:
         build:
             context: ./websocket-server
@@ -53,7 +52,6 @@ services:
             - "3000:3000"
         networks:
             - my-network
-
     laravel-cron:
         build:
             context: .
@@ -62,7 +60,6 @@ services:
         restart: unless-stopped
         volumes:
             - .:/var/www/html
-            # creo un volume anonimo vendor, cosi' che quando viene montato il volume var non viene sovrascritta la cartella vendor creata dal Dockerfile
             - /var/www/html/vendor
         environment:
             CONTAINER_TYPE: "cron"
@@ -72,7 +69,6 @@ services:
             - db
 volumes:
     db_data:
-
 networks:
     my-network:
         driver: bridge

@@ -74,7 +74,7 @@
             $user->nickname = $validator->validated()['nickname'];
             $user->email    = $validator->validated()['email'];
 
-            if (!empty($validator->validated()['password'])) {
+            if (!empty($validator->validated()['password']))    {
                 $user->password = Hash::make($validator->validated()['password']);
             }
 

@@ -35,7 +35,7 @@
             <h1 class="auth-title">Bentornato</h1>
             <p class="auth-sub">Accedi al tuo account FlightTracker</p>
 
-            <form action="{{ route('login') }}" method="POST">
+            <form id="login-form" action="{{ route('login') }}" method="POST">
                 @csrf
 
                 <!-- Email -->
@@ -77,7 +77,7 @@
                     <label for="remember" class="auth-checkbox-label">Ricordami</label>
                 </div>
 
-                <button type="submit" class="auth-btn">Accedi</button>
+                <button id="login-btn" type="submit" class="auth-btn">Accedi</button>
 
                 <p class="auth-link">
                     Non hai ancora un account?
@@ -95,6 +95,26 @@
         const input = document.getElementById('password');
         input.type = input.type === 'password' ? 'text' : 'password';
     }
+
+    const loginForm = document.getElementById('login-form');
+    const loginBtn = document.getElementById('login-btn');
+
+    const emailInput = document.getElementById('email');
+    const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+    function checkLoginForm() {
+        const email = emailInput.value.trim();
+        const password = document.getElementById('password').value.trim();
+        loginBtn.disabled = !(emailRegex.test(email) && password);
+    }
+
+    emailInput.addEventListener('input', checkLoginForm);
+    document.getElementById('password').addEventListener('input', checkLoginForm);
+    checkLoginForm();
+
+
+
+
 </script>
 </body>
 </html>

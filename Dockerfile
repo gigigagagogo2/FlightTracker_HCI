@@ -12,13 +12,14 @@ RUN apk update && apk add --no-cache \
   libjpeg-turbo-dev \
   freetype-dev \
   zip \
-  unzip && \
+  unzip \
+  openssl-dev \
+  ca-certificates && \
   rm -rf /var/cache/apk/*
 
 # Installa le estensioni PHP necessarie per Laravel
 RUN docker-php-ext-configure zip && \
   docker-php-ext-install zip pdo pdo_mysql
-
 # Installa Composer globalmente
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

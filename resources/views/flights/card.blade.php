@@ -112,9 +112,9 @@ Carbon::setLocale('it');
                         <p class="card-value cyan" id="current-coordinates">-- / --</p>
                         <i class="fas fa-map-marker-alt card-icon"></i>
                     </div>
-                    <div class="live-card amber-accent">
+                    <div class="live-card cyan-accent">
                         <p class="card-label">Velocità</p>
-                        <p class="card-value amber" id="current-speed">-- km/h</p>
+                        <p class="card-value cyan" id="current-speed">-- km/h</p>
                         <i class="fas fa-tachometer-alt card-icon"></i>
                     </div>
                 </div>

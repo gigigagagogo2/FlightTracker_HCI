@@ -22,13 +22,6 @@ body.page-flight-monitor .site-footer {
     min-height: calc(100vh - 60px);
 }
 
-.flight-panel::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--amber), var(--cyan));
-}
 
 .panel-header {
     padding: 2rem 1.75rem 1.25rem;

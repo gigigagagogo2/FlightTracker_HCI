@@ -1,126 +1,110 @@
 @php
     use Carbon\Carbon;
+    $departure = Carbon::parse($flight->departure_time);
+    $arrival   = Carbon::parse($flight->arrival_time);
+    $duration  = $arrival->diff($departure);
 @endphp
 
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Riepilogo Volo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="{{ asset('css/flights/show_card.css') }}" rel="stylesheet">
-
-    <!-- Font Awesome 5 -->
+    <title>Riepilogo Volo – FlightTracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <link rel="stylesheet" href="{{ asset('css/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/flights/summary.css') }}">
 </head>
 <body>
 
 @include("navbar")
 
-<div class="container flight-summary mt-5">
-    <h2 class="text-center mb-4">Riepilogo Volo</h2>
+<main class="summary-main">
+    <div class="summary-wrap">
 
-    <!-- CONTENITORE PRINCIPALE -->
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm p-4 mb-4 position-relative">
+        <!-- Header -->
+        <div class="summary-header">
+            <div class="summary-badge">
+                <span class="pulse-dot pulse-dot--sm"></span>
+                Volo completato
+            </div>
+            <h1 class="summary-title">Riepilogo Volo</h1>
+            <p class="summary-sub">{{ $flight->departureAirport->name }} → {{ $flight->arrivalAirport->name }}</p>
+        </div>
 
-                <!-- Sezione Aereo -->
-                <div class="row align-items-center mb-4">
-                    <div class="col-md-4 text-center">
-                        <img src="/{{ $flight->airplaneModel->image_path }}" alt="{{ $flight->airplaneModel->name }}"
-                             class="airplane-image mb-3">
-                        <h5>{{ $flight->airplaneModel->name }}</h5>
-                    </div>
-
-                    <div class="col-md-8">
-                        <div class="info-block mb-3">
-                            <strong>Partenza:</strong> {{ $flight->departureAirport->city }}
-                            – {{ Carbon::parse($flight->departure_time)->format('d/m/Y H:i') }}<br>
-                            <strong>Arrivo:</strong> {{ $flight->arrivalAirport->city }}
-                            – {{ Carbon::parse($flight->arrival_time)->format('d/m/Y H:i') }}
-                        </div>
-                    </div>
+        <!-- Hero card aereo + rotta -->
+        <div class="hero-card">
+            <div class="hero-card-inner">
+                <div class="hero-plane-wrap">
+                    <img src="/{{ $flight->airplaneModel->image_path }}" alt="{{ $flight->airplaneModel->name }}">
                 </div>
-
-                <!-- Statistiche del Volo -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card bg-light">
-                            <div class="card-body text-center">
-                                <i class="fas fa-tachometer-alt fa-2x text-primary mb-2"></i>
-                                <h5>Velocità Media</h5>
-                                <h3 id="average-speed" class="text-primary">
-                                    {{ round($averageSpeed, 1) . " Km/h"}}
-                                </h3>
-                            </div>
+                <div class="hero-info">
+                    <div class="hero-model">{{ $flight->airplaneModel->name }}</div>
+                    <div class="route-row">
+                        <div class="route-city">
+                            <span class="city-name">{{ $flight->departureAirport->city }}</span>
+                            <span class="city-time">{{ $departure->format('d/m/Y H:i') }}</span>
                         </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <div class="card bg-light">
-                            <div class="card-body text-center">
-                                <i class="fas fa-clock fa-2x text-success mb-2"></i>
-                                <h5>Durata Volo</h5>
-                                <h3 id="total-time" class="text-success">
-                                    @php
-                                        $departure = Carbon::parse($flight->departure_time);
-                                        $arrival = Carbon::parse($flight->arrival_time);
-                                        $duration = $arrival->diff($departure);
-                                        $hours = $duration->h;
-                                        $minutes = $duration->i;
-
-                                        if ($hours > 0) {
-                                            echo $hours . 'h ' . $minutes . 'm';
-                                        } else {
-                                            echo $minutes . ' minuti';
-                                        }
-                                    @endphp
-                                </h3>
-                            </div>
+                        <div class="route-arrow">
+                            <div class="dot"></div>
+                            <div class="route-arrow-line"></div>
+                            <i class="fas fa-plane route-arrow-icon"></i>
+                            <div class="route-arrow-line"></div>
+                            <div class="dot"></div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Informazioni Aggiuntive -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card bg-light">
-                            <div class="card-body text-center">
-                                <i class="fas fa-map-marker-alt fa-2x text-warning mb-2"></i>
-                                <h5>Posizione Finale</h5>
-                                <p id="final-coordinates" class="mb-0">
-                                    {{ number_format($flight->arrivalAirport->latitude, 4) }} /
-                                    {{ number_format($flight->arrivalAirport->longitude, 4) }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <div class="card bg-light">
-                            <div class="card-body text-center">
-                                <i class="fas fa-route fa-2x text-info mb-2"></i>
-                                <h5>Distanza Percorsa</h5>
-                                <p id="distance-traveled" class="mb-0">
-                                    {{ round($distance, 1) . " Km"}}
-                                </p>
-                            </div>
+                        <div class="route-city route-city--right">
+                            <span class="city-name">{{ $flight->arrivalAirport->city }}</span>
+                            <span class="city-time">{{ $arrival->format('d/m/Y H:i') }}</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Stats grid -->
+        <div class="stats-grid">
+            <div class="stat-card accent-green">
+                <span class="stat-icon stat-icon--green"><i class="fas fa-tachometer-alt"></i></span>
+                <div class="stat-label">Velocità media</div>
+                <div class="stat-value stat-value--white">{{ round($averageSpeed, 1) }} km/h</div>
+            </div>
+
+            <div class="stat-card accent-green">
+                <span class="stat-icon stat-icon--green"><i class="fas fa-clock"></i></span>
+                <div class="stat-label">Durata volo</div>
+                <div class="stat-value stat-value--white">
+                    @if($duration->h > 0)
+                        {{ $duration->h }}h {{ $duration->i }}m
+                    @else
+                        {{ $duration->i }} min
+                    @endif
+                </div>
+            </div>
+
+            <div class="stat-card accent-green">
+                <span class="stat-icon stat-icon--green"><i class="fas fa-route"></i></span>
+                <div class="stat-label">Distanza</div>
+                <div class="stat-value stat-value--white">{{ round($distance, 1) }} km</div>
+            </div>
+
+            <div class="stat-card accent-green">
+                <span class="stat-icon stat-icon--green"><i class="fas fa-map-marker-alt"></i></span>
+                <div class="stat-label">Posizione finale</div>
+                <div class="stat-value stat-value--white stat-value--coords">
+                    Lat: {{ number_format($flight->arrivalAirport->latitude, 4) }} <br> Long: {{ number_format($flight->arrivalAirport->longitude, 4) }}
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ route('home') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Torna alla home
+        </a>
+
     </div>
-</div>
+</main>
 
 @include("footer")
-
 
 </body>
 </html>

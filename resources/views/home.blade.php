@@ -366,7 +366,7 @@
     const heroSubtitle = document.getElementById("hero-subtitle");
     const heroBadge = document.querySelector(".hero-badge");
 
-    const words = ["aeroporto", "città"];
+    const words = ["aeroporto", "città" ];
     let wordIndex = 0;
     setInterval(() => {
         wordIndex = (wordIndex + 1) % words.length;

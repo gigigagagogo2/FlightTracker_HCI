@@ -1,4 +1,4 @@
-@import url('../base.css');
+@import url('/css/base.css');
 
 /* ── LAYOUT PRINCIPALE ── */
 .flight-layout {
@@ -22,6 +22,13 @@ body.page-flight-monitor .site-footer {
     min-height: calc(100vh - 60px);
 }
 
+.flight-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amber), var(--cyan));
+}
 
 .panel-header {
     padding: 2rem 1.75rem 1.25rem;
@@ -449,3 +456,55 @@ body.page-flight-monitor .site-footer {
     .waiting-panel h3 { font-size: 0.8rem; }
     .waiting-panel p { font-size: 0.7rem; }
 }
+
+/* ── CUORE PREFERITO ── */
+.heart-btn {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    z-index: 2;
+}
+
+#heartIcon {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    transition: color 0.2s, transform 0.2s;
+}
+
+#heartIcon.fas { color: #ef4444; }
+#heartIcon:hover { transform: scale(1.2); }
+
+/* ── RIMUOVI SFUMATURA GIALLA ── */
+.airplane-card::after { display: none; }
+
+/* ── TOAST ── */
+.sc-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #0f1729;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: #f1f5f9;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.sc-toast--show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.sc-toast--success { border-color: rgba(16,185,129,0.4); color: #34d399; }
+.sc-toast--error   { border-color: rgba(239,68,68,0.4);  color: #f87171; }
+.sc-toast--neutral { border-color: rgba(255,255,255,0.15); color: #94a3b8; }

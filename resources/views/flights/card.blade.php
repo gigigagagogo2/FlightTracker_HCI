@@ -1,6 +1,7 @@
-@php use Carbon\Carbon;
-App::setLocale('it');
-Carbon::setLocale('it');
+@php
+    use Carbon\Carbon;
+    App::setLocale('it');
+    Carbon::setLocale('it');
 @endphp
     <!DOCTYPE html>
 <html lang="it">
@@ -16,11 +17,9 @@ Carbon::setLocale('it');
 </head>
 <body class="page-flight-monitor">
 @include("navbar")
-
 @php
     $diffInMinutes = Carbon::now()->diffInMinutes($flight->departure_time, false);
 @endphp
-
 <div class="flight-layout">
 
     <!-- ── PANNELLO SINISTRO ── -->
@@ -42,12 +41,11 @@ Carbon::setLocale('it');
         <div class="airplane-card">
             @auth
                 @if(! auth()->user()->is_admin)
-                    <button class="star-btn">
-                        <i id="starIcon" class="fa-star {{ $flight->isPreferito() ? 'fas' : 'far' }}"></i>
+                    <button class="heart-btn" id="heartBtn">
+                        <i id="heartIcon" class="fa-heart {{ $flight->isPreferito() ? 'fas' : 'far' }}"></i>
                     </button>
                 @endif
             @endauth
-
             <div class="airplane-img-wrap">
                 <img src="/{{ $flight->airplaneModel->image_path }}" alt="{{ $flight->airplaneModel->name }}">
             </div>
@@ -80,15 +78,11 @@ Carbon::setLocale('it');
         </div>
 
         @if($diffInMinutes > 120)
-            <!-- In attesa -->
             <div class="waiting-panel">
-                <div class="waiting-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
+                <div class="waiting-icon"><i class="fas fa-clock"></i></div>
                 <h3>Monitoraggio non disponibile</h3>
                 <p>Il monitoraggio sarà attivo nelle 2 ore precedenti alla partenza del volo.</p>
             </div>
-
         @else
             <!-- Progresso -->
             <div class="progress-section">
@@ -136,6 +130,9 @@ Carbon::setLocale('it');
 
 </div>
 
+<!-- TOAST -->
+<div class="sc-toast" id="scToast"></div>
+
 @include("footer")
 
 <script type="module">
@@ -158,6 +155,10 @@ Carbon::setLocale('it');
             zoomControl: true,
             gestureHandling: "greedy",
             minZoom: 2,
+            restriction: {
+                latLngBounds: { north: 85, south: -85, west: -180, east: 180 },
+                strictBounds: true,
+            },
             styles: [
                 { elementType: "geometry", stylers: [{ color: "#1a2540" }] },
                 { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
@@ -174,27 +175,14 @@ Carbon::setLocale('it');
             ]
         });
 
-        const startPoint = new google.maps.LatLng(
-            {{ $flight->departureAirport->latitude }},
-            {{ $flight->departureAirport->longitude }}
-        );
-        const endPoint = new google.maps.LatLng(
-            {{ $flight->arrivalAirport->latitude }},
-            {{ $flight->arrivalAirport->longitude }}
-        );
+        const startPoint = new google.maps.LatLng({{ $flight->departureAirport->latitude }}, {{ $flight->departureAirport->longitude }});
+        const endPoint   = new google.maps.LatLng({{ $flight->arrivalAirport->latitude }},   {{ $flight->arrivalAirport->longitude }});
 
-        new google.maps.Marker({
-            position: startPoint, map,
-            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#f59e0b', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 },
-        });
-        new google.maps.Marker({
-            position: endPoint, map,
-            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#f59e0b', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 },
-        });
+        new google.maps.Marker({ position: startPoint, map, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#f59e0b', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 } });
+        new google.maps.Marker({ position: endPoint,   map, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#f59e0b', fillOpacity: 1, strokeColor: '#0a0f1e', strokeWeight: 2 } });
 
-        const heading = spherical.computeHeading(startPoint, endPoint);
+        const heading    = spherical.computeHeading(startPoint, endPoint);
         const iconHeading = -45 + heading;
-
         const data = await fetchFlightData();
         if (!data || data.progress === 1) return;
 
@@ -203,11 +191,7 @@ Carbon::setLocale('it');
         overlay.setMap(map);
 
         route = new google.maps.Polyline({
-            path: [startPoint, endPoint],
-            geodesic: true,
-            strokeOpacity: 0,
-            strokeWeight: 2,
-            zIndex: 1,
+            path: [startPoint, endPoint], geodesic: true, strokeOpacity: 0, strokeWeight: 2, zIndex: 1,
             icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeColor: '#f59e0b', scale: 4 }, offset: '0', repeat: '20px' }],
             map
         });
@@ -228,58 +212,45 @@ Carbon::setLocale('it');
         try {
             const res = await fetch("{{ url('/api/simulazione-voli') }}", {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                },
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
                 body: JSON.stringify({ ids: [{{ $flight->id }}] }),
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const allData = await res.json();
             return allData[{{ $flight->id }}] || null;
-        } catch (err) {
-            console.error("Errore fetch:", err);
-            return null;
-        }
+        } catch (err) { console.error("Errore fetch:", err); return null; }
     }
 
     async function aggiornaPosizione() {
         try {
             const data = await fetchFlightData();
             if (!data) return;
-
             if (data.progress === 1) {
                 if (overlay) overlay.setMap(null);
-                if (route) route.setMap(null);
+                if (route)   route.setMap(null);
                 overlay = null; route = null;
                 return;
             }
-
             const pos = new google.maps.LatLng(data.lat, data.lng);
             overlay.setPosition(pos);
-
             document.getElementById("current-coordinates").innerText = `${pos.lat().toFixed(2)}° / ${pos.lng().toFixed(2)}°`;
-            document.getElementById("current-speed").innerText = `${Math.round(data.speed)} km/h`;
-
+            document.getElementById("current-speed").innerText       = `${Math.round(data.speed)} km/h`;
             const percent = Math.round(data.progress * 100);
             document.getElementById("progress-bar").style.width = `${percent}%`;
-            document.getElementById("progress-pct").innerText = `${percent}%`;
-        } catch (err) {
-            console.error("Errore aggiornamento:", err);
-        }
+            document.getElementById("progress-pct").innerText   = `${percent}%`;
+        } catch (err) { console.error("Errore aggiornamento:", err); }
     }
 
+    // ── CUORE ──
     document.addEventListener("DOMContentLoaded", function () {
-        const starIcon = document.getElementById("starIcon");
-        if (starIcon) {
-            starIcon.closest('button').addEventListener("click", togglePreferito);
-        }
+        const heartBtn = document.getElementById("heartBtn");
+        if (heartBtn) heartBtn.addEventListener("click", togglePreferito);
     });
 
     async function togglePreferito() {
-        const starIcon = document.getElementById("starIcon");
-        if (!starIcon) return;
-        const isFavorito = starIcon.classList.contains("fas");
+        const heartIcon = document.getElementById("heartIcon");
+        if (!heartIcon) return;
+        const isFavorito = heartIcon.classList.contains("fas");
         const url = `{{ url('/flights/preferiti') }}/{{ $flight->id }}`;
         try {
             const response = await fetch(url, {
@@ -287,11 +258,17 @@ Carbon::setLocale('it');
                 headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" }
             });
             if (!response.ok) throw new Error();
-            starIcon.classList.toggle("fas");
-            starIcon.classList.toggle("far");
-        } catch {
-            alert("Errore nel salvataggio dei preferiti.");
-        }
+            heartIcon.classList.toggle("fas");
+            heartIcon.classList.toggle("far");
+            showToast(isFavorito ? 'Rimosso dai preferiti' : 'Aggiunto ai preferiti!', isFavorito ? 'neutral' : 'success');
+        } catch { showToast('Errore nel salvataggio dei preferiti', 'error'); }
+    }
+
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('scToast');
+        toast.textContent = msg;
+        toast.className = `sc-toast sc-toast--${type} sc-toast--show`;
+        setTimeout(() => { toast.className = 'sc-toast'; }, 2800);
     }
 
     initMap();
@@ -299,26 +276,18 @@ Carbon::setLocale('it');
 
 <script>
     (g => {
-        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
-            m = document, b = window;
-        b = b[c] || (b[c] = {});
-        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
-            u = () => h || (h = new Promise(async (f, n) => {
-                await (a = m.createElement("script"));
-                e.set("libraries", [...r] + "");
-                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                e.set("callback", c + ".maps." + q);
-                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-                d[q] = f;
-                a.onerror = () => h = n(Error(p + " could not load."));
-                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                m.head.append(a)
-            }));
-        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
-    })({
-        key: "{{ env('GOOGLE_MAPS_API') }}",
-        v: "weekly",
-    });
+        var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",
+            m=document,b=window;b=b[c]||(b[c]={});
+        var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,
+            u=()=>h||(h=new Promise(async(f,n)=>{
+                await(a=m.createElement("script"));
+                e.set("libraries",[...r]+"");
+                for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);
+                e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;
+                d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));
+                a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));
+        d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))
+    })({ key: "{{ env('GOOGLE_MAPS_API') }}", v: "weekly" });
 </script>
 </body>
 </html>

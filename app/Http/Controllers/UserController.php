@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -112,22 +112,19 @@ class UserController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'nickname' => 'required|string|max:255|unique:users,nickname,' . $user->id,
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$/',
-                Rule::unique('users')->ignore($user->id),
-            ],
-            'password' => 'nullable|string|min:6',
+            'nickname' => 'required|string|max:255|unique:users,nickname,' . Auth::id(),
+            'email'    => ['required', 'email:rfc,strict', 'unique:users,email,' . Auth::id()],
+            'password' => ['nullable', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
             'nickname.required' => 'Il nickname è obbligatorio.',
-            'nickname.unique' => 'Questo nickname è già in uso.',
-            'email.required' => 'L\'email è obbligatoria.',
-            'email.email' => 'Inserisci un indirizzo email valido.',
-            'email.unique' => 'Questa email è già registrata.',
-            'password.min' => 'La password deve contenere almeno 6 caratteri.',
+            'nickname.unique'   => 'Questo nickname è già in uso.',
+            'email.required'    => 'L\'email è obbligatoria.',
+            'email.email'       => 'Inserisci un\'email valida.',
+            'email.unique'      => 'Questa email è già registrata.',
+            'password.min'      => 'La password deve essere di almeno 8 caratteri.',
+            'password.mixed_case' => 'La password deve contenere maiuscole e minuscole.',
+            'password.numbers'    => 'La password deve contenere almeno un numero.',
+            'password.symbols'    => 'La password deve contenere almeno un carattere speciale.',
         ]);
 
         $user->nickname = $request->input('nickname');

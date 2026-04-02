@@ -39,7 +39,7 @@
                 <div id="viewList">
                     <div class="panel-header">
                         <div class="flight-badge">
-                            <span class="pulse-dot pulse-dot--cyan"></span>
+                            <span class="pulse-dot pulse-dot--amber"></span>
                             Live
                         </div>
                         <h1>La mia <span>mappa</span></h1>

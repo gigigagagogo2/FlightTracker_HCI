@@ -21,7 +21,9 @@
     $diffInMinutes = Carbon::now()->diffInMinutes($flight->departure_time, false);
 @endphp
 <div class="flight-layout">
-
+    @php
+        $trackingAvailableAt = $flight->departure_time->copy()->subHours(2);
+    @endphp
     <!-- ── PANNELLO SINISTRO ── -->
     <aside class="flight-panel">
         <div class="panel-header">
@@ -77,13 +79,7 @@
             </div>
         </div>
 
-        @if($diffInMinutes > 120)
-            <div class="waiting-panel">
-                <div class="waiting-icon"><i class="fas fa-clock"></i></div>
-                <h3>Monitoraggio non disponibile</h3>
-                <p>Il monitoraggio sarà attivo nelle 2 ore precedenti alla partenza del volo.</p>
-            </div>
-        @else
+
             <!-- Progresso -->
             <div class="progress-section">
                 <p class="section-label">Avanzamento volo</p>
@@ -113,7 +109,6 @@
                     </div>
                 </div>
             </div>
-        @endif
     </aside>
 
     <!-- ── MAPPA ── -->
@@ -121,9 +116,26 @@
         @if($diffInMinutes <= 120)
             <div id="map"></div>
         @else
-            <div class="map-unavailable">
-                <i class="fas fa-map"></i>
-                <p>MAPPA NON DISPONIBILE</p>
+            <div class="map-waiting">
+                <div class="waiting-content">
+                    <div class="waiting-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+
+                    <h2>Monitoraggio non disponibile</h2>
+
+                    <p>
+                        Disponibile dal
+                        <strong>{{ $trackingAvailableAt->isoFormat('D MMMM') }}</strong>
+                        alle
+                        <strong>{{ $trackingAvailableAt->format('H:i') }}</strong>
+                    </p>
+
+                    <p class="waiting-sub">
+                        (2 ore prima della partenza prevista alle
+                        {{ $flight->departure_time->translatedFormat('H:i') }})
+                    </p>
+                </div>
             </div>
         @endif
     </div>
@@ -139,6 +151,7 @@
     let map, overlay, route;
 
     async function initMap() {
+        if (!document.getElementById('map')) return;
         await google.maps.importLibrary('maps');
         const {spherical} = await google.maps.importLibrary("geometry");
         const module = await import('/js/RotatableOverlay.js');

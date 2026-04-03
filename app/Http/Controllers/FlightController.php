@@ -11,7 +11,7 @@ class FlightController extends Controller
     public function search(Request $request)
     {
         $query  = $request->input('query', '');
-        $filter = $request->input('filter', '');
+        $filter = $request->input('filter', '');  // 'in_arrivo' | 'in_partenza' | 'atterrati' | ''
         $now    = Carbon::now();
 
         $flights = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])
@@ -26,6 +26,7 @@ class FlightController extends Controller
                 });
             });
 
+        // ── FILTRI LATO SERVER ──
         switch ($filter) {
             case 'in_arrivo':
                 // Voli in volo che arrivano nelle prossime 2 ore
@@ -47,19 +48,10 @@ class FlightController extends Controller
                 $flights->where('arrival_time', '<', $now)
                     ->orderBy('arrival_time', 'desc');  // prima i più recenti
                 break;
-                
-            case str_starts_with($filter, 'paese_'):
-                $paese = substr($filter, 6);
-                $flights->where(function($q) use ($paese) {
-                    $q->whereHas('departureAirport', fn($s) => $s->where('country', $paese))
-                        ->orWhereHas('arrivalAirport',  fn($s) => $s->where('country', $paese));
-                })->where('departure_time', '<=', $now)
-                    ->where('arrival_time',   '>=', $now)
-                    ->orderBy('departure_time', 'asc');
-                break;
 
             default:
-
+                // Nessun filtro — ordine: prima in volo, poi in partenza, poi atterrati
+                // Usa CASE per assegnare priorità
                 $flights->orderByRaw("
                 CASE
                     WHEN departure_time <= ? AND arrival_time >= ? THEN 1
@@ -73,6 +65,7 @@ class FlightController extends Controller
 
         $results = $flights->limit(20)->get();
 
+        // Aggiunge campo status calcolato per il frontend
         $results->each(function ($flight) use ($now) {
             $dep = Carbon::parse($flight->departure_time);
             $arr = Carbon::parse($flight->arrival_time);

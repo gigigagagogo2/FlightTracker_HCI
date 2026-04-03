@@ -443,6 +443,7 @@
 
     input.addEventListener("input", () => {
         const query = input.value.trim();
+        console.log('query:', query, 'length:', query.length);
         const activeFilter = document.querySelector(".filter-pill.selected")?.dataset.filter ?? '';
         if (query.length > 0 || activeFilter) {
             fetchAndShow(query, activeFilter);

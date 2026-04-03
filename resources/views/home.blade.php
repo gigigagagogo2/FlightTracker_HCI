@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 @include('navbar')
@@ -51,16 +50,16 @@
             </form>
 
             <div class="filter-bar" id="filter-bar">
-                <button class="filter-pill" id="btn-in-arrivo">
+                <button class="filter-pill" id="btn-in-arrivo" data-filter="in_arrivo">
                     <i class="bi bi-airplane-engines-fill"></i> In arrivo
                 </button>
-                <button class="filter-pill" id="btn-in-partenza">
-                    <i class="bi bi-airplane-fill"></i> In partenza
+                <button class="filter-pill" id="btn-in-partenza" data-filter="in_partenza">
+                    <i class="bi bi-airplane-fill" ></i> In partenza
                 </button>
-                <button class="filter-pill" id="btn-atterrati">
+                <button class="filter-pill" id="btn-atterrati" data-filter="atterrati">
                     <i class="bi bi-geo-alt-fill"></i> Atterrati
                 </button>
-                <button class="filter-pill filter-pill--country" id="btn-paese">
+                <button class="filter-pill filter-pill--country" id="btn-paese" data-filter="">
                     <span id="paese-flag"></span>
                     <span id="paese-label">Rilevamento...</span>
                 </button>
@@ -283,13 +282,6 @@
 
     initCarousel('grid-popolari', 'carousel-prev', 'carousel-next', 'popolari-no-results', 'carousel-wrapper-popolari');
 
-    // ── FILTRI ──
-    const filtri = {
-        inArrivoProssimi: v => v.arrival_time && Date.now() <= new Date(v.arrival_time).getTime() && new Date(v.arrival_time).getTime() <= Date.now() + 2*3600000,
-        inPartenzaProssimi: v => v.departure_time && Date.now() <= new Date(v.departure_time).getTime() && new Date(v.departure_time).getTime() <= Date.now() + 2*3600000,
-        atterrati: v => v.status === "red",
-        inPaese: () => false,
-    };
 
     // ── IP GEOLOCATION + CARICAMENTO VOLI VICINO ──
     (async () => {
@@ -321,13 +313,7 @@
 
             document.getElementById('paese-flag').textContent = getFlag(codice);
             document.getElementById('paese-label').textContent = paese || 'Paese';
-            document.getElementById('btn-paese').dataset.country = paese;
-
-            filtri.inPaese = volo => {
-                const c1 = (volo.departure_airport?.country || '').toLowerCase();
-                const c2 = (volo.arrival_airport?.country || '').toLowerCase();
-                return c1.includes(paese.toLowerCase()) || c2.includes(paese.toLowerCase());
-            };
+            document.getElementById('btn-paese').dataset.filter = `paese_${paese}`;
 
             // Carica voli vicino a te tramite endpoint dedicato
             const vinoRes = await fetch(`/flights/vicino?paese=${encodeURIComponent(paese)}`);
@@ -359,14 +345,20 @@
 
     // ── SEARCH LOGIC ──
     const input = document.getElementById("search-input");
-    const resultContainer = document.getElementById("result-container");
-    const cardsContainer = document.getElementById("cards-container");
-    const statsBar = document.getElementById("stats-bar");
-    const heroTitleText = document.getElementById("hero-title-text");
-    const heroSubtitle = document.getElementById("hero-subtitle");
-    const heroBadge = document.querySelector(".hero-badge");
 
-    const words = ["aeroporto", "città" ];
+    document.getElementById('search-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+    });
+
+    const resultContainer = document.getElementById("result-container");
+    const cardsContainer  = document.getElementById("cards-container");
+    const statsBar        = document.getElementById("stats-bar");
+    const heroTitleText   = document.getElementById("hero-title-text");
+    const heroSubtitle    = document.getElementById("hero-subtitle");
+    const heroBadge       = document.querySelector(".hero-badge");
+
+    // Placeholder rotante
+    const words = ["aeroporto", "città"];
     let wordIndex = 0;
     setInterval(() => {
         wordIndex = (wordIndex + 1) % words.length;
@@ -375,12 +367,12 @@
 
     function disableSearch() {
         cardsContainer.style.display = "block";
-        statsBar.style.display = "flex";
+        statsBar.style.display       = "flex";
         resultContainer.style.display = "none";
-        resultContainer.innerHTML = "";
-        heroTitleText.style.display = "block";
-        heroSubtitle.style.display = "block";
-        heroBadge.style.display = "inline-flex";
+        resultContainer.innerHTML    = "";
+        heroTitleText.style.display  = "block";
+        heroSubtitle.style.display   = "block";
+        heroBadge.style.display      = "inline-flex";
         document.getElementById("search-section").classList.remove("search-active");
     }
 
@@ -389,81 +381,71 @@
     }
 
     const statusConfig = {
-        green:  { label: 'In volo',     borderColor: 'rgba(34,211,238,0.3)',  color: '#22d3ee', dotAnim: 'pulse-anim' },
-        yellow: { label: 'In partenza', borderColor: 'rgba(245,158,11,0.3)',  color: '#f59e0b', dotAnim: 'pulse-anim' },
-        red:    { label: 'Atterrato',   borderColor: 'rgba(239,68,68,0.3)',   color: '#ef4444', dotAnim: '' },
-        gray:   { label: 'Sconosciuto', borderColor: 'rgba(71,85,105,0.3)',   color: '#475569', dotAnim: '' },
+        green:  { label: 'In volo',     borderColor: 'rgba(34,211,238,0.3)',  color: '#22d3ee' },
+        yellow: { label: 'In partenza', borderColor: 'rgba(245,158,11,0.3)',  color: '#f59e0b' },
+        red:    { label: 'Atterrato',   borderColor: 'rgba(239,68,68,0.3)',   color: '#ef4444' },
+        gray:   { label: 'Sconosciuto', borderColor: 'rgba(71,85,105,0.3)',   color: '#475569' },
     };
 
     function showResults(data) {
         document.getElementById("search-section").classList.add("search-active");
         heroTitleText.style.display = "none";
-        heroSubtitle.style.display = "none";
-        heroBadge.style.display = "none";
+        heroSubtitle.style.display  = "none";
+        heroBadge.style.display     = "none";
         cardsContainer.style.display = "none";
-        statsBar.style.display = "none";
+        statsBar.style.display      = "none";
         resultContainer.style.display = "block";
 
-        let filteredData = [...data];
-        const activeBtn = document.querySelector(".filter-pill.selected");
-        const filtro = {
-            "btn-in-arrivo": filtri.inArrivoProssimi,
-            "btn-in-partenza": filtri.inPartenzaProssimi,
-            "btn-atterrati": filtri.atterrati,
-            "btn-paese": filtri.inPaese
-        }[activeBtn?.id];
-
-        if (filtro) {
-            filteredData = filteredData.filter(filtro);
-        } else {
-            filteredData = filteredData.filter(f => f.status !== "red");
-        }
-
-        if (filteredData.length === 0) {
+        // Il server manda già i dati filtrati e ordinati — nessun filtro lato client
+        if (data.length === 0) {
             resultContainer.innerHTML = '<p class="no-results">Nessun volo trovato.</p>';
             return;
         }
 
         resultContainer.innerHTML = '<h3 class="results-title">Risultati</h3>';
 
-        filteredData.forEach(flight => {
+        data.forEach(flight => {
             const statusClass = ['green','yellow','red'].includes(flight.status) ? flight.status : 'gray';
             const cfg = statusConfig[statusClass];
             const card = document.createElement("div");
             card.className = "flight-card";
             card.addEventListener("click", () => window.location.href = `/flights/${flight.id}`);
             card.innerHTML = `
-            <div class="flight-card-content">
-                <div class="result-status-badge" style="border-color:${cfg.borderColor}; color:${cfg.color};">
-                    <span class="result-status-dot" style="background:${cfg.color};"></span>
-                    ${cfg.label}
-                </div>
-                <img src="${flight.airplane_model.image_path}" alt="Aereo" class="airplane-image">
-                <div class="flight-info">
-                    <h5 class="flight-route">
-                        ${flight.departure_airport.name}
-                        <span class="route-arrow"><i class="bi bi-airplane-fill"></i></span>
-                        ${flight.arrival_airport.name}
-                    </h5>
-                    <p class="flight-times">
-                        ${new Date(flight.departure_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
-                        <span class="arrow">→</span>
-                        ${new Date(flight.arrival_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
-                    </p>
-                    <p class="aircraft-info"><strong>${flight.airplane_model.name}</strong></p>
-                </div>
-            </div>`;
+        <div class="flight-card-content">
+            <div class="result-status-badge" style="border-color:${cfg.borderColor}; color:${cfg.color};">
+                <span class="result-status-dot" style="background:${cfg.color};"></span>
+                ${cfg.label}
+            </div>
+            <img src="${flight.airplane_model.image_path}" alt="Aereo" class="airplane-image">
+            <div class="flight-info">
+                <h5 class="flight-route">
+                    ${flight.departure_airport.name}
+                    <span class="route-arrow"><i class="bi bi-airplane-fill"></i></span>
+                    ${flight.arrival_airport.name}
+                </h5>
+                <p class="flight-times">
+                    ${new Date(flight.departure_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+                    <span class="arrow">→</span>
+                    ${new Date(flight.arrival_time).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+                </p>
+                <p class="aircraft-info"><strong>${flight.airplane_model.name}</strong></p>
+            </div>
+        </div>`;
             resultContainer.appendChild(card);
         });
     }
 
+    function fetchAndShow(query, filter = '') {
+        fetch(`/search-flights?query=${encodeURIComponent(query)}&filter=${filter}`)
+            .then(r => r.json())
+            .then(data => showResults(data));
+    }
+
     input.addEventListener("input", () => {
         const query = input.value.trim();
-        const filtroAttivo = document.querySelector(".filter-pill.selected");
-        if (query.length > 0 || filtroAttivo) {
-            fetch(`/search-flights?query=${encodeURIComponent(query)}`)
-                .then(r => r.json())
-                .then(data => showResults(data));
+        const activeFilter = document.querySelector(".filter-pill.selected")?.dataset.filter ?? '';
+        if (query.length > 0 || activeFilter) {
+            fetchAndShow(query, activeFilter);
         } else {
             disableSearch();
         }
@@ -475,13 +457,12 @@
             deselectAll();
             if (!wasSelected) btn.classList.add("selected");
             const query = input.value.trim();
-            const filtroAttivo = document.querySelector(".filter-pill.selected");
-            if (!query && !filtroAttivo) { disableSearch(); return; }
-            fetch(`/search-flights?query=${encodeURIComponent(query)}`)
-                .then(r => r.json())
-                .then(data => showResults(data));
+            const activeFilter = document.querySelector(".filter-pill.selected")?.dataset.filter ?? '';
+            if (!query && !activeFilter) { disableSearch(); return; }
+            fetchAndShow(query, activeFilter);
         });
     });
+
 </script>
 </body>
 </html>

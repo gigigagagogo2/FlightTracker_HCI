@@ -10,25 +10,85 @@ class FlightController extends Controller
 {
     public function search(Request $request)
     {
-        $query = $request->input('query');
+        $query  = $request->input('query', '');
+        $filter = $request->input('filter', '');
+        $now    = Carbon::now();
 
         $flights = Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])
             ->where(function ($q) use ($query) {
+                if ($query === '') return;
                 $q->whereHas('departureAirport', function ($sub) use ($query) {
                     $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])
                         ->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
-                });
-            })
-            ->orWhere(function ($q) use ($query) {
-                $q->whereHas('arrivalAirport', function ($sub) use ($query) {
+                })->orWhereHas('arrivalAirport', function ($sub) use ($query) {
                     $sub->whereRaw("LOWER(REGEXP_REPLACE(name, '^aeroporto\\s*', '')) LIKE ?", ["%" . strtolower($query) . "%"])
                         ->orWhereRaw('LOWER(city) LIKE ?', ["%" . strtolower($query) . "%"]);
                 });
-            })
-            ->limit(20)
-            ->get();
+            });
 
-        return response()->json($flights);
+        switch ($filter) {
+            case 'in_arrivo':
+                // Voli in volo che arrivano nelle prossime 2 ore
+                $flights->where('departure_time', '<=', $now)
+                    ->where('arrival_time', '>=', $now)
+                    ->where('arrival_time', '<=', $now->copy()->addHours(2))
+                    ->orderBy('arrival_time', 'asc');
+                break;
+
+            case 'in_partenza':
+                // Voli che partono nelle prossime 2 ore
+                $flights->where('departure_time', '>=', $now)
+                    ->where('departure_time', '<=', $now->copy()->addHours(2))
+                    ->orderBy('departure_time', 'asc');
+                break;
+
+            case 'atterrati':
+                // Voli già atterrati (arrival_time nel passato)
+                $flights->where('arrival_time', '<', $now)
+                    ->orderBy('arrival_time', 'desc');  // prima i più recenti
+                break;
+                
+            case str_starts_with($filter, 'paese_'):
+                $paese = substr($filter, 6);
+                $flights->where(function($q) use ($paese) {
+                    $q->whereHas('departureAirport', fn($s) => $s->where('country', $paese))
+                        ->orWhereHas('arrivalAirport',  fn($s) => $s->where('country', $paese));
+                })->where('departure_time', '<=', $now)
+                    ->where('arrival_time',   '>=', $now)
+                    ->orderBy('departure_time', 'asc');
+                break;
+
+            default:
+
+                $flights->orderByRaw("
+                CASE
+                    WHEN departure_time <= ? AND arrival_time >= ? THEN 1
+                    WHEN departure_time > ? THEN 2
+                    ELSE 3
+                END
+            ", [$now, $now, $now])
+                    ->orderBy('departure_time', 'asc');
+                break;
+        }
+
+        $results = $flights->limit(20)->get();
+
+        $results->each(function ($flight) use ($now) {
+            $dep = Carbon::parse($flight->departure_time);
+            $arr = Carbon::parse($flight->arrival_time);
+
+            if ($dep <= $now && $arr >= $now) {
+                $flight->status = 'green';   // in volo
+            } elseif ($dep > $now && $dep <= $now->copy()->addHours(2)) {
+                $flight->status = 'yellow';  // in partenza
+            } elseif ($arr < $now) {
+                $flight->status = 'red';     // atterrato
+            } else {
+                $flight->status = 'gray';
+            }
+        });
+
+        return response()->json($results);
     }
 
     private function haversineDistance($lat1, $lon1, $lat2, $lon2)

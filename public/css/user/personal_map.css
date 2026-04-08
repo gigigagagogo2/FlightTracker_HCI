@@ -86,15 +86,6 @@ body.page-map .site-footer { margin-top: 0; }
     position: relative;
 }
 
-.flight-panel::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--amber), var(--cyan));
-    z-index: 1;
-}
-
 /* ── HEADER ── */
 .panel-header {
     padding: 2rem 1.75rem 1.25rem;
@@ -543,4 +534,39 @@ body.page-map .site-footer { margin-top: 0; }
 .detail-remove-btn:hover {
     background: rgba(239,68,68,0.12);
     transform: scale(1.15);
+}
+
+/* ── Sezioni lista (In volo / Atterrati) ── */
+
+.flist-section { margin-top: 0.5rem; }
+
+.flist-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding: 0.4rem 0.75rem 0.2rem;
+    margin: 0;
+}
+
+.flist-section-label--landed { color: #475569; }
+
+/* Volo atterrato: attenuato, icona diversa, click → summary */
+.flight-list-item.atterrato {
+    opacity: 0.65;
+    cursor: pointer;
+}
+
+.flight-list-item.atterrato:hover {
+    opacity: 0.9;
+    background: rgba(255,255,255,0.04);
+}
+
+.flight-list-item.atterrato .fli-icon i {
+    color: var(--text-muted);
+}
+
+.flight-list-item.atterrato .fli-model {
+    color: var(--text-secondary);
 }

@@ -74,14 +74,28 @@
                     ->withInput();
             }
 
-            $user->nickname = $validator->validated()['nickname'];
-            $user->email    = $validator->validated()['email'];
+            $validated    = $validator->validated();
+            $emailChanged = $user->email !== $validated['email'];
 
-            if (!empty($validator->validated()['password']))    {
-                $user->password = Hash::make($validator->validated()['password']);
+            $user->nickname = $validated['nickname'];
+            $user->email    = $validated['email'];
+
+            if (!empty($validated['password'])) {
+                $user->password = Hash::make($validated['password']);
+            }
+
+            if ($emailChanged) {
+                $user->email_verified_at = null;
             }
 
             $user->save();
+
+            if ($emailChanged) {
+                $user->sendEmailVerificationNotification();
+                return redirect()->route('admin.dashboard')
+                    ->withFragment('users')
+                    ->with('success', 'Utente aggiornato. Email di verifica inviata al nuovo indirizzo.');
+            }
 
             return redirect()->route('admin.dashboard')
                 ->withFragment('users')

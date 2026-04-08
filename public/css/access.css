@@ -166,6 +166,12 @@
 
 .auth-eye:hover { color: var(--text-secondary); }
 
+/* Stato attivo: occhio illuminato in amber quando la password è visibile */
+.auth-eye.is-active {
+    color: var(--amber);
+    filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.55));
+}
+
 .auth-error {
     display: block;
     font-family: 'DM Mono', monospace;

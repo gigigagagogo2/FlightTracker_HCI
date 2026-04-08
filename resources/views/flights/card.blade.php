@@ -234,16 +234,33 @@
         } catch (err) { console.error("Errore fetch:", err); return null; }
     }
 
+    let isLanded = false;
+
     async function aggiornaPosizione() {
+        if (isLanded) return;
         try {
             const data = await fetchFlightData();
             if (!data) return;
+
             if (data.progress === 1) {
-                if (overlay) overlay.setMap(null);
-                if (route)   route.setMap(null);
-                overlay = null; route = null;
+                isLanded = true;
+                // Sposta il piano sulla destinazione e mostra stato atterrato
+                const arrPos = new google.maps.LatLng(
+                    parseFloat('{{ $flight->arrivalAirport->latitude }}'),
+                    parseFloat('{{ $flight->arrivalAirport->longitude }}')
+                );
+                if (overlay) overlay.setPosition(arrPos);
+                if (route)   { route.setMap(null); route = null; }
+                // Aggiorna UI
+                document.querySelector('.flight-badge').innerHTML = 'ATTERRATO';
+                document.getElementById('progress-bar').style.width = '100%';
+                document.getElementById('progress-pct').innerText   = '100%';
+                document.getElementById('current-speed').innerText  = '0 km/h';
+                document.getElementById('current-coordinates').innerText =
+                    `${parseFloat('{{ $flight->arrivalAirport->latitude }}').toFixed(2)}° / ${parseFloat('{{ $flight->arrivalAirport->longitude }}').toFixed(2)}°`;
                 return;
             }
+
             const pos = new google.maps.LatLng(data.lat, data.lng);
             overlay.setPosition(pos);
             document.getElementById("current-coordinates").innerText = `${pos.lat().toFixed(2)}° / ${pos.lng().toFixed(2)}°`;

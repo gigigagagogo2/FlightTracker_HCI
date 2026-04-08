@@ -18,6 +18,15 @@ Route::get('/flights/vicino', [HomeController::class, 'vicino'])->name('flights.
 Route::get('/search-flights', [FlightController::class, 'search'])->name('flights.search');
 Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.show');
 Route::post('/api/simulazione-voli', [FlightSimulationController::class, 'getMultipleFlightData']);
+Route::get('/api/flight-info/{id}', function ($id) {
+    $flight = \App\Models\Flight::with(['airplaneModel', 'departureAirport', 'arrivalAirport'])->find($id);
+    if (!$flight) return response()->json(null, 404);
+    return response()->json([
+        'from'  => $flight->departureAirport->city,
+        'to'    => $flight->arrivalAirport->city,
+        'model' => $flight->airplaneModel->name,
+    ]);
+});
 Route::view('/privacy', 'privacy')->name('privacy');
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/about', 'about')->name('about');

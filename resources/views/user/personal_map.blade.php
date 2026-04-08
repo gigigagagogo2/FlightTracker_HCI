@@ -23,12 +23,6 @@
             <p class="map-empty__sub">Aggiungi voli ai preferiti per visualizzarli sulla mappa.</p>
             <a href="{{ route('home') }}" class="map-empty__btn">Esplora i voli</a>
         </div>
-    @elseif($activeFlightsCount === 0)
-        <div class="map-empty">
-            <div class="map-empty__icon"><i class="fas fa-plane-slash"></i></div>
-            <h3 class="map-empty__title">Nessun volo in corso</h3>
-            <p class="map-empty__sub">I tuoi voli preferiti non sono attualmente in volo.</p>
-        </div>
     @else
         <div class="map-layout">
 
@@ -43,28 +37,40 @@
                             Live
                         </div>
                         <h1>La mia <span>mappa</span></h1>
-                        <p class="panel-sub">{{ $activeFlightsCount }} volo/i attivo/i — clicca per i dettagli</p>
+                        <p class="panel-sub" id="panelSub">{{ $activeFlightsCount }} volo/i attivo/i — clicca per i dettagli</p>
                     </div>
 
-                    <div class="flight-list" id="flightList">
-                        @foreach($flights as $flight)
-                            <div class="flight-list-item" data-id="{{ $flight->id }}" onclick="selectFlight({{ $flight->id }})">
-                                <div class="fli-icon"><i class="fas fa-plane"></i></div>
-                                <div class="fli-info">
-                                    <div class="fli-model">{{ $flight->airplaneModel->name }}</div>
-                                    <div class="fli-route">
-                                        {{ $flight->departureAirport->city }}
-                                        <i class="fas fa-arrow-right fli-arrow"></i>
-                                        {{ $flight->arrivalAirport->city }}
+                    <div class="flight-list">
+                        <!-- Sezione voli attivi -->
+                        <div class="flist-section" id="sectionActive">
+                            <p class="flist-section-label">In volo</p>
+                            <div id="flightListActive">
+                                @foreach($flights as $flight)
+                                    <div class="flight-list-item" data-id="{{ $flight->id }}" onclick="selectFlight({{ $flight->id }})">
+                                        <div class="fli-icon"><i class="fas fa-plane"></i></div>
+                                        <div class="fli-info">
+                                            <div class="fli-model">{{ $flight->airplaneModel->name }}</div>
+                                            <div class="fli-route">
+                                                {{ $flight->departureAirport->city }}
+                                                <i class="fas fa-arrow-right fli-arrow"></i>
+                                                {{ $flight->arrivalAirport->city }}
+                                            </div>
+                                        </div>
+                                        <button class="fli-remove"
+                                                title="Rimuovi dai preferiti"
+                                                onclick="event.stopPropagation(); openRemovePopup({{ $flight->id }}, '{{ addslashes($flight->airplaneModel->name) }}')">
+                                            <i class="fas fa-heart"></i>
+                                        </button>
                                     </div>
-                                </div>
-                                <button class="fli-remove"
-                                        title="Rimuovi dai preferiti"
-                                        onclick="event.stopPropagation(); openRemovePopup({{ $flight->id }}, '{{ addslashes($flight->airplaneModel->name) }}')">
-                                    <i class="fas fa-heart"></i>
-                                </button>
+                                @endforeach
                             </div>
-                        @endforeach
+                        </div>
+
+                        <!-- Sezione voli atterrati (popolata dinamicamente) -->
+                        <div class="flist-section flist-section--landed" id="sectionLanded" style="display:none;">
+                            <p class="flist-section-label flist-section-label--landed">Atterrati</p>
+                            <div id="flightListLanded"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -294,6 +300,12 @@
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const simData = await res.json();
 
+            // Voli già atterrati al caricamento: vanno in sezione atterrati
+            flights.forEach(flight => {
+                const data = simData[flight.id];
+                if (data?.progress === 1) spostaAdAtterrato(flight.id);
+            });
+
             await Promise.all(flights.map(async flight => {
                 const data = simData[flight.id];
                 if (!data || data.progress === 1) return;
@@ -314,6 +326,7 @@
                     map
                 });
             }));
+
         } catch (err) { console.error('Errore simulazione:', err); }
 
         let offset = 0;
@@ -344,9 +357,16 @@
             for (const flightId in data) {
                 const fd = data[flightId];
                 if (fd.progress === 1) {
+                    // Rimuove SOLO dalla mappa, NON dalla lista
                     overlays[flightId]?.setMap(null); routes[flightId]?.setMap(null);
                     delete overlays[flightId]; delete routes[flightId];
-                    document.querySelector(`.flight-list-item[data-id="${flightId}"]`)?.remove();
+                    spostaAdAtterrato(parseInt(flightId));
+
+                    // Se stavo guardando questo volo in dettaglio, torna alla lista
+                    if (parseInt(flightId) === currentFlightId) {
+                        tornataLista();
+                        showToast('Il volo è atterrato', 'info');
+                    }
                     continue;
                 }
                 const pos = new google.maps.LatLng(fd.lat, fd.lng);
@@ -419,6 +439,32 @@
 
         document.getElementById('viewList').style.display   = 'none';
         document.getElementById('viewDetail').style.display = 'block';
+    }
+
+    function spostaAdAtterrato(flightId) {
+        const item = document.querySelector(`#flightListActive .flight-list-item[data-id="${flightId}"]`);
+        if (!item || item.closest('#flightListLanded')) return; // già spostato
+
+        // Cambia icona e comportamento click
+        const icon = item.querySelector('.fli-icon i');
+        if (icon) icon.className = 'fas fa-plane-arrival';
+        item.classList.add('atterrato');
+        item.onclick = () => window.location.href = `/flights/${flightId}`;
+
+        // Sposta nella sezione atterrati
+        document.getElementById('flightListLanded').appendChild(item);
+        document.getElementById('sectionLanded').style.display = 'block';
+
+        // Nasconde sezione "In volo" se vuota
+        const activeItems = document.querySelectorAll('#flightListActive .flight-list-item');
+        if (activeItems.length === 0) {
+            document.getElementById('sectionActive').style.display = 'none';
+        }
+
+        // Aggiorna contatore nel sottotitolo
+        const activeCount = document.querySelectorAll('#flightListActive .flight-list-item').length;
+        const sub = document.getElementById('panelSub');
+        if (sub) sub.textContent = `${activeCount} volo/i attivo/i — clicca per i dettagli`;
     }
 
     function tornataLista() {

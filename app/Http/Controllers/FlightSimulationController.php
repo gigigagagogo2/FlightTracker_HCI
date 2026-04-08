@@ -20,6 +20,4 @@ class FlightSimulationController extends Controller
         return response()->json($service->simulateMultipleFlights($flights));
     }
 
-
-
 }

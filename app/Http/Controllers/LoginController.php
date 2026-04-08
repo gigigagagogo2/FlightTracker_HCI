@@ -26,8 +26,10 @@ class LoginController extends Controller
         // Tentativo di login
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate(); // protegge da session fixation (attacco)
-            // Se il login è riuscito ti reindirizza dove si voleva andare prima del login (intended).
-            // Pagina di reindirizzamento di defaul: '/'
+            // Se è admin va direttamente alla dashboard, altrimenti alla home
+            if (Auth::user()->is_admin) {
+                return redirect()->route('admin.dashboard');
+            }
             return redirect()->intended('/');
         }
 

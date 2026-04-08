@@ -10,6 +10,7 @@ class HomeController extends Controller
 {
     public function index()
     {
+
         $now = Carbon::now();
 
         $popolari = Flight::with(['departureAirport', 'arrivalAirport', 'airplaneModel'])

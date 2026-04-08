@@ -80,9 +80,6 @@
                         <div class="avatar-email">{{ Auth::user()->email }}</div>
 
                         <div class="avatar-links">
-                            <a href="{{ route('user.flights') }}" class="avatar-link">
-                                <i class="bi bi-airplane"></i> I miei voli
-                            </a>
                             <a href="{{ route('user.personal.map') }}" class="avatar-link">
                                 <i class="bi bi-map"></i> La mia mappa
                             </a>
@@ -135,30 +132,40 @@
                         <!-- Password -->
                         <div class="profile-field">
                             <label class="profile-label">Nuova password <span class="profile-label__optional">(lascia vuoto per non cambiarla)</span></label>
-                            <div class="profile-input-wrap profile-input-wrap--pw">
-                                <i class="bi bi-lock profile-input-icon"></i>
-                                <input type="password" name="password" id="profile-password"
-                                       class="profile-input {{ $errors->has('password') ? 'profile-input--error' : '' }}"
-                                       autocomplete="new-password"
-                                       readonly>
+                            <!-- Wrapper con position:relative che contiene input+occhio E il popup -->
+                            <div class="profile-pw-wrap">
+                                <div class="profile-input-wrap profile-input-wrap--pw">
+                                    <i class="bi bi-lock profile-input-icon"></i>
+                                    <input type="password" name="password" id="profile-password"
+                                           class="profile-input {{ $errors->has('password') ? 'profile-input--error' : '' }}"
+                                           autocomplete="new-password"
+                                           readonly>
+                                    <button type="button" class="auth-eye" id="profile-eye-btn"
+                                            onclick="toggleProfilePassword()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                            <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="1.5"/>
+                                        </svg>
+                                    </button>
+                                </div><!-- end profile-input-wrap--pw -->
 
-                                <!-- Popup regole password -->
-                                <div class="pw-popup" id="profile-pw-popup" style="display:none;">
-                                    <div class="pw-popup__strength">
-                                        <div class="pw-popup__track">
-                                            <div class="pw-popup__fill" id="profile-strength-bar"></div>
-                                        </div>
-                                        <span class="pw-popup__label" id="profile-strength-label"></span>
+                            <!-- Popup regole password -->
+                            <div class="pw-popup" id="profile-pw-popup" style="display:none;">
+                                <div class="pw-popup__strength">
+                                    <div class="pw-popup__track">
+                                        <div class="pw-popup__fill" id="profile-strength-bar"></div>
                                     </div>
-                                    <ul class="pw-popup__rules">
-                                        <li class="rule" id="profile-rule-length"><span class="rule-icon"></span> Almeno 8 caratteri</li>
-                                        <li class="rule" id="profile-rule-uppercase"><span class="rule-icon"></span> Almeno una maiuscola</li>
-                                        <li class="rule" id="profile-rule-lowercase"><span class="rule-icon"></span> Almeno una minuscola</li>
-                                        <li class="rule" id="profile-rule-number"><span class="rule-icon"></span> Almeno un numero</li>
-                                        <li class="rule" id="profile-rule-special"><span class="rule-icon"></span> Almeno un carattere speciale</li>
-                                    </ul>
+                                    <span class="pw-popup__label" id="profile-strength-label"></span>
                                 </div>
-                            </div><!-- end profile-input-wrap--pw -->
+                                <ul class="pw-popup__rules">
+                                    <li class="rule" id="profile-rule-length"><span class="rule-icon"></span> Almeno 8 caratteri</li>
+                                    <li class="rule" id="profile-rule-uppercase"><span class="rule-icon"></span> Almeno una maiuscola</li>
+                                    <li class="rule" id="profile-rule-lowercase"><span class="rule-icon"></span> Almeno una minuscola</li>
+                                    <li class="rule" id="profile-rule-number"><span class="rule-icon"></span> Almeno un numero</li>
+                                    <li class="rule" id="profile-rule-special"><span class="rule-icon"></span> Almeno un carattere speciale</li>
+                                </ul>
+                            </div><!-- end pw-popup -->
+                            </div><!-- end profile-pw-wrap -->
 
                             @error('password')
                             <span class="profile-field-error">{{ $message }}</span>
@@ -187,6 +194,13 @@
 @include("footer")
 
 <script>
+    function toggleProfilePassword() {
+        const input = document.getElementById('profile-password');
+        const btn   = document.getElementById('profile-eye-btn');
+        input.type  = input.type === 'password' ? 'text' : 'password';
+        btn.classList.toggle('is-active', input.type === 'text');
+    }
+
     const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
 
     function checkProfileForm() {
@@ -279,6 +293,16 @@
         profileStrengthBar.style.background = level.color;
         profileStrengthLabel.textContent    = level.label;
         profileStrengthLabel.style.color    = level.color;
+    });
+
+    // Chiude il popup password cliccando fuori dal campo o dal popup stesso
+    document.addEventListener('click', (e) => {
+        const popup = document.getElementById('profile-pw-popup');
+        const input = document.getElementById('profile-password');
+        const eye   = document.getElementById('profile-eye-btn');
+        if (!input.contains(e.target) && !popup.contains(e.target) && !eye.contains(e.target)) {
+            popup.style.display = 'none';
+        }
     });
 
     // Auto-dismiss alerts di sessione

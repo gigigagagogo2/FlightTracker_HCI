@@ -39,8 +39,8 @@ class FlightSeeder extends Seeder
                     ->setTime(rand(0, 23), [0, 15, 30, 45][rand(0, 3)], 0);
             }
 
-            #$arrivalTime = (clone $departureTime)->addMinutes(2);
-            $arrivalTime = (clone $departureTime)->addHours(rand(1, 5))->addMinutes(rand(0, 59));
+            $arrivalTime = (clone $departureTime)->addMinutes(2);
+            #$arrivalTime = (clone $departureTime)->addHours(rand(1, 5))->addMinutes(rand(0, 59));
 
             Flight::create([
                 'airplane_model_id'    => $airplanes->random()->id,

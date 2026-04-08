@@ -1,24 +1,108 @@
+/* ── Footer ─────────────────────────────────────────── */
+
 .site-footer {
     width: 100%;
     background-color: #060b14;
-    padding: 2rem 1rem;
-    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 2rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
     text-align: center;
-    font-size: 0.95rem;
-    color: #475569;
-    margin-top: 0;
 }
 
-.site-footer a {
+.footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Riga contatti */
+.footer-contact {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);   /* #94a3b8 — leggibile su navy scuro */
+    margin: 0;
+}
+
+.footer-contact__icon {
+    font-style: normal;
+    opacity: 0.7;
+}
+
+.footer-contact a {
+    color: var(--text-primary);     /* #f1f5f9 — link email ben visibile */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-contact a:hover {
+    color: var(--amber);
+}
+
+/* Riga link navigazione */
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.footer-links a {
+    color: var(--text-secondary);   /* #94a3b8 */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: var(--amber);
+}
+
+.footer-links__sep {
+    color: var(--text-muted);       /* #475569 — il separatore può restare attenuato */
+    user-select: none;
+}
+
+/* Copyright */
+.footer-copy {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0.4rem 0 0;
+}
+
+/* ── Variante chiara (solo admin panel) ────────────────── */
+
+.site-footer--light {
+    background-color: #f8fafc;
+    border-top: 1px solid #e3e8ef;
+}
+
+.site-footer--light .footer-contact {
+    color: #64748b;
+}
+
+.site-footer--light .footer-contact a {
+    color: #334155;
+}
+
+.site-footer--light .footer-contact a:hover {
+    color: #b45309;
+}
+
+.site-footer--light .footer-links a {
+    color: #64748b;
+}
+
+.site-footer--light .footer-links a:hover {
+    color: #b45309;
+}
+
+.site-footer--light .footer-links__sep {
+    color: #cbd5e1;
+}
+
+.site-footer--light .footer-copy {
     color: #94a3b8;
-    text-decoration: none;
-}
-
-.site-footer a:hover {
-    color: #f59e0b;
-    text-decoration: none;
-}
-
-.footer-content p {
-    margin: 0.3rem 0;
 }

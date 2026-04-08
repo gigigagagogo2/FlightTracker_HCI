@@ -279,6 +279,11 @@ input[type="file"] { display: none; }
     align-items: center;
 }
 
+/* Wrapper che contiene input-wrap + popup: il popup si posiziona rispetto a questo */
+.profile-pw-wrap {
+    position: relative;
+}
+
 .profile-input-wrap--pw {
     position: relative;
 }

@@ -1,134 +1,316 @@
-/* ========== Navbar generale ========== */
-.navbar {
-    position: relative;
+/*
+ * NAVBAR — FlightTracker HCI
+ * Patterns: Persistent Navigation · Visual Hierarchy · Button Group
+ *           Visual Feedback · Fitts's Law · Tooltip (al posto di dropdown)
+ */
+
+/* ── Base ─────────────────────────────────────────────── */
+
+.ft-navbar {
+    position: sticky;
     top: 0;
-    left: 0;
     width: 100%;
-    height: 60px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
+    background: #111827; /* var(--navy-mid) solido — colore costante indipendente dallo scroll */
+    border-bottom: 1px solid var(--border);
+}
+
+.ft-navbar__inner {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 60px;
 }
 
-/* ========== Link navbar ========== */
-.navbar .nav-link {
-    color: #333;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    position: relative;
+.ft-navbar__bar {
+    height: 2px;
+    background: linear-gradient(90deg, var(--amber), var(--cyan));
+    opacity: 0.55;
 }
 
-.navbar .nav-link:hover,
-.nav-link.dropdown-toggle-no-caret:hover,
-.nav-link.dropdown-toggle-no-caret:focus {
-    color: #0d6efd;
+/* ── Brand ────────────────────────────────────────────── */
+
+.ft-navbar__brand {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
     text-decoration: none;
+    transition: opacity 0.2s ease;
+    flex-shrink: 0;
 }
 
-/* Spaziatura tra nav-items */
-.navbar-nav .nav-item {
-    margin-right: 1rem;
-}
-.navbar-nav .nav-item:last-child {
-    margin-right: 0;
+.ft-navbar__brand:hover { opacity: 0.8; }
+
+.ft-navbar__brand-accent { color: var(--amber); }
+
+/* ── Lista azioni ─────────────────────────────────────── */
+
+.ft-navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-/* ========== Icone generiche ========== */
-.home-icon,
-.map-icon,
-.profile-icon {
-    font-size: 24px;
-    color: #6c757d;
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
-    transition: all 0.3s ease;
-}
-.home-icon:hover,
-.map-icon:hover,
-.profile-icon:hover {
-    transform: scale(1.1);
-    color: #007bff !important;
-    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
+/* ── Link testuali (Accedi / Registrati) ──────────────── */
+
+.ft-navbar__link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: color 0.2s ease, background 0.2s ease;
+    position: relative;
+    white-space: nowrap;
 }
 
-/* ========== Foto profilo ========== */
-.profile-pic {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    object-fit: cover;
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
-    transition: all 0.3s ease;
-}
-.profile-pic:hover {
-    transform: scale(1.1);
-    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
-}
-
-/* Hover extra per icone contenute nei link */
-.nav-link:hover .home-icon,
-.nav-link:hover .map-icon,
-.nav-link:hover .profile-icon {
-    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.5));
+.ft-navbar__link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0.75rem;
+    right: 0.75rem;
+    height: 1px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s ease;
 }
 
-/* ========== Responsive ========== */
-@media (max-width: 768px) {
-    .home-icon,
-    .map-icon,
-    .profile-icon {
-        font-size: 20px;
-    }
-    .profile-pic {
-        width: 20px;
-        height: 20px;
-    }
+.ft-navbar__link:hover,
+.ft-navbar__link:focus-visible {
+    color: var(--text-primary);
+    background: var(--glass);
+    outline: none;
 }
 
-/* ========== Dropdown profilo ========== */
-
-/* Rimuove caret da dropdown Bootstrap */
-.dropdown-toggle-no-caret::after {
-    display: none;
+.ft-navbar__link:hover::after,
+.ft-navbar__link:focus-visible::after {
+    transform: scaleX(1);
 }
 
-/* Aumenta area cliccabile e allinea dropdown */
-#profileDropdown {
+/* ── Bottoni icona (Fitts's Law: area ≥ 40×40 px) ────── */
+
+.ft-navbar__icon-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
     padding: 0;
-    position: relative;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 8px;
     cursor: pointer;
-    border-radius: 6px;
-}
-#profileDropdown:hover,
-#profileDropdown:focus {
-    background-color: rgba(13, 110, 253, 0.1);
-    color: #0d6efd;
     text-decoration: none;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    font-family: inherit;
+    flex-shrink: 0;
+    position: relative; /* necessario per il tooltip */
 }
 
-/* Posizionamento dropdown */
-.navbar-nav .dropdown-menu {
-    position: absolute !important;
-    margin-top: 0 !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    min-width: 160px;
-    z-index: 1050;
+.ft-navbar__icon-btn:hover {
+    color: var(--amber);
+    background: var(--amber-glow);
+    transform: scale(1.07);
 }
 
-/* Mostra dropdown su hover */
-.nav-item.dropdown:hover > .dropdown-menu {
-    display: block;
+.ft-navbar__icon-btn:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
 }
 
-/* Fix per evitare spostamenti su hover */
-.nav-item.dropdown {
-    position: relative;
+/* ── Tooltip al hover (verso il BASSO — navbar è in cima) ── */
+
+[data-tooltip] { position: relative; }
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    /* Appare sotto il bottone, non sopra (evita uscita dallo schermo) */
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    background: var(--navy-light);
+    color: var(--text-primary);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-hover);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── Avatar ───────────────────────────────────────────── */
+
+.ft-navbar__avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--border-hover);
+    transition: border-color 0.2s ease;
+}
+
+.ft-navbar__icon-btn:hover .ft-navbar__avatar { border-color: var(--amber); }
+
+.ft-navbar__avatar--admin { border-color: rgba(34, 211, 238, 0.4); }
+
+.ft-navbar__icon-btn:hover .ft-navbar__avatar--admin { border-color: var(--cyan); }
+
+/* ── Button Group ─────────────────────────────────────── */
+
+.ft-btn-group {
+    display: inline-flex;
+    align-items: center;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 0;
+}
+
+.ft-btn-group__sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border-hover);
+    flex-shrink: 0;
+    margin: 0 2px;
+}
+
+/* Variante admin: accento cyan */
+.ft-btn-group--admin {
+    border-color: rgba(34, 211, 238, 0.22);
+    background: rgba(34, 211, 238, 0.04);
+}
+
+.ft-btn-group--admin .ft-navbar__icon-btn:hover {
+    color: var(--cyan);
+    background: var(--cyan-glow);
+}
+
+.ft-btn-group--admin .ft-navbar__icon-btn:focus-visible {
+    outline-color: var(--cyan);
+    color: var(--cyan);
+    background: var(--cyan-glow);
+}
+
+/* ── Badge Admin ──────────────────────────────────────── */
+
+.ft-admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+    height: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--cyan);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Variante chiara (solo admin panel) ───────────────── */
+/*
+ * Quando l'admin è nel pannello di controllo la navbar usa
+ * il tema chiaro per coordinarsi con il bianco della dashboard.
+ * Il footer admin riceve la stessa classe dal blade.
+ */
+
+.ft-navbar--light {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 1px solid #e3e8ef;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.ft-navbar--light .ft-navbar__bar {
+    opacity: 1;
+}
+
+.ft-navbar--light .ft-navbar__brand {
+    color: #1e293b;
+}
+
+.ft-navbar--light .ft-navbar__brand-accent {
+    color: #b45309; /* amber scuro, leggibile su bianco */
+}
+
+.ft-navbar--light .ft-navbar__icon-btn {
+    color: #64748b;
+}
+
+.ft-navbar--light .ft-navbar__icon-btn:hover {
+    color: #b45309;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+/* Badge admin su sfondo chiaro */
+.ft-navbar--light .ft-admin-badge {
+    color: #0e7490; /* cyan scuro, leggibile su bianco */
+}
+
+/* Gruppo admin su sfondo chiaro — bordo e sfondo più visibili */
+.ft-navbar--light .ft-btn-group--admin {
+    border-color: rgba(14, 116, 144, 0.55);
+    background: rgba(14, 116, 144, 0.1);
+    box-shadow: 0 0 0 1px rgba(14, 116, 144, 0.12);
+}
+
+.ft-navbar--light .ft-btn-group--admin .ft-navbar__icon-btn:hover {
+    color: #0e7490;
+    background: rgba(14, 116, 144, 0.1);
+}
+
+/* Separatori su sfondo chiaro */
+.ft-navbar--light .ft-btn-group {
+    background: #f8fafc;
+    border-color: #e3e8ef;
+}
+
+.ft-navbar--light .ft-btn-group__sep {
+    background: #e3e8ef;
+}
+
+/* Tooltip su navbar chiara: dark per contrasto */
+.ft-navbar--light [data-tooltip]::after {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #334155;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    .ft-navbar__inner { padding: 0 1rem; }
+    .ft-navbar__link  { padding: 0.375rem 0.5rem; font-size: 0.8rem; }
+    .ft-admin-badge   { display: none; }
+}

@@ -127,14 +127,25 @@ class UserController extends Controller
             'password.symbols'    => 'La password deve contenere almeno un carattere speciale.',
         ]);
 
-        $user->nickname = $request->input('nickname');
-        $user->email = $request->input('email');
+        $user->nickname  = $request->input('nickname');
+        $emailChanged    = $user->email !== $request->input('email');
+        $user->email     = $request->input('email');
 
         if ($request->filled('password') && $request->input('password') !== '********') {
             $user->password = Hash::make($request->input('password'));
         }
 
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
         $user->save();
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+            return redirect()->route('user.profile')
+                ->with('success', 'Profilo aggiornato. Controlla la nuova email per verificare l\'indirizzo.');
+        }
 
         return redirect()->route('user.profile')->with('success', 'Profilo aggiornato con successo.');
     }

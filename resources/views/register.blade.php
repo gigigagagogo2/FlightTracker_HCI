@@ -73,8 +73,8 @@
                                placeholder="••••••••">
                         <button type="button" class="auth-eye" onclick="togglePassword('password')">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="3" stroke="#475569" stroke-width="1.5"/>
-                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="#475569" stroke-width="1.5"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="1.5"/>
                             </svg>
                         </button>
                     </div>
@@ -119,8 +119,8 @@
                                placeholder="••••••••">
                         <button type="button" class="auth-eye" onclick="togglePassword('password_confirmation')">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="3" stroke="#475569" stroke-width="1.5"/>
-                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="#475569" stroke-width="1.5"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="1.5"/>
                             </svg>
                         </button>
                     </div>
@@ -142,7 +142,9 @@
 <script>
     function togglePassword(fieldId) {
         const input = document.getElementById(fieldId);
-        input.type = input.type === 'password' ? 'text' : 'password';
+        const btn   = input.closest('.auth-input-wrap').querySelector('.auth-eye');
+        input.type  = input.type === 'password' ? 'text' : 'password';
+        btn.classList.toggle('is-active', input.type === 'text');
     }
     const passwordInput = document.getElementById('password');
     const strengthBar    = document.getElementById('strength-bar');

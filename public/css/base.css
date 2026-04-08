@@ -19,6 +19,15 @@
     --error: #ef4444;
 }
 
+/* ── SCROLLBAR MINIMAL ── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Firefox */
+* { scrollbar-width: thin; scrollbar-color: var(--border-hover) transparent; }
+
 /* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

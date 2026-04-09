@@ -75,34 +75,36 @@
 /* ── Variante chiara (solo admin panel) ────────────────── */
 
 .site-footer--light {
-    background-color: #f8fafc;
-    border-top: 1px solid #e3e8ef;
+    background-color: #f1f5f9;
+    border-top: 2px solid #cbd5e1;
 }
 
 .site-footer--light .footer-contact {
-    color: #64748b;
-}
-
-.site-footer--light .footer-contact a {
     color: #334155;
 }
 
+.site-footer--light .footer-contact a {
+    color: #0f172a;  /* quasi nero */
+    font-weight: 500;
+}
+
 .site-footer--light .footer-contact a:hover {
-    color: #b45309;
+    color: #c2410c;
 }
 
 .site-footer--light .footer-links a {
-    color: #64748b;
+    color: black;  /* più scuro del precedente #64748b */
+    font-weight: 500;
 }
 
 .site-footer--light .footer-links a:hover {
-    color: #b45309;
+    color: #c2410c;
 }
 
 .site-footer--light .footer-links__sep {
-    color: #cbd5e1;
+    color: #94a3b8;
 }
 
 .site-footer--light .footer-copy {
-    color: #94a3b8;
+    color: #64748b;
 }

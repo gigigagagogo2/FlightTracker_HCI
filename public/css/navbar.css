@@ -1,10 +1,3 @@
-/*
- * NAVBAR — FlightTracker HCI
- * Patterns: Persistent Navigation · Visual Hierarchy · Button Group
- *           Visual Feedback · Fitts's Law · Tooltip (al posto di dropdown)
- */
-
-/* ── Base ─────────────────────────────────────────────── */
 
 .ft-navbar {
     position: sticky;
@@ -261,7 +254,7 @@
 }
 
 .ft-navbar--light .ft-navbar__brand-accent {
-    color: #b45309; /* amber scuro, leggibile su bianco */
+    color: var(--amber);
 }
 
 .ft-navbar--light .ft-navbar__icon-btn {

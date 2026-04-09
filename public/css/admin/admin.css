@@ -3,7 +3,7 @@
  */
 
 body {
-    background-color: #f7f9fc;
+    background-color: #f7f9fc !important;
     font-family: 'Syne', "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
 }
@@ -82,15 +82,18 @@ body {
     flex: 1;
     padding: 2.5rem 2rem;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 62px);
 }
 
 /* ── PANNELLO BENVENUTO ── */
 .welcome-panel {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
     min-height: 400px;
     color: #94a3b8;
     gap: 1rem;

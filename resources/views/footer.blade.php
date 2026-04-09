@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+<link rel="stylesheet" href="{{ asset('css/base.css') }}">
 <footer class="site-footer {{ (auth()->check() && auth()->user()->is_admin && request()->routeIs('admin.*')) ? 'site-footer--light' : '' }}">
     <div class="footer-inner">
         <p class="footer-contact">

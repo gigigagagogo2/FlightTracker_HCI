@@ -18,6 +18,27 @@ html, body {
     width: 100%;
     max-width: 900px;
 }
+.auth-eye {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.auth-eye:hover { color: var(--text-secondary); }
+
+/* Stato attivo: occhio illuminato in amber quando la password è visibile */
+.auth-eye.is-active {
+    color: var(--amber);
+    filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.55));
+}
 
 /* ── ALERTS ── */
 .profile-alert {

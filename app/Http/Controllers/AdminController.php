@@ -240,43 +240,32 @@
                 'latitude'  => 'required|numeric|between:-90,90',
                 'longitude' => 'required|numeric|between:-180,180',
             ]);
-
-
-            // Capitalizza città e paese
-            $validated['city'] = ucfirst(strtolower(trim($validated['city'])));
+            $validated['city']    = ucfirst(strtolower(trim($validated['city'])));
             $validated['country'] = ucfirst(strtolower(trim($validated['country'])));
 
-
-            // Controllo duplicati
-            $existsByName = Airport::where('name', $validated['name'])->exists();
-            $lat = round($validated['latitude'], 6);
-            $lon = round($validated['longitude'], 6);
-
-            $existsByCoords = Airport::whereRaw('ROUND(latitude, 6) = ?', [$lat])
-                ->whereRaw('ROUND(longitude, 6) = ?', [$lon])
-                ->exists();
-
-
-            if ($existsByName || $existsByCoords) {
-                $errors = [];
-
-                if ($existsByName) {
-                    $errors['name'] = 'Esiste già un aeroporto con questo nome.';
-                }
-
-                if ($existsByCoords) {
-                    $errors['city'] = 'Esiste già un aeroporto alle stesse coordinate.';
-                }
-
-                return redirect()->back()->withInput()->withErrors($errors);
-            }
-
+            // ← Aggiungi prefisso PRIMA del controllo
             $prefisso = 'Aeroporto ';
             $nome = trim($validated['name']);
             if (!Str::startsWith($nome, $prefisso)) {
                 $validated['name'] = $prefisso . $nome;
             }
 
+            // ORA controlla con il nome già prefissato
+            $existsByName = Airport::where('name', $validated['name'])->exists();
+            $lat = round($validated['latitude'], 6);
+            $lon = round($validated['longitude'], 6);
+
+            if ($existsByName ) {
+                $errors = [];
+                if ($existsByName)   $errors['name'] = 'Esiste già un aeroporto con questo nome.';
+
+                return redirect()->route('admin.dashboard')
+                    ->withFragment('airports')
+                    ->withErrors($errors, 'createAirport')
+                    ->withInput();
+            }
+
+            // ← Rimuovi il blocco del prefisso che hai qui sotto, non serve più
             Airport::create($validated);
             return redirect()->route('admin.dashboard')
                 ->withFragment('airports')
@@ -316,24 +305,17 @@
                 ->where('id', '!=', $id)
                 ->exists();
 
-            $existsByCoords = Airport::whereRaw('ROUND(latitude, 6) = ?', [$lat])
-                ->whereRaw('ROUND(longitude, 6) = ?', [$lon])
-                ->where('id', '!=', $id)
-                ->exists();
-
-            if ($existsByName || $existsByCoords) {
+            if ($existsByName) {
                 $errors = [];
 
                 if ($existsByName) {
                     $errors['name'] = 'Esiste già un aeroporto con questo nome.';
                 }
 
-                if ($existsByCoords) {
-                    $errors['city'] = 'Esiste già un aeroporto alle stesse coordinate.';
-                }
-
-                return redirect()->back()->withInput()->withErrors($errors);
-            }
+                return redirect()->route('admin.dashboard')
+                    ->withFragment('airports')
+                    ->withErrors($errors, 'editAirport')
+                    ->withInput();            }
 
             // Salva le coordinate arrotondate nel database
             $validated['latitude'] = $lat;

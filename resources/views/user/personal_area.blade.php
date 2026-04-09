@@ -105,7 +105,9 @@
                             <div class="profile-input-wrap">
                                 <i class="bi bi-person profile-input-icon"></i>
                                 <input type="text" name="nickname" id="profile-nickname"
-                                       value="{{ old('nickname', Auth::user()->nickname) }}"
+                                       value="{{ Auth::user()->nickname }}"
+                                       data-original="{{ Auth::user()->nickname }}"
+                                       data-edit-value="{{ old('nickname', Auth::user()->nickname) }}"
                                        class="profile-input {{ $errors->has('nickname') ? 'profile-input--error' : '' }}"
                                        readonly>
                             </div>
@@ -120,7 +122,9 @@
                             <div class="profile-input-wrap">
                                 <i class="bi bi-envelope profile-input-icon"></i>
                                 <input type="email" name="email" id="profile-email"
-                                       value="{{ old('email', Auth::user()->email) }}"
+                                       value="{{ Auth::user()->email }}"
+                                       data-original="{{ Auth::user()->email }}"
+                                       data-edit-value="{{ old('email', Auth::user()->email) }}"
                                        class="profile-input {{ $errors->has('email') ? 'profile-input--error' : '' }}"
                                        readonly>
                             </div>
@@ -210,7 +214,16 @@
         saveBtn.disabled = !(nickname && emailRegex.test(email));
     }
 
+    const originalNickname = document.getElementById('profile-nickname').dataset.original;
+    const originalEmail    = document.getElementById('profile-email').dataset.original;
+
     function enableEdit() {
+        // Mostra il valore che l'utente stava digitando (old) se c'è un errore
+        document.getElementById('profile-nickname').value =
+            document.getElementById('profile-nickname').dataset.editValue;
+        document.getElementById('profile-email').value =
+            document.getElementById('profile-email').dataset.editValue;
+
         document.querySelectorAll('.profile-input').forEach(i => i.removeAttribute('readonly'));
         document.getElementById('editBtn').style.display   = 'none';
         document.getElementById('saveBtn').style.display   = 'inline-flex';
@@ -222,15 +235,19 @@
     function cancelEdit() {
         document.querySelectorAll('.profile-input').forEach(i => {
             i.setAttribute('readonly', true);
-            i.value = i.defaultValue;
             i.classList.remove('profile-input--error');
         });
+
+        // Ripristina i valori originali dell'utente, non defaultValue
+        document.getElementById('profile-nickname').value = originalNickname;
+        document.getElementById('profile-email').value    = originalEmail;
+        document.getElementById('profile-password').value = '';
+
         document.querySelectorAll('.profile-field-error').forEach(el => el.style.display = 'none');
         document.getElementById('editBtn').style.display   = 'inline-flex';
         document.getElementById('saveBtn').style.display   = 'none';
         document.getElementById('cancelBtn').style.display = 'none';
         document.getElementById('edit-hint').textContent   = 'Clicca su Modifica per aggiornare i dati';
-        // reset strength
         document.getElementById('profile-pw-popup').style.display = 'none';
         document.getElementById('profile-strength-bar').style.width = '0%';
         document.getElementById('profile-strength-label').textContent = '';

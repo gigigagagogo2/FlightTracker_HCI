@@ -23,7 +23,7 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.9rem;
-    color: var(--text-secondary);   /* #94a3b8 — leggibile su navy scuro */
+    color: #94a3b8;
     margin: 0;
 }
 
@@ -33,13 +33,13 @@
 }
 
 .footer-contact a {
-    color: var(--text-primary);     /* #f1f5f9 — link email ben visibile */
+    color: #f1f5f9;     /* #f1f5f9 — link email ben visibile */
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .footer-contact a:hover {
-    color: var(--amber);
+    color: #f59e0b;
 }
 
 /* Riga link navigazione */
@@ -51,24 +51,24 @@
 }
 
 .footer-links a {
-    color: var(--text-secondary);   /* #94a3b8 */
+    color: #94a3b8;   /* #94a3b8 */
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .footer-links a:hover {
-    color: var(--amber);
+    color: #f59e0b;
 }
 
 .footer-links__sep {
-    color: var(--text-muted);       /* #475569 — il separatore può restare attenuato */
+    color: #475569 ;       /* #475569 — il separatore può restare attenuato */
     user-select: none;
 }
 
 /* Copyright */
 .footer-copy {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: #475569 ;
     margin: 0.4rem 0 0;
 }
 

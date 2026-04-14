@@ -70,7 +70,7 @@
     <!-- ── STATS BAR ── -->
     <div class="stats-bar" id="stats-bar">
         <div class="stat-item">
-            <span class="stat-value stat-value--amber" id="stat-voli-attivi">{{ $popolari->count() }}</span>
+            <span class="stat-value stat-value--amber" id="stat-voli-attivi">{{ $voliAttiviCount }}</span>
             <span class="stat-label">Voli attivi</span>
         </div>
         <div class="stat-divider"></div>

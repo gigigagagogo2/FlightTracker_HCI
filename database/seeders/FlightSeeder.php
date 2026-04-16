@@ -23,7 +23,7 @@ class FlightSeeder extends Seeder
             return;
         }
 
-        for ($i = 0; $i < 5000; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             // Prendi aeroporti diversi
             $departure = $airports->random();
             do {
@@ -98,5 +98,68 @@ class FlightSeeder extends Seeder
             'departure_time'       => Carbon::now()->subHours(5),
             'arrival_time'         => Carbon::now()->subHours(2),
         ]);
+
+        // Alla fine del seeder, dopo gli ultimi Flight::create, aggiungi:
+
+// Volo Roma Fiumicino → Milano Malpensa il 15/04/2026 alle 15:00
+        $fiumicino = Airport::where('city', 'Roma')->orWhere('name', 'like', '%Fiumicino%')->first();
+        $malpensa   = Airport::where('name', 'like', '%Malpensa%')->first();
+        if ($fiumicino && $malpensa) {
+            Flight::create([
+                'airplane_model_id'    => $airplanes->random()->id,
+                'departure_airport_id' => $fiumicino->id,
+                'arrival_airport_id'   => $malpensa->id,
+                'departure_time'       => Carbon::create(2026, 4, 15, 15, 0, 0),
+                'arrival_time'         => Carbon::create(2026, 4, 15, 16, 10, 0),
+            ]);
+        }
+
+// Volo Milano Malpensa → Francoforte in data odierna
+        $francoforte = Airport::where('city', 'like', '%Francoforte%')
+            ->orWhere('city', 'like', '%Frankfurt%')
+            ->orWhere('name', 'like', '%Frankfurt%')
+            ->first();
+        if ($malpensa && $francoforte) {
+            Flight::create([
+                'airplane_model_id'    => $airplanes->random()->id,
+                'departure_airport_id' => $malpensa->id,
+                'arrival_airport_id'   => $francoforte->id,
+                'departure_time'       => Carbon::now()->subHour(),
+                'arrival_time'         => Carbon::now()->addMinutes(15),
+            ]);
+        }
+        // Volo Francoforte → Milano Malpensa — arriva alle 15:00 oggi
+        if ($francoforte && $malpensa) {
+            Flight::create([
+                'airplane_model_id'    => $airplanes->random()->id,
+                'departure_airport_id' => $francoforte->id,
+                'arrival_airport_id'   => $malpensa->id,
+                'departure_time'       => Carbon::now()->setTime(13, 45, 0),
+                'arrival_time'         => Carbon::now()->setTime(15, 0, 0),
+            ]);
+        }
+
+// Volo Venezia Marco Polo → Charles de Gaulle in data odierna
+        $venezia = Airport::where('name', 'like', '%Marco Polo%')
+            ->orWhere('city', 'like', '%Venezia%')
+            ->first();
+        $cdg = Airport::where('name', 'like', '%de Gaulle%')
+            ->orWhere('name', 'like', '%Charles%')
+            ->orWhere('city', 'like', '%Paris%')
+            ->orWhere('city', 'like', '%Parigi%')
+            ->first();
+        if ($venezia && $cdg) {
+            Flight::create([
+                'airplane_model_id'    => $airplanes->random()->id,
+                'departure_airport_id' => $venezia->id,
+                'arrival_airport_id'   => $cdg->id,
+                'departure_time'       => Carbon::now()->subMinutes(45),
+                'arrival_time'         => Carbon::now()->addMinutes(30),
+            ]);
+        }
+
+
+
+
     }
 }

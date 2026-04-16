@@ -43,5 +43,13 @@ class UserSeeder extends Seeder
             'password' => Hash::make('prova'),
             'is_admin' => false,
         ]);
+
+        User::create([
+            'nickname' => 'mario',
+            'email' => 'mariorossi@gmail.com',
+            'email_verified_at' => Carbon::now(),
+            'password' => Hash::make('mario'),
+            'is_admin' => false,
+        ]);
     }
 }

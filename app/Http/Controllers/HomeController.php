@@ -20,8 +20,13 @@ class HomeController extends Controller
             ->limit(9)
             ->get();
 
+        $voliAttiviCount = Flight::where('departure_time', '<=', $now)
+            ->where('arrival_time', '>=', $now)
+            ->count();
+
         return view('home', [
             'popolari' => $popolari,
+            'voliAttiviCount' => $voliAttiviCount,
         ]);
     }
 

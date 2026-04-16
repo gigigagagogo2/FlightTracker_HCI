@@ -35,9 +35,28 @@
     text-decoration: none;
     transition: opacity 0.2s ease;
     flex-shrink: 0;
+    position: relative;
 }
 
-.ft-navbar__brand:hover { opacity: 0.8; }
+.ft-navbar__brand::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s ease;
+}
+
+.ft-navbar__brand:hover::after,
+.ft-navbar__brand:focus-visible::after {
+    transform: scaleX(1);
+}
+
+.ft-navbar__brand:hover { opacity: 1; }
 
 .ft-navbar__brand-accent { color: var(--amber); }
 
@@ -305,5 +324,10 @@
 @media (max-width: 640px) {
     .ft-navbar__inner { padding: 0 1rem; }
     .ft-navbar__link  { padding: 0.375rem 0.5rem; font-size: 0.8rem; }
-    .ft-admin-badge   { display: none; }
+
+    /* Su mobile: badge più compatto ma con testo */
+    .ft-admin-badge {
+        padding: 0 6px;
+        font-size: 0.6rem;
+    }
 }

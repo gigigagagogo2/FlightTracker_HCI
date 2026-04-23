@@ -104,7 +104,8 @@
                                 ID <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
                             </th>
                             <th data-sort="nickname" onclick="sortSection('users', 'nickname')" style="cursor:pointer;">
-                                Nickname <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
+                                Nome utente
+                                <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
                             </th>
                             <th data-sort="email" onclick="sortSection('users', 'email')" style="cursor:pointer;">
                                 Email <i class="sort-icon bi bi-arrow-down-up ms-1" style="opacity:0.3;"></i>
@@ -249,7 +250,7 @@
                         <input type="hidden" id="edit_user_original_nickname" name="original_nickname">
                         <input type="hidden" id="edit_user_original_email" name="original_email">
                         <div class="mb-3">
-                            <label for="modal_nickname" class="form-label fw-semibold text-secondary small text-uppercase" style="letter-spacing: 0.05em;">Nickname</label>
+                            <label for="modal_nickname" class="form-label fw-semibold text-secondary small text-uppercase" style="letter-spacing: 0.05em;">Nome utente</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0" style="border-radius: 0.6rem 0 0 0.6rem;">
                                     <i class="bi bi-at text-muted"></i>

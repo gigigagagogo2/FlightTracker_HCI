@@ -23,7 +23,7 @@ class FlightSeeder extends Seeder
             return;
         }
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 5000; $i++) {
             // Prendi aeroporti diversi
             $departure = $airports->random();
             do {
@@ -109,8 +109,8 @@ class FlightSeeder extends Seeder
                 'airplane_model_id'    => $airplanes->random()->id,
                 'departure_airport_id' => $fiumicino->id,
                 'arrival_airport_id'   => $malpensa->id,
-                'departure_time'       => Carbon::create(2026, 4, 15, 15, 0, 0),
-                'arrival_time'         => Carbon::create(2026, 4, 15, 16, 10, 0),
+                'departure_time'       => Carbon::create(2026, 4, 15, 13, 30, 0),
+                'arrival_time'         => Carbon::create(2026, 4, 15, 15, 0, 0),
             ]);
         }
 
@@ -125,7 +125,7 @@ class FlightSeeder extends Seeder
                 'departure_airport_id' => $malpensa->id,
                 'arrival_airport_id'   => $francoforte->id,
                 'departure_time'       => Carbon::now()->subHour(),
-                'arrival_time'         => Carbon::now()->addMinutes(15),
+                'arrival_time'         => Carbon::now()->setTime(15, 0, 0),
             ]);
         }
         // Volo Francoforte → Milano Malpensa — arriva alle 15:00 oggi
@@ -157,7 +157,6 @@ class FlightSeeder extends Seeder
                 'arrival_time'         => Carbon::now()->addMinutes(30),
             ]);
         }
-
 
 
 
